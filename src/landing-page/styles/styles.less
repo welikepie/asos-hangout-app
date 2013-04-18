@@ -2,8 +2,8 @@
 @import '../../common/styles/feeds.less';
 
 html {
+	position: relative;
 	width: 100%;
-	height: 100%;
 	padding: 0;
 	margin: 0;
 
@@ -99,4 +99,43 @@ header {
 
 #twitter-feed {
 	.twitter-feed();
+}
+
+.overlay {
+	position: absolute;
+	top: 0; right: 0; bottom: 0; left: 0;
+	z-index: 10;
+	display: none;
+	&.open { display: block; }
+	width: 100%;
+	height: 100%;
+
+	background: rgba(0, 0, 0, 0.5);
+
+	.shop-view {
+		position: relative;
+		display: block;
+		width: 500px;
+		margin: 40px auto;
+
+		img {
+			position: relative;
+			z-index: 11;
+			display: block;
+			width: 500px;
+		}
+
+		a {
+			position: absolute;
+			bottom: 0; left: 0;
+			z-index: 12;
+			display: block;
+			width: 100%;
+
+			font: bold 24px/36px @sans-serif-font;
+			color: #222;
+			text-align: center;
+			background: rgba(255, 255, 255, 0.5);
+		}
+	}
 }

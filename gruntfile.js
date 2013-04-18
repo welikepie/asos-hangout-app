@@ -68,11 +68,21 @@ module.exports = function (grunt) {
 
 		'clean': {
 			'build': { 'src': ['build'] },
+			'common': { 'src': ['build/common'] },
 			'landing-page': { 'src': ['build/landing-page'] },
 			'hangout-app': { 'src': ['build/hangout-app'] }
 		},
 
 		'copy': {
+
+			'common-scripts': {
+				'src': '**/*.js',
+				'dest': 'build/common/scripts/',
+				'expand': true,
+				'cwd': 'src/common/scripts/',
+				'filter': 'isFile'
+			},
+
 			'landing-page-html': {
 				'src': 'src/landing-page/index.html',
 				'dest': 'build/landing-page/index.html'
@@ -89,6 +99,13 @@ module.exports = function (grunt) {
 				'cwd': 'src/landing-page/images/',
 				'dest': 'build/landing-page/images/',
 				'expand': true,
+				'filter': 'isFile'
+			},
+			'landing-page-scripts': {
+				'src': '**/*.js',
+				'dest': 'build/landing-page/scripts/',
+				'expand': true,
+				'cwd': 'src/landing-page/scripts/',
 				'filter': 'isFile'
 			},
 
@@ -122,10 +139,17 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-recess');
 
+	grunt.registerTask('landing-page-scripts-dev', [
+		'clean:common',
+		'copy:common-scripts',
+		'copy:landing-page-scripts'
+	]);
+
 	grunt.registerTask('landing-page-dev', [
 		'clean:landing-page',
 		'recess:landing-page-lint',
 		'recess:landing-page-dev',
+		'landing-page-scripts-dev',
 		'copy:landing-page-styling',
 		'copy:landing-page-images',
 		'copy:landing-page-html'
