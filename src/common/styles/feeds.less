@@ -1,0 +1,163 @@
+@import 'settings.less';
+
+.product-feed (@height: 300px) {
+
+	padding: (@baseline * 0.5);
+	background: #fc4b45;
+
+	h1 {
+		float: left;
+		padding: 0;
+		margin: 0 0 (@baseline * 0.5);
+
+		font: normal 28px/28px @sans-serif-font;
+		color: white;
+		text-transform: uppercase;
+	}
+
+	> a {
+		display: block;
+		float: right;
+		@media (max-width: 370px) { float: left; }
+		height: 28px;
+		padding: 5px;
+		margin: 0 0 (@baseline * 0.5);
+
+		font: bold 12px/14px @sans-serif-font;
+		color: black;
+		text-decoration: none;
+		text-transform: uppercase;
+
+		background: white;
+		border: 2px solid black;
+	}
+
+	.wrapper {
+		position: relative;
+		height: 300px;
+		clear: both;
+
+		background: white;
+
+		ul {
+			position: relative;
+			z-index: 1;
+			display: block;
+			width: 100%;
+			height: 100%;
+			padding: 0;
+			margin: 0;
+			overflow: hidden;
+
+			white-space: nowrap;
+			list-style: none;
+
+			li {
+				display: inline-block;
+				height: 100%;
+
+				a {
+					position: relative;
+					display: block;
+					height: 100%;
+				}
+				img {
+					position: relative;
+					z-index: 1;
+					display: block;
+					height: 100%;
+				}
+				h2 {
+					position: absolute;
+					bottom: 0; left: 0;
+					z-index: 2;
+					width: 100%;
+					padding: 4px 6px;
+					margin: 0;
+
+					font: normal 18px/24px @sans-serif-font;
+					color: black;
+
+					background: rgba(255, 255, 255, 0.4);
+				}
+			}
+		}
+
+		a.prev, a.next {
+			position: absolute;
+			top: 50%;
+			z-index: 2;
+			display: block;
+			width: 24px;
+			height: 48px;
+			margin: -24px 0 0;
+
+			font-size: 24px;
+			font-weight: bold;
+			line-height: 48px;
+			color: white;
+			text-align: center;
+
+			background: rgba(0, 0, 0, 0.6);
+		}
+
+		a.prev { left: 0; }
+		a.next { right: 0; }
+	}
+
+}
+
+.twitter-feed () {
+
+	padding: (@baseline * 0.5);
+	background: #0276ff;
+
+	h1 {
+		padding: 0;
+		margin: 0 0 (@baseline * 0.5);
+
+		font: normal 28px/28px @sans-serif-font;
+		color: white;
+		text-transform: uppercase;
+	}
+
+	ul {
+		padding: 0;
+		margin: 0;
+
+		list-style: none;
+		background: white;
+
+		li {
+			display: block;
+			padding: 8px;
+			overflow: hidden;
+			font-family: @sans-serif-font;
+
+			+ li { border-top: 1px solid #EEE; }
+
+			a {
+				color: #333;
+				text-decoration: none;
+				&:focus, &:hover { text-decoration: underline; }
+			}
+
+			img.avatar {
+				display: block;
+				float: left;
+				width: 48px;
+				height: 48px;
+			}
+			h2 {
+				padding: 0;
+				margin: 0 0 8px 56px;
+				font-size: 16px;
+			}
+			p {
+				margin: 0 0 0 56px;
+				font-size: 13px;
+			}
+		}
+	}
+
+}

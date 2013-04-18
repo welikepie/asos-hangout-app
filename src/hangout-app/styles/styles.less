@@ -1,0 +1,40 @@
+@import '../../common/styles/settings.less';
+@import '../../common/styles/feeds.less';
+
+html {
+	width: 300px;
+	padding: 0;
+	margin: 0;//10px;
+	//border: 1px solid #666;
+}
+body {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+}
+.root {
+	display: block;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+header {
+	display: block;
+	width: 100%;
+	margin: @baseline 0;
+	text-align: center;
+}
+
+#product-feed {
+	.product-feed(300px);
+	margin: 0 @baseline @baseline;
+}
+
+#twitter-feed {
+	.twitter-feed();
+	margin: 0 @baseline @baseline;
+}
