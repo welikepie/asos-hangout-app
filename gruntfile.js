@@ -126,7 +126,14 @@ module.exports = function (grunt) {
 				'dest': 'build/hangout-app/images/',
 				'expand': true,
 				'filter': 'isFile'
-			}
+			},
+			'hangout-app-scripts': {
+				'src': '**/*.js',
+				'dest': 'build/hangout-app/scripts/',
+				'expand': true,
+				'cwd': 'src/hangout-app/scripts/',
+				'filter': 'isFile'
+			},
 		}
 
 	});
@@ -144,7 +151,6 @@ module.exports = function (grunt) {
 		'copy:common-scripts',
 		'copy:landing-page-scripts'
 	]);
-
 	grunt.registerTask('landing-page-dev', [
 		'clean:landing-page',
 		'recess:landing-page-lint',
@@ -155,10 +161,16 @@ module.exports = function (grunt) {
 		'copy:landing-page-html'
 	]);
 
+	grunt.registerTask('hangout-app-scripts-dev', [
+		'clean:common',
+		'copy:common-scripts',
+		'copy:hangout-app-scripts'
+	]);
 	grunt.registerTask('hangout-app-dev', [
 		'clean:hangout-app',
 		'recess:hangout-app-lint',
 		'recess:hangout-app-dev',
+		'hangout-app-scripts-dev',
 		'copy:hangout-app-styling',
 		'copy:hangout-app-images',
 		'copy:hangout-app-html'

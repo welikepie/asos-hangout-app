@@ -112,30 +112,68 @@ header {
 
 	background: rgba(0, 0, 0, 0.5);
 
-	.shop-view {
+	.product-view {
 		position: relative;
 		display: block;
-		width: 500px;
+		width: 500px + (@baseline * 2);
+		padding: @baseline;
 		margin: 40px auto;
 
-		img {
+		background: white;
+
+		> img {
 			position: relative;
 			z-index: 11;
 			display: block;
 			width: 500px;
 		}
-
-		a {
+		> .info {
 			position: absolute;
 			bottom: 0; left: 0;
 			z-index: 12;
 			display: block;
 			width: 100%;
+			overflow: hidden;
 
-			font: bold 24px/36px @sans-serif-font;
-			color: #222;
-			text-align: center;
+			font-family: @sans-serif-font;
 			background: rgba(255, 255, 255, 0.5);
+
+			> h2 {
+				padding: @baseline (@baseline * 2) (@baseline * 0.5);
+				margin: 0;
+				line-height: 1.3em;
+				a {
+					color: inherit;
+					text-decoration: none;
+					&:hover { text-decoration: underline; }
+				}
+			}
+			> .price {
+				padding: 0 (@baseline * 2) @baseline;
+				margin: 0;
+				color: #444;
+			}
+			> .description {
+				padding: 0 (@baseline * 2) @baseline;
+				ul { margin: 0; }
+				li { margin: 0; +li { margin-top: 4px; } }
+			}
+			> a.shop {
+				display: block;
+				float: left;
+				height: 28px;
+				padding: 5px;
+				margin: 0 (@baseline * 2) (@baseline * 2);
+
+				font: bold 12px/14px @sans-serif-font;
+				color: black;
+				text-decoration: none;
+				text-transform: uppercase;
+
+				background: white;
+				border: 2px solid black;
+				&:after { content: ' >'; }
+			}
 		}
 	}
 }
