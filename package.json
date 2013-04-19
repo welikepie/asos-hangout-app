@@ -8,7 +8,7 @@
     "hangoutUrl": ""
   },
   "devDependencies": {
-    "grunt": "~0.4.0",
+    "grunt": "~0.4.1",
     "grunt-contrib-clean": "~0.4.0",
     "grunt-contrib-copy": "~0.4.0",
     "grunt-contrib-jshint": "~0.2.0",
