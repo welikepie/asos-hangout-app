@@ -6,6 +6,92 @@ module.exports = function (grunt) {
 
 		'pkg': grunt.file.readJSON('package.json'),
 
+		// JSHINT Javascript Linting
+		// Task used to ensure the Javascript used in the app is top-notch and
+		// doesn't contain any errors or dubious tricks. Should the linter find
+		// issues with any of the code, a detailed report will be displayed.
+		'jshint': {
+		
+			'options': {
+				'immed': true,		// Complains about immediate function invocations not wrapped in parentheses
+				'latedef': true,	// Prohibits using a variable before it was defined
+				'forin': true,		// Requires usage of .hasOwnProperty() with 'for ... in ...' loops
+				'noarg': true,		// Prohibits usage of arguments.caller and arguments.callee (both are deprecated)
+				'newcap': true,
+				'eqeqeq': true,		// Enforces the usage of triple sign comparison (=== and !==)
+				'bitwise': true,	// Forbids usage of bitwise operators (rare and, most likely, & is just mistyped &&)
+				'strict': true,		// Enforces usage of ES5's strict mode in all function scopes
+				'undef': true,		// Raises error on usage of undefined variables
+				'plusplus': true,	// Complains about ++ and -- operators, as they can cause confusion with their placement
+				'unused': true,		// Complains about variables and globals that have been defined, but not used
+				'curly': true,		// Requires curly braces for all loops and conditionals
+				'smarttabs': true,	// Supresses mixed spaces and tabs warning if mixing is only for alignment
+				'browser': true,	// Assumes browser enviroment and browser-specific globals
+
+				// Set of globals to cover usage of Require.js
+				'globals': {
+					'require': true,
+					'define': true
+				}
+			},
+			
+			// Lints all the scripts (escept for ones contained in "vendor" directory, as these
+			// are third-party libraries), but doesn't throw errors on console calls and unused
+			// variable names (common for scripts in work). Also lints gruntfile.
+			'common-dev': {
+				'options': {
+					'debug': true,
+					'devel': true,
+					'unused': false
+				},
+				'src': ['gruntfile.js', 'src/common/scripts/*.js', 'src/common/scripts/!(vendor)/**/*.js']
+			},
+			// Lints all the scripts, this time throwing errors on console calls and unused
+			// variables. Helps not to leave any logs behind in user-facing app.
+			'common-release': {
+				'options': {
+					'debug': false,
+					'devel': false,
+					'unused': true
+				},
+				'src': ['src/common/scripts/*.js', 'src/common/scripts/!(vendor)/**/*.js']
+			},
+
+			'landing-page-dev': {
+				'options': {
+					'debug': true,
+					'devel': true,
+					'unused': false
+				},
+				'src': ['src/landing-page/scripts/*.js', 'src/landing-page/scripts/!(vendor)/**/*.js']
+			},
+			'landing-page-release': {
+				'options': {
+					'debug': false,
+					'devel': false,
+					'unused': true
+				},
+				'src': ['src/landing-page/scripts/*.js', 'src/landing-page/scripts/!(vendor)/**/*.js']
+			},
+
+			'hangout-app-dev': {
+				'options': {
+					'debug': true,
+					'devel': true,
+					'unused': false
+				},
+				'src': ['src/hangout-app/scripts/*.js', 'src/hangout-app/scripts/!(vendor)/**/*.js']
+			},
+			'hangout-app-release': {
+				'options': {
+					'debug': false,
+					'devel': false,
+					'unused': true
+				},
+				'src': ['src/hangout-app/scripts/*.js', 'src/hangout-app/scripts/!(vendor)/**/*.js']
+			}
+		},
+
 		'recess': {
 
 			'landing-page-lint': {
@@ -70,7 +156,9 @@ module.exports = function (grunt) {
 			'build': { 'src': ['build'] },
 			'common': { 'src': ['build/common'] },
 			'landing-page': { 'src': ['build/landing-page'] },
-			'hangout-app': { 'src': ['build/hangout-app'] }
+			'hangout-app': { 'src': ['build/hangout-app'] },
+			'hangout-app-scripts-post': { 'src': ['src/hangout-app/main.js'] },
+			'hangout-app-cleanup': { 'src': ['build/hangout-app/index.html', 'build/hangout-app/styles'] }
 		},
 
 		'copy': {
@@ -109,10 +197,85 @@ module.exports = function (grunt) {
 				'filter': 'isFile'
 			},
 
-			'hangout-app-html': {
-				'src': 'src/hangout-app/index.html',
-				'dest': 'build/hangout-app/index.html'
+			'hangout-app-html-dev': {
+				'src': ['index.html', 'hangout.js'],
+				'cwd': 'src/hangout-app/',
+				'dest': 'build/hangout-app/',
+				'expand': true,
+				'filter': 'isFile',
+				'options': {
+					'processContent': function (content) {
+						return content.replace('https://hangoutsapi.talkgadget.google.com/hangouts/api/', '');
+					}
+				}
 			},
+			'hangout-app-html-release': {
+				'src': 'src/hangout-app/index.html',
+				'dest': 'build/hangout-app/index.html',
+				'options': {
+					'processContent': function (content) {
+						return grunt.template.process(content
+							.replace(
+								/<link(?:[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*|[^>]*href="([^"]+)"[^>]*rel="stylesheet"[^>]*)>/gi,
+								function (match, file) {
+									var baseUrl = grunt.config.get('pkg.app.baseUrl'),
+										css = grunt.file.read('build/hangout-app/' + file).replace(
+											/\.\.\/images/gi,
+											baseUrl + 'images'
+										).replace(/\s+/gi, ' ');
+									return '<style type="text/css">' + css + '</style>';
+								}
+							)
+							.replace(
+								/<!--<base[^>]*>-->/i,
+								"<base href=\"<%= pkg.app.baseUrl %>\">"
+							).replace(
+								/src="..\/common\/scripts\/vendor\/require\.js"/gi,
+								'src="scripts/require.js"'
+							));
+					}
+				}
+			},
+			'hangout-app-xml': {
+				'src': 'src/hangout-app/app.xml',
+				'dest': 'build/hangout-app/app.xml',
+				'options': { 'processContent': grunt.template.process }
+			},
+
+			'hangout-app-scripts': {
+				'src': '**/*.js',
+				'dest': 'build/hangout-app/scripts/',
+				'expand': true,
+				'cwd': 'src/hangout-app/scripts/',
+				'filter': 'isFile'
+			},
+			'hangout-app-scripts-pre': {
+				'src': 'src/hangout-app/scripts/main.js',
+				'dest': 'src/hangout-app/main.js'
+			},
+			'hangout-app-amd': {
+				'src': 'src/common/scripts/vendor/require.js',
+				'dest': 'build/hangout-app/scripts/require.js'
+			},
+			'hangout-app-compile-lint': {
+				'src': 'build/hangout-app/scripts/main.js',
+				'dest': 'build/hangout-app/scripts/main.js',
+				'options': {
+					'processContent': function (content) {
+						/*jshint boss:true */
+						var config;
+						if (config = content.match(/require\.config\((\{[^\v]+?\})\);/i)) {
+							config = JSON.parse(config[1]);
+							if ('config' in config) { config = 'require.config(' + JSON.stringify({'config': config.config}) + ');'; }
+							else { config = ''; }
+						} else { config = ''; }
+						return content
+							.replace(/require\.config\(\{[^\v]+?\}\);/i, config)
+							.replace(/define\("hangout-app\/scripts\/main", function\(\)\{\}\);/i, "");
+					}
+				}
+			},
+
 			'hangout-app-styling': {
 				'src': '**/*.!(less)',
 				'cwd': 'src/hangout-app/styles/',
@@ -126,14 +289,22 @@ module.exports = function (grunt) {
 				'dest': 'build/hangout-app/images/',
 				'expand': true,
 				'filter': 'isFile'
-			},
-			'hangout-app-scripts': {
-				'src': '**/*.js',
-				'dest': 'build/hangout-app/scripts/',
-				'expand': true,
-				'cwd': 'src/hangout-app/scripts/',
-				'filter': 'isFile'
-			},
+			}
+			
+		},
+
+		'requirejs': {
+			// Compilation of modular scripts into one file for ease of
+			// loading, less requests and minification (less space = more awesome)
+			'hangout-app': {
+				'options': {
+					'baseUrl': 'src',
+					'mainConfigFile': 'src/hangout-app/main.js',
+					'optimize': 'none',
+					'include': 'hangout-app/scripts/main',
+					'out': 'build/hangout-app/scripts/main.js'
+				}
+			}
 		}
 
 	});
@@ -143,12 +314,14 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-requirejs');
 	grunt.loadNpmTasks('grunt-recess');
 
 	grunt.registerTask('landing-page-scripts-dev', [
 		'clean:common',
+		'jshint:common-dev',
 		'copy:common-scripts',
+		'jshint:landing-page-dev',
 		'copy:landing-page-scripts'
 	]);
 	grunt.registerTask('landing-page-dev', [
@@ -163,8 +336,19 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('hangout-app-scripts-dev', [
 		'clean:common',
+		'jshint:common-dev',
 		'copy:common-scripts',
+		'jshint:hangout-app-dev',
 		'copy:hangout-app-scripts'
+	]);
+	grunt.registerTask('hangout-app-scripts-compiled', [
+		'clean:common',
+		'jshint:common-dev',
+		'jshint:hangout-app-dev',
+		'copy:hangout-app-scripts-pre',
+		'requirejs:hangout-app',
+		'copy:hangout-app-compile-lint',
+		'clean:hangout-app-scripts-post'
 	]);
 	grunt.registerTask('hangout-app-dev', [
 		'clean:hangout-app',
@@ -173,7 +357,19 @@ module.exports = function (grunt) {
 		'hangout-app-scripts-dev',
 		'copy:hangout-app-styling',
 		'copy:hangout-app-images',
-		'copy:hangout-app-html'
+		'copy:hangout-app-html-dev'
+	]);
+	grunt.registerTask('hangout-app-compiled', [
+		'clean:hangout-app',
+		'recess:hangout-app-lint',
+		'recess:hangout-app-dev',
+		'hangout-app-scripts-compiled',
+		'copy:hangout-app-amd',
+		'copy:hangout-app-styling',
+		'copy:hangout-app-images',
+		'copy:hangout-app-html-release',
+		'copy:hangout-app-xml',
+		'clean:hangout-app-cleanup'
 	]);
 
 };

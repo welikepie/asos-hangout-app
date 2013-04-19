@@ -4,7 +4,7 @@
   "app": {
     "title": "ASOS Hangout App",
     "appUrl": "",
-    "baseUrl": "",
+    "baseUrl": "https://dev.welikepie.com:444/asos-hangout-app/",
     "hangoutUrl": ""
   },
   "devDependencies": {

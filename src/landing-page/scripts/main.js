@@ -12,11 +12,11 @@ require.config({
 		"backbone": {
 			"deps": ["underscore", "jquery"],
 			"exports": "Backbone"
-		},
+		}
 	},
 	"waitSeconds": 10
 });
-require(['common/scripts/product-feed-slider', 'common/scripts/product-overlay-view'], function (bindProductFeed, bindProductView) {
+require(['jquery', 'common/scripts/product-feed-slider', 'common/scripts/product-overlay-view'], function ($, bindProductFeed, bindProductView) {
 	"use strict";
 
 	bindProductFeed('#product-feed');

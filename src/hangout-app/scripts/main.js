@@ -1,5 +1,5 @@
 /*jshint devel:true */
-/*global require:true */
+/*global require:true, gapi:true */
 require.config({
 	"baseUrl": "..",
 	"paths": {
@@ -12,27 +12,31 @@ require.config({
 		"backbone": {
 			"deps": ["underscore", "jquery"],
 			"exports": "Backbone"
-		},
+		}
 	},
 	"waitSeconds": 10
 });
-require(['common/scripts/product-feed-slider', 'common/scripts/product-overlay-view'], function (bindProductFeed, bindProductView) {
+require(['jquery', 'common/scripts/product-feed-slider', 'common/scripts/product-overlay-view'], function ($, bindProductFeed, bindProductView) {
 	"use strict";
 
-	bindProductFeed('#product-feed');
-	var showProduct = bindProductView('.overlay', '.overlay .product-view');
+	gapi.hangout.onApiReady.add(function init () {
 
-	$('#product-feed ul a').on('click', function (ev) {
-		ev.preventDefault();
-		ev.stopPropagation();
-		var model = {
-			'photo': $('img', this).attr('src'),
-			'title': $('h2', this).html(),
-			'price': $('.price', this).html(),
-			'description': $('.description').html(),
-			'link': this.getAttribute('href')
-		};
-		showProduct(model);
+		bindProductFeed('#product-feed');
+		var showProduct = bindProductView('.overlay', '.overlay .product-view');
+
+		$('#product-feed ul a').on('click', function (ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			var model = {
+				'photo': $('img', this).attr('src'),
+				'title': $('h2', this).html(),
+				'price': $('.price', this).html(),
+				'description': $('.description').html(),
+				'link': this.getAttribute('href')
+			};
+			showProduct(model);
+		});
+
 	});
 
 });

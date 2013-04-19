@@ -4,10 +4,9 @@
 html {
 	position: relative;
 	width: 300px;
-	height: 600px;
+	height: 100%;
 	padding: 0;
-	margin: 10px;
-	border: 1px solid #666;
+	margin: 0;
 }
 body {
 	width: 100%;
@@ -64,6 +63,20 @@ header {
 			z-index: 11;
 			display: block;
 			width: 100%;
+		}
+		> .close {
+			position: absolute;
+			top: 0; right: 0;
+			z-index: 12;
+			display: block;
+			width: 16px + @baseline;
+			height: 16px + @baseline;
+			padding: (@baseline * 0.5);
+			overflow: hidden;
+
+			text-indent: -9999px;
+			background: white url('../images/close.png') no-repeat center center;
+			cursor: pointer;
 		}
 		> .info {
 			position: absolute;

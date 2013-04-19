@@ -5,6 +5,7 @@ define(['jquery', 'underscore'], function ($, _) {
 
 		var overlay = $(overlaySelector),
 			productView = overlay.find('.product-view'),
+			closeButton = productView.find('.close'),
 			showProduct = function showProduct (model) {
 
 				overlay
@@ -22,10 +23,13 @@ define(['jquery', 'underscore'], function ($, _) {
 
 			};
 
-		overlay.on('click', function () {
-			overlay
-				.animate({'opacity': 0}, {'duration': 300})
-				.queue(function (next) { overlay.css({'display': 'none'}); next(); });
+		overlay.on('click', function (ev) {
+			if (ev.target === overlay.get(0) || ev.target === closeButton.get(0)) {
+				ev.preventDefault();
+				overlay
+					.animate({'opacity': 0}, {'duration': 300})
+					.queue(function (next) { overlay.css({'display': 'none'}); next(); });
+			}
 		});
 
 		return showProduct;
