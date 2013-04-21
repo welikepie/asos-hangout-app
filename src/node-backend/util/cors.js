@@ -37,7 +37,7 @@
 
 			};
 
-		return corsHeaders;
+		return {'corsHeaders': corsHeaders};
 
 	});
 

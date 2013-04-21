@@ -2,10 +2,11 @@
 <html>
 	<head>
 		<title>SSE Test</title>
+		<!--<base href="">-->
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	</head>
 	<body>
-		<pre id="status"></pre>
+		<!--<pre id="status"></pre>
 		<table>
 			<thead>
 				<tr>
@@ -23,40 +24,62 @@
 					<td class="message"></td>
 				</tr>
 			</tbody>
-		</table>
+		</table>-->
 	</body>
-	<script type="text/javascript" src="http://zeptojs.com/zepto.js"></script>
+	<script type="text/javascript" src="common/scripts/vendor/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="common/scripts/vendor/easyXDM/easyXDM.min.js"></script>
 	<script type="text/javascript">
 
-	var status = $('#status'),
-		events = $('#events'),
-		template = events.find('.template').remove(),
+	var productFeed = /* PRODUCT FEED */null,
+		baseUrl = document.getElementsByTagName('base').length ? document.getElementsByTagName('base')[0].href : ''
+
 		source,
+		socket/*,
 
-		addEvent = function (event, id, message) {
-			var t = template.clone();
-			t.find('.time').text(new Date());
-			t.find('.event').text(event);
-			t.find('.id').text(id);
-			t.find('.message').text(message);
-			events.prepend(t);
-		};
+		// DEBUG BITS
+		status = $('#status'),
+		events = $('#events'),
+		template = events.find('.template').remove()*/;
 
-	if (typeof window.EventSource === 'function') {
+	socket = new easyXDM.Socket({
+		'interval': 1000,
+		'local': baseUrl + 'common/scripts/vendor/easyXDM/name.html',
+		'swf': baseUrl + 'common/scripts/vendor/easyXDM/easyXDM.swf',
+		'swfNoThrottle': true,
+		'onReady': function () {
 
-		source = new window.EventSource("product-feed/stream");
-		source.addEventListener("open", function (ev) {
-			console.log('Event "open": ', ev);
-			addEvent('open', '', ev.data);
-		});
-		source.addEventListener("add", function (ev) {
-			console.log('Event "message": ', ev);
-			addEvent('message', '', ev.data);
-		});
+			if (typeof window.EventSource === 'function') {
 
-	} else {
-		window.alert('This browser doesn\'t do server-sent events!');
-	}
+				// Send over initial state of the object
+				socket.postMessage(JSON.stringify({'event': 'productFeed:reset', 'payload': productFeed}));
+
+				// Establish connection to SSE stream and establish message pass-through
+				source = new window.EventSource("stream");
+				$(source).on("message", function (ev) { socket.postMessage(ev.originalEvent.data); });
+
+				// DEBUG BITS
+				/*var addEvent = function (event, id, message) {
+					var t = template.clone();
+					t.find('.time').text(new Date());
+					t.find('.event').text(event);
+					t.find('.id').text(id);
+					t.find('.message').text(message);
+					events.prepend(t);
+				};
+				$(source)
+					.on("open", function (ev) {
+						console.log('Event "open": ', ev);
+						addEvent('open', '', ev.originalEvent.data);
+					})
+					.on("message", function (ev) {
+						console.log('Event "message": ', ev);
+						addEvent('message', '', ev.originalEvent.data);
+					});*/
+
+			} else { window.alert('This browser doesn\'t do server-sent events!'); }
+
+		}
+	});
 
 	</script>
 </html>

@@ -3,7 +3,7 @@
 require.config({
 	"baseUrl": "..",
 	"paths": {
-		"jquery": "common/scripts/vendor/jquery-1.9.1",
+		"jquery": "common/scripts/vendor/jquery-1.9.1.min",
 		"backbone": "common/scripts/vendor/backbone",
 		"underscore": "common/scripts/vendor/underscore"
 	},

@@ -179,7 +179,8 @@ module.exports = function (grunt) {
 			'landing-page': { 'src': ['build/landing-page'] },
 			'hangout-app': { 'src': ['build/hangout-app'] },
 			'hangout-app-scripts-post': { 'src': ['src/hangout-app/main.js'] },
-			'hangout-app-cleanup': { 'src': ['build/hangout-app/index.html', 'build/hangout-app/styles'] }
+			'hangout-app-cleanup': { 'src': ['build/hangout-app/index.html', 'build/hangout-app/styles'] },
+			'node-backend': { 'src': ['build/node-backend'] }
 		},
 
 		'copy': {
@@ -239,7 +240,7 @@ module.exports = function (grunt) {
 							.replace(
 								/<link(?:[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*|[^>]*href="([^"]+)"[^>]*rel="stylesheet"[^>]*)>/gi,
 								function (match, file) {
-									var baseUrl = grunt.config.get('pkg.app.baseUrl'),
+									var baseUrl = grunt.config.get('pkg.app.baseSslUrl'),
 										css = grunt.file.read('build/hangout-app/' + file).replace(
 											/\.\.\/images/gi,
 											baseUrl + 'images'
@@ -249,7 +250,7 @@ module.exports = function (grunt) {
 							)
 							.replace(
 								/<!--<base[^>]*>-->/i,
-								"<base href=\"<%= pkg.app.baseUrl %>\">"
+								"<base href=\"<%= pkg.app.baseSslUrl %>\">"
 							).replace(
 								/src="..\/common\/scripts\/vendor\/require\.js"/gi,
 								'src="scripts/require.js"'
@@ -310,6 +311,45 @@ module.exports = function (grunt) {
 				'dest': 'build/hangout-app/images/',
 				'expand': true,
 				'filter': 'isFile'
+			},
+
+			'node-backend-dev': {
+				'src': '**/*',
+				'cwd': 'src/node-backend',
+				'dest': 'build/node-backend',
+				'expand': true,
+				'filter': 'isFile',
+				'options': {
+					'processContent': function (content, path) {
+						if (!path.match(/\/vendor\//i)) {
+							return grunt.template.process(content
+								.replace(
+									/<!--<base[^>]*>-->/i,
+									"<base href=\"http://localhost/asos-hangout-app/build/\">"
+								)
+							);
+						} else { return content; }
+					}
+				}
+			},
+			'node-backend-release': {
+				'src': '**/*',
+				'cwd': 'src/node-backend',
+				'dest': 'build/node-backend',
+				'expand': true,
+				'filter': 'isFile',
+				'options': {
+					'processContent': function (content, path) {
+						if (!path.match(/\/vendor\//i)) {
+							return grunt.template.process(content
+								.replace(
+									/<!--<base[^>]*>-->/i,
+									"<base href=\"<%= pkg.app.baseUrl %>\">"
+								)
+							);
+						} else { return content; }
+					}
+				}
 			}
 			
 		},
@@ -391,6 +431,23 @@ module.exports = function (grunt) {
 		'copy:hangout-app-html-release',
 		'copy:hangout-app-xml',
 		'clean:hangout-app-cleanup'
+	]);
+
+	grunt.registerTask('node-backend-dev', [
+		'clean:common',
+		'jshint:common-dev',
+		'copy:common-scripts',
+		'clean:node-backend',
+		'jshint:node-backend-dev',
+		'copy:node-backend-dev'
+	]);
+	grunt.registerTask('node-backend-release', [
+		'clean:common',
+		'jshint:common-release',
+		'copy:common-scripts',
+		'clean:node-backend',
+		'jshint:node-backend-release',
+		'copy:node-backend-release'
 	]);
 
 };
