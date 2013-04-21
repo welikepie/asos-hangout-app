@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>SSE Test</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	</head>
+	<body>
+		<pre id="status"></pre>
+		<table>
+			<thead>
+				<tr>
+					<th>Arrived</th>
+					<th>Event</th>
+					<th>ID</th>
+					<th>Message</th>
+				</tr>
+			</thead>
+			<tbody id="events">
+				<tr class="template">
+					<td class="time"></td>
+					<td class="event"></td>
+					<td class="id"></td>
+					<td class="message"></td>
+				</tr>
+			</tbody>
+		</table>
+	</body>
+	<script type="text/javascript" src="http://zeptojs.com/zepto.js"></script>
+	<script type="text/javascript">
+
+	var status = $('#status'),
+		events = $('#events'),
+		template = events.find('.template').remove(),
+		source,
+
+		addEvent = function (event, id, message) {
+			var t = template.clone();
+			t.find('.time').text(new Date());
+			t.find('.event').text(event);
+			t.find('.id').text(id);
+			t.find('.message').text(message);
+			events.prepend(t);
+		};
+
+	if (typeof window.EventSource === 'function') {
+
+		source = new window.EventSource("product-feed/stream");
+		source.addEventListener("open", function (ev) {
+			console.log('Event "open": ', ev);
+			addEvent('open', '', ev.data);
+		});
+		source.addEventListener("add", function (ev) {
+			console.log('Event "message": ', ev);
+			addEvent('message', '', ev.data);
+		});
+
+	} else {
+		window.alert('This browser doesn\'t do server-sent events!');
+	}
+
+	</script>
+</html>
