@@ -89,6 +89,27 @@ module.exports = function (grunt) {
 					'unused': true
 				},
 				'src': ['src/hangout-app/scripts/*.js', 'src/hangout-app/scripts/!(vendor)/**/*.js']
+			},
+
+			'node-backend-dev': {
+				'options': {
+					'debug': true,
+					'devel': true,
+					'unused': false,
+					'browser': false,
+					'node': true
+				},
+				'src': ['src/node-backend/*.js', 'src/node-backend/!(vendor)/**/*.js']
+			},
+			'node-backend-release': {
+				'options': {
+					'debug': false,
+					'devel': false,
+					'unused': true,
+					'browser': false,
+					'node': true
+				},
+				'src': ['src/node-backend/*.js', 'src/node-backend/!(vendor)/**/*.js']
 			}
 		},
 

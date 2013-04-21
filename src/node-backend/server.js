@@ -10,9 +10,9 @@
 	var http = require('http'),
 		url = require('url'),
 
-		monitored = require('./util/monitored-objects');
+		observed = require('./util/observed-objects');
 
-	var productFeed = new monitored.monitoredCollection(),
+	var productFeed = observed.observeCollection(),
 		server = http.createServer(function (request, response) {
 
 			var temp,
