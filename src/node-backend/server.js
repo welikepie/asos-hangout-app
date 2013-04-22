@@ -92,7 +92,7 @@
 		@private
 		**/
 		getFromId = function getFromId (id) {
-			return _.last(events, event_counter - id);
+			return _.last(events, event_counter - 1 - id);
 		};
 
 		/**
@@ -109,8 +109,10 @@
 			var i, list = listeners.slice();
 			console.log('Event streamed to ', list.length, ' listeners.');
 			for (i = 0; i < list.length; i++) {
-				try { list[i].res.write(content); }
-				catch (e) {
+				try {
+					list[i].res.write(content);
+					if (list[i].xhr) { removeListener(list[i]); }
+				} catch (e) {
 					console.exception('Error encountered while streaming:');
 					removeListener(list[i]);
 				}
@@ -139,6 +141,7 @@
 			var ident = {'req': request, 'res': response};
 
 			console.log('Adding new listener...');
+			response.write('retry: 5000\n\n');
 
 			// Presence of Last-Event-ID header indicates this client is reconnecting -
 			// if there are any events left in the history, they should be provided as catchup.
@@ -146,17 +149,26 @@
 				response.write(getFromId(parseInt(request.headers['last-event-id'], 10)).join(''));
 			} else if ('x-last-event-id' in request.headers) {
 				response.write(getFromId(parseInt(request.headers['x-last-event-id'], 10)).join(''));
+			} else {
+				// Dummy message to ensure Last-Event-ID is set in every situation
+				response.write('id: ' + (event_counter - 1) + '\n\n');
 			}
 
-			// Add the listener to the listeners' list and ensure it will
-			// be removed in the event on connection closing client-side
-			request.on('close', removeListener.bind(this, ident));
-			listeners.push(ident);
+			if (request.headers['x-requested-with'] === 'XMLHttpRequest') {
+				response.end();
+			} else {
 
-			// Too many listeners? Trim the numbers by closing oldest connections
-			console.log('Listeners count: ', listeners.length + '(' + Math.max(0, listeners.length - listeners_limit) + ' over limit)');
-			while (listeners.length > listeners_limit) {
-				removeListener(listeners.shift());
+				// Add the listener to the listeners' list and ensure it will
+				// be removed in the event on connection closing client-side
+				request.on('close', removeListener.bind(this, ident));
+				listeners.push(ident);
+
+				// Too many listeners? Trim the numbers by closing oldest connections
+				console.log('Listeners count: ', listeners.length + '(' + Math.max(0, listeners.length - listeners_limit) + ' over limit)');
+				while (listeners.length > listeners_limit) {
+					removeListener(listeners.shift());
+				}
+
 			}
 
 		};
@@ -225,10 +237,9 @@
 			response.writeHead(200, _.extend(corsHeaders(request), {
 				'Content-Type': 'text/event-stream',
 				'Cache-Control': 'no-cache',
-				'Connection': 'keep-alive'
+				'Connection': 'keep-alive',
+				'Transfer-Encoding': 'chunked'
 			}));
-
-			response.write('retry: 10000\n\n');
 			return SSEManager.add(request, response);
 
 		}
@@ -340,6 +351,8 @@
 	productFeed.on('add', function (item) { console.log('New product added: ', item); });
 	productFeed.on('remove', function (item) { console.log('Product removed: ', item); });
 	server.on('request', function (request) { console.log(request.method + ' to ' + request.url); });
+
+	setInterval(SSEManager.emit.bind(SSEManager, 'message', 'This is a test message.'), 5000);
 	
 	server.listen(8888);
 	console.log('HTTP Server has been started.');

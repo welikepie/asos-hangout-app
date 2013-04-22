@@ -6,7 +6,8 @@ require.config({
 		"jquery": "common/scripts/vendor/jquery-1.9.1.min",
 		"backbone": "common/scripts/vendor/backbone",
 		"underscore": "common/scripts/vendor/underscore",
-		"easyXDM": "common/scripts/vendor/easyXDM/easyXDM.min"
+		"easyXDM": "common/scripts/vendor/easyXDM/easyXDM.min",
+		"json3": "common/scripts/vendor/easyXDM/json3.min"
 	},
 	"shim": {
 		"underscore": {"exports": "_"},
@@ -14,15 +15,16 @@ require.config({
 			"deps": ["underscore", "jquery"],
 			"exports": "Backbone"
 		},
-		"easyXDM": {"exports": "easyXDM"}
+		"easyXDM": {"exports": "easyXDM"},
+		"json3": {"exports": "JSON"}
 	},
 	"waitSeconds": 10
 });
 require([
-	'jquery', 'underscore', 'backbone', 'easyXDM',
+	'json3', 'jquery', 'underscore', 'backbone', 'easyXDM',
 	'common/scripts/data/Product', 'common/scripts/product-feed-slider', 'common/scripts/product-overlay-view'
 ], function (
-	$, _, Backbone, easyXDM,
+	JSON, $, _, Backbone, easyXDM,
 	Products, bindProductFeed, bindProductView
 ) {
 	"use strict";
@@ -112,21 +114,27 @@ require([
 			'remote': 'http://localhost:8888/',
 			'onMessage': function (message) {
 
-				var data = JSON.parse(message),
-					ev = data.event.split(':', 2);
+				try {
 
-				if (ev[0] === 'productFeed') {
+					var data = JSON.parse(message),
+						ev = data.event.split(':', 2);
 
-					if (ev[1] === 'reset') {
-						productFeed.reset(data.payload);
-					} else if (ev[1] === 'add') {
-						if (!productFeed.get(data.payload.id)) { productFeed.add(data.payload); }
-					} else if (ev[1] === 'remove') {
-						var model = productFeed.get(data.payload.id);
-						if (model) { productFeed.remove(model); }
+					if (ev[0] === 'productFeed') {
+
+						if (ev[1] === 'reset') {
+							productFeed.reset(data.payload);
+						} else if (ev[1] === 'add') {
+							if (!productFeed.get(data.payload.id)) { productFeed.add(data.payload); }
+						} else if (ev[1] === 'remove') {
+							var model = productFeed.get(data.payload.id);
+							if (model) { productFeed.remove(model); }
+						}
+
+					} else if (ev[0] === 'message') {
+						window.alert(data.payload);
 					}
 
-				}
+				} catch (e) {}
 
 			}
 
