@@ -186,7 +186,7 @@ module.exports = function (grunt) {
 		'copy': {
 
 			'common-scripts': {
-				'src': '**/*.js',
+				'src': '**/*',
 				'dest': 'build/common/scripts/',
 				'expand': true,
 				'cwd': 'src/common/scripts/',
@@ -312,6 +312,13 @@ module.exports = function (grunt) {
 				'expand': true,
 				'filter': 'isFile'
 			},
+			'hangout-app-branding': {
+				'src': '**/*',
+				'cwd': 'src/hangout-app/branding',
+				'dest': 'build/hangout-app/branding',
+				'expand': true,
+				'filter': 'isFile'
+			},
 
 			'node-backend-dev': {
 				'src': '**/*',
@@ -428,6 +435,7 @@ module.exports = function (grunt) {
 		'copy:hangout-app-amd',
 		'copy:hangout-app-styling',
 		'copy:hangout-app-images',
+		'copy:hangout-app-branding',
 		'copy:hangout-app-html-release',
 		'copy:hangout-app-xml',
 		'clean:hangout-app-cleanup'

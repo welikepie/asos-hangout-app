@@ -4,8 +4,8 @@
   "app": {
     "title": "ASOS Hangout App",
     "appUrl": "",
-    "baseUrl": "http://dev.welikepie.com/asos-hangout-app/",
-    "baseSslUrl": "https://dev.welikepie.com:444/asos-hangout-app/",
+    "baseUrl": "http://dev.welikepie.com/asos-hangout-app/preview/",
+    "baseSslUrl": "https://dev.welikepie.com:444/asos-hangout-app/preview/hangout-app/",
     "hangoutUrl": ""
   },
   "devDependencies": {
