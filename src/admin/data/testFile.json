@@ -1,0 +1,40 @@
+
+[
+	{
+		"id": 0,
+		"name": "Alice McCall Golden Nugget Dress",
+		"url": "http://www.asos.com/Alice-McCall/Alice-McCall-Golden-Nugget-Dress/Prod/pgeproduct.aspx?iid=2696495&cid=6932&sh=0&pge=0&pgesize=20&sort=-1&clr=Gold+strike",
+		"photo_small": "http://images.asos-media.com/inv/media/5/9/4/6/2696495/goldstrike/image1xl.jpg",
+		"photo_big": "http://images.asos-media.com/inv/media/5/9/4/6/2696495/goldstrike/image1xxl.jpg",
+		"price": "£345.00",
+		"description": "<p>Golden Nugget evening dress by Alice McCall</p><ul><li>Made from a soft woven fabric</li><li>Floral embroidery and krowang detailing</li><li>Capped sleeves</li><li>Gathered pleats to skirt</li><li>Zip back fastening</li><li>Fit and flare style</li></ul>"
+	},
+	{
+		"id": 1,
+		"name": "ASOS Deep Plunge Lace Back",
+		"url": "http://www.asos.com/ASOS/ASOS-Deep-Plunge-Lace-Back/Prod/pgeproduct.aspx?iid=2783844&WT.ac=rec_viewed",
+		"photo_small": "http://images.asos-media.com/inv/media/4/4/8/3/2783844/black/image1xl.jpg",
+		"photo_big": "http://images.asos-media.com/inv/media/4/4/8/3/2783844/black/image1xxl.jpg",
+		"price": "£25.00",
+		"description": "<p>Midi dress by ASOS Collection</p><ul><li>Made from a soft, easy-care stretch jersey</li><li>Plunging neckline with gathered detailing</li><li>Sheer lace back</li><li>Bodycon fit</li></ul>"
+	},
+	{
+		"id": 2,
+		"name": "ASOS Waistcoat with Utility Elastic Back Detail",
+		"url": "http://www.asos.com/ASOS/ASOS-Waistcoat-with-Utility-Elastic-Back-Detail/Prod/pgeproduct.aspx?iid=2851678&cid=2641&sh=0&pge=0&pgesize=20&sort=-1&clr=Taupe",
+		"photo_small": "http://images.asos-media.com/inv/media/8/7/6/1/2851678/taupe/image1xl.jpg",
+		"photo_big": "http://images.asos-media.com/inv/media/8/7/6/1/2851678/taupe/image1xxl.jpg",
+		"price": "£35.00",
+		"description": "<p>Waistcoat by ASOS Collection</p><ul><li>Made from an easy-care poly-blend fabric</li><li>Wrap front with notched lapels</li><li>Belted waist with a d-ring fastening</li><li>Raised, elasticated back hem</li><li>Straight yoke to reverse</li></ul>"
+	},
+	{
+		"id": 3,
+		"name": "ASOS Slim Fit Blazer",
+		"url": "http://www.asos.com/ASOS/ASOS-Slim-Fit-Blazer/Prod/pgeproduct.aspx?iid=2799206&cid=5678&sh=0&pge=0&pgesize=20&sort=-1&clr=Navy",
+		"photo_small": "http://images.asos-media.com/inv/media/6/0/2/9/2799206/navy/image1xl.jpg",
+		"photo_big": "http://images.asos-media.com/inv/media/6/0/2/9/2799206/navy/image1xxl.jpg",
+		"price": "£65.00",
+		"description": "<p>Blazer by ASOS</p><ul><li>Constructed in 100% cotton</li><li>Slim notched lapel</li><li>Tow button closure</li><li>Pockets to chest and hips</li><li>Full lining</li><li>Slim fit</li></ul>"
+	}
+]
+

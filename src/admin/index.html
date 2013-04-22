@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<title>Admin Page</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="stylesheet" href="style/bootstrap.css" type="text/css">
+		<link rel="stylesheet" href="style/flat-ui.css" type="text/css">
+			<link rel="stylesheet" href="style/custom_addon.css" type="text/css">
+		<script src="http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.js"></script>
+	</head>
+	<body>
+		<div id="container" class="well span15"style="height:100%;">
+			<div class="span5 column">
+				<h1> this is all the things.</h1>
+				<input type="textarea" id="searchBox"><button class="btn btn-warning" onclick="(function(){search(document.getElementById('searchBox').value)})();">Search</button>
+				<ul id="fullList">
+					<li class="template">
+						<div class="container">
+							<h4 class="name"></h4>
+							<a class="url"></a>
+							<img class="img"/>
+							<div class="descriptions"></div>
+							<button class="btn btn-success"></button>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="span5 column">
+				<h1> this is what has been selected.</h1>
+				<button class="btn btn-warning" onclick="(function(){partialClothes.reset([]) })();">Clear All</button>
+				<ul id="partialList">
+					<li class="template">
+						<div class="container">
+							<h4 class="name"></h4>
+							<a class="url"></a>
+							<img class="img"/>
+							<div class="descriptions"></div>
+							<button class="btn btn-danger"></button>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="span5 column">
+				<h1> this is a test page </h1>
+			</div>
+		</div>
+	</body>
+	<footer>
+		<script src="script/jquery191.js"></script>
+		<script src="script/underscore-min.js"></script>
+		<script src="script/backbone-min.js"></script>
+		<script src="script/script.js"></script>
+	</footer>
+</html>
