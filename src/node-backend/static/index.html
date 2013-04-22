@@ -54,7 +54,7 @@
 				socket.postMessage(JSON.stringify({'event': 'productFeed:reset', 'payload': productFeed}));
 
 				// Establish connection to SSE stream and establish message pass-through
-				source = new window.EventSource("stream");
+				source = new window.EventSource(window.location.protocol + '//' + window.location.host + "/stream");
 				$(source).on("message", function (ev) { socket.postMessage(ev.originalEvent.data); });
 
 				// DEBUG BITS
