@@ -12,10 +12,10 @@ define(['jquery', 'underscore'], function ($, _) {
 					.queue('fx', function (next) {
 						productView
 							.find('img').attr('src', model.photo).end()
-							.find('.title').html(model.title).end()
+							.find('.title').html(model.name).end()
 							.find('.price').html(model.price).end()
 							.find('.description').empty().html(model.description).end()
-							.find('.shop').attr('href', model.link);
+							.find('.shop').attr('href', model.url);
 						overlay.css({'display': 'block', 'opacity': 0});
 						next();
 					})
