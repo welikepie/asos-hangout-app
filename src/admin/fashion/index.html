@@ -1,0 +1,67 @@
+<html>
+	<head>
+		<title>Admin Page</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="stylesheet" href="style/bootstrap.css" type="text/css">
+		<link rel="stylesheet" href="style/flat-ui.css" type="text/css">
+		<link rel="stylesheet" href="style/custom_addon.css" type="text/css">
+		<!--
+			AMRoche:test
+			ASOS:test
+			admin:test
+		-->
+	</head>
+	<body>
+		<div id="container" class="well span15"style="height:100%;">
+			<div class="span5 column">
+				<h1> All outfits.</h1>
+				<input type="textarea" id="searchBox"><button class="btn btn-warning" onclick="(function(){search(document.getElementById('searchBox').value)})();">Search</button>
+				<ul id="fullList">
+					<li class="template">
+						<div class="container">
+							<h4 class="name"></h4>
+							<a class="url"></a>
+							<img class="img"/>
+							<div class="descriptions"></div>
+							<button class="btn btn-success"></button>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="span5 column">
+				<h1> Outfits selected.</h1>
+				<button class="btn btn-warning" onclick="(function(){partialClothes.reset([]) })();">Clear All</button>
+				<ul id="partialList">
+					<li class="template">
+						<div class="container">
+							<h4 class="name"></h4>
+							<a class="url"></a>
+							<img class="img"/>
+							<div class="descriptions"></div>
+							<button class="btn btn-danger"></button>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</body>
+	<footer>
+		<script src="script/jquery191.js"></script>
+		<script src="script/underscore-min.js"></script>
+		<script src="script/backbone-min.js"></script>
+		
+		<script>var authentToken = 
+		<?php
+		$headers = apache_request_headers();
+				$authentToken;
+				foreach ($headers as $header => $value) {
+					if($header=="Authorization"){
+						$authentToken = $value;
+					}
+				}
+				echo json_encode($authentToken);
+				?>;
+			</script>
+		<script src="script/script.js"></script>
+	</footer>
+</html>

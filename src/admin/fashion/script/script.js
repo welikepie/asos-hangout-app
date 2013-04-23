@@ -1,4 +1,8 @@
 var fullClothes  = new Backbone.Collection;
+var endpoint = ""; //URL to send the requests to.
+var basicToken = authentToken; //this is pulled through from the DOM
+console.log(basicToken);
+//pulling the base JSON through containing the fashion objects and rendering to dom
 fullClothes.fetch({url:"data/testFile.json",success:function(message){search("");}});
 var searchResults = new Backbone.Collection;
 
@@ -112,8 +116,8 @@ var partialClothesList = Backbone.View.extend(function () {
 }());
 
 partialClothesList = new partialClothesList();
-
-
+//ADD LISTENER TO WRITE TO partialClothes ON LOAD FROM THE CURRENT FASHION OBJECT STATE
+//searches based on whether name or description contains searched parameter
 function search(param){
 	if(param==""){
 		searchResults.reset([]);
@@ -136,18 +140,29 @@ function search(param){
 		}
 	}
 }
-partialClothesList.on("all",(function(msg){console.log(msg)})());
+//partialClothesList.on("all",(function(msg){console.log(msg)})());
+//modifying objects with the content to append and the type of operation
 function modify(idNum, type){
+		var xmlhttp = new XMLHttpRequest();
 	if(type=="add" && partialClothes.findWhere({id:idNum}) == undefined){
 		console.log("adding");
 		var funde = fullClothes.findWhere({id:idNum});
 		partialClothes.add(funde);
 		console.log(funde.toJSON());
+		xmlhttp.open("POST",endpoint,false);
+		xmlhttp.setRequestHeader("Authorization", basicToken);
+		xmlhttp.send(funde.toJSON());
 	}
 	if(type=="remove" && partialClothes.findWhere({id:idNum}) != undefined){
 		console.log("removing");
 		partialClothes.remove(partialClothes.findWhere({id:idNum}));
 		console.log("id: "+idNum);
+		xmlhttp.open("DELETE",endpoint,false);
+		xmlhttp.setRequestHeader("Authorization", basicToken);
+		xmlhttp.send();
+		 var obj = new Object();
+   		obj.id=idNum;
+		console.log(JSON.stringify(obj));
 	}
 	
 }

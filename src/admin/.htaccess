@@ -1,0 +1,11 @@
+#AuthUserFile /usr/local/you/safedir/.htpasswd
+# ^ full servr path to .htpasswd file.
+
+#absolute filepath to password file \/
+AuthUserFile C:/xampp/apache/bin/.htpasswd
+AuthGroupFile /dev/null
+AuthName "Please enter login credentials"
+AuthType Basic
+require valid-user
+
+#http://www.javascriptkit.com/howto/htaccess3.shtml
