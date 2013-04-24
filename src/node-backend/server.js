@@ -13,202 +13,68 @@
 		url = require('url'),
 
 		_ = require('./vendor/lodash'),
+		ntwitter = require('./vendor/ntwitter'),
 
 		observed = require('./util/observed-objects'),
-		corsHeaders = require('./util/cors').corsHeaders;
+		corsHeaders = require('./util/cors').corsHeaders,
+		SSEManager = require('./util/sse-manager').SSEManager,
 
-	/**
-	Event and listener manager for efficiently handling Server-Sent Events stream.
-	With the help of this manager, subscribing connections to the event stream becomes
-	the matter of calling a single function on the request and response objects.
+		// Generic options and settings are collected here.
+		appOptions = observed.observeModel({
+			'twitterSearch': '',
+			'youtubeEmbedId': ''
+		}),
 
-	Any events emitted on the manager are broadcast to all listeners and stored in
-	event history - it is from that history that older entries will be served to clients
-	that attempt reconnection to the server.
+		// Product feed collection is established here, along with bindings to pass
+		// all change events to SSE manager for inclusion in event stream.
+		productFeed = observed.observeCollection(),
 
-	Manager additionally controls the number of listeners, automatically closing the oldest
-	connections when the new ones cause the total to go above the limit. With SSE's reconnection
-	behaviour, it essentially converts the traffic from streaming into slow polling until the
-	number of concurrent connections drops.
+		// Public Twitter feed, collection containing all tweets accepted by the
+		// admins of the app, over the course of the app operating.
+		twitterFeed = observed.observeCollection(),
 
-	@class SSEManager
+		// Private Twitter feed, contains all latest tweets.
+		// Used in conjunction with Twitter's Streaming API to provide all tweets coming through.
+		//allTweets = observed.observeCollection(),
 
-	@static
-	@public
-	**/
-	var SSEManager = (function () {
+		// SSE managers, one for public feed, one for admin twitter feed
+		publicSSE,
+		twitterSSE;
 
-		var events = [],
-			event_limit = 100,
-			event_counter = 1,
+	// INITIALISE SSE AND AUTH MANAGERS
+	publicSSE = new SSEManager(100, 1000, 0);
+	twitterSSE = new SSEManager(50, 10, 10);
+	auth = require('./vendor/http-auth').auth({
+		'authRealm': 'Admin Area',
+		'authFile': path.join(__dirname, 'users.htpasswd')
+	});
 
-			emit,
-			getFromId,
-			pushToStream,
+	// Bind modifications of the product feed collection to public SSE manager
+	// (all changes will be automatically sent down the stream)
+	productFeed.addListener('add', publicSSE.emit.bind(publicSSE, 'productFeed:add'));
+	productFeed.addListener('remove', publicSSE.emit.bind(publicSSE, 'productFeed:remove'));
 
-			listeners = [],
-			listeners_limit = 2000,
+	// Bind modification of twitter feed to public SSE manager as well.
+	twitterFeed.addListener('add', publicSSE.emit.bind(publicSSE, 'twitterFeed:add'));
+	twitterFeed.addListener('remove', publicSSE.emit.bind(publicSSE, 'twitterFeed:remove'));
 
-			addListener,
-			removeListener;
+	// Bind any changes applied to application options to appear in public SSE stream as well
+	// (debouncing + change collection to have only one event in stream in case of several simultaneous changes)
+	appOptions.addListener('change', (function () {
 
-		/**
-		Method used to broadcast the event to all listeners of the stream.
-		Given event name and its payload, it is converted into entry in SSE stream format
-		(payload is stringified into JSON representation) and written to all open connections,
-		as well as added to the history for further reference.
+		var pendingChanges = {},
+			streamChanges = _.debounce(function () {
+				var localPending = pendingChanges;
+				pendingChanges = {};
+				publicSSE.emit('appOptions:change', localPending);
+			}, 100);
 
-		@method emit
-		@param {string}  event    Event name.
-		@param {any}     payload  Arbitrary data related to the event.
-
-		@static
-		@public
-		**/
-		emit = function emit (event, payload) {
-
-			// Update the ID counter and generate the event
-			var id = event_counter++,
-				content = 'id: ' + id + '\ndata: ' + JSON.stringify({'event': event, 'payload': payload}) + '\n\n';
-
-			console.log('Emitting event\n\n' + content);
-
-			// Add event to the history, trim the history and, finally, push the event to stream
-			events.push(content);
-			console.log('Event log length: ', events.length + '(' + Math.max(0, events.length - event_limit) + ' over limit)');
-			while (events.length > event_limit) { events.shift(); }
-			pushToStream(content);
-
+		return function (change) {
+			_.extend(pendingChanges, change);
+			streamChanges();
 		};
 
-		/**
-		Shortcut method for getting the events between given ID and thelast emitted one.
-		Used when adding reconnected listeners to the stream.
-
-		@param  {integer}  id  Last observed event's ID.
-		@return {string[]}     All entries in event history from given ID.
-
-		@static
-		@private
-		**/
-		getFromId = function getFromId (id) {
-			return _.last(events, event_counter - 1 - id);
-		};
-
-		/**
-		Given the fragment of the SSE stream, method writes it to all open connections.
-		Should any connections turn out to be closed or faulty, they are automatically
-		removed from listeners' list.
-
-		@param {string}  content  Latest event in SSE stream format.
-
-		@static
-		@private
-		**/
-		pushToStream = function pushToStream (content) {
-			var i, list = listeners.slice();
-			console.log('Event streamed to ', list.length, ' listeners.');
-			for (i = 0; i < list.length; i++) {
-				try {
-					list[i].res.write(content);
-					if (list[i].xhr) { removeListener(list[i]); }
-				} catch (e) {
-					console.exception('Error encountered while streaming:');
-					removeListener(list[i]);
-				}
-			}
-		};
-
-		/**
-		Given request and response objects, method adds the connection to listeners' list,
-		keeping the connection alive and thus, sending any events to that client.
-
-		Event catchup is taken care of automatically, provided the request comes with appropriate headers.
-		Should connection be closed on client's side, the listener will be automatically removed from listeners' list.
-
-		@method add
-		@param  {object}  request   Request object, obtained from HTTP server's callback.
-		@param  {object}  response  Response object, obtained from HTTP server's callback.
-		@return {object}            Identification object, used to remove the listener later on.
-
-		@static
-		@public
-		**/
-		addListener = function addListener (request, response) {
-
-			// Object containing these created early,
-			// will be used as identifier for === comparison
-			var ident = {'req': request, 'res': response};
-
-			console.log('Adding new listener...');
-			response.write('retry: 5000\n\n');
-
-			// Presence of Last-Event-ID header indicates this client is reconnecting -
-			// if there are any events left in the history, they should be provided as catchup.
-			if ('last-event-id' in request.headers) {
-				response.write(getFromId(parseInt(request.headers['last-event-id'], 10)).join(''));
-			} else if ('x-last-event-id' in request.headers) {
-				response.write(getFromId(parseInt(request.headers['x-last-event-id'], 10)).join(''));
-			} else {
-				// Dummy message to ensure Last-Event-ID is set in every situation
-				response.write('id: ' + (event_counter - 1) + '\n\n');
-			}
-
-			if (request.headers['x-requested-with'] === 'XMLHttpRequest') {
-				response.end();
-			} else {
-
-				// Add the listener to the listeners' list and ensure it will
-				// be removed in the event on connection closing client-side
-				request.on('close', removeListener.bind(this, ident));
-				listeners.push(ident);
-
-				// Too many listeners? Trim the numbers by closing oldest connections
-				console.log('Listeners count: ', listeners.length + '(' + Math.max(0, listeners.length - listeners_limit) + ' over limit)');
-				while (listeners.length > listeners_limit) {
-					removeListener(listeners.shift());
-				}
-
-			}
-
-		};
-
-		/**
-		Given the identification object, removes the connection from the listeners' list,
-		removes any bound events and closes the connection. Used either when request is closed
-		client-side or when the number of listeners goes over the limit.
-
-		@method removeListener
-		@param  {object}  ident  Identification object received from `add`.
-
-		@static
-		@private
-		**/
-		removeListener = function removeListener (ident) {
-
-			console.log('Removing listener...');
-
-			var inx = listeners.indexOf(ident);
-			if (inx !== -1) { listeners.splice(inx, 1); }
-
-			ident.req.removeAllListeners();
-			ident.res.removeAllListeners();
-			try { ident.res.end(); } catch (e) {}
-
-		};
-
-		return {
-			'emit': emit,
-			'add': addListener
-		};
-
-	}());
-
-	// Product feed collection is established here, along with bindings to pass
-	// all change events to SSE manager for inclusion in event stream.
-	var productFeed = observed.observeCollection();
-	productFeed.addListener('add', SSEManager.emit.bind(SSEManager, 'productFeed:add'));
-	productFeed.addListener('remove', SSEManager.emit.bind(SSEManager, 'productFeed:remove'));
+	}()));
 
 	var server = http.createServer(function (request, response) {
 
@@ -227,24 +93,49 @@
 			return response.end();
 		}
 
-		// SSE STREAM
+		// SSE STREAMS
 		// ===============================
-		// Requests for SSE stream are handled by the SSE manager.
-		// The code below serves to register newly created connection as
-		// new listener.
+		// Requests for event streams (along with their XDM pass-throughs)
+		// will be listed here.
 		if (request.method === 'GET' && path === '/stream') {
 
-			response.writeHead(200, _.extend(corsHeaders(request), {
-				'Content-Type': 'text/event-stream',
-				'Cache-Control': 'no-cache',
-				'Connection': 'keep-alive',
-				'Transfer-Encoding': 'chunked'
-			}));
-			return SSEManager.add(request, response);
+			// Treat request as SSE subscription if SSE MIME type
+			// is explicitly listed in allowed response types
+			if ('accept' in request.headers && request.headers['accept'].indexOf('text/event-stream') !== -1) {
+
+				response.writeHead(200, _.extend(corsHeaders(request), {
+					'Content-Type': 'text/event-stream',
+					'Cache-Control': 'no-cache',
+					'Connection': 'keep-alive',
+					'Transfer-Encoding': 'chunked'
+				}));
+				return publicSSE.addListener(request, response);
+
+			// In other cases, consider the request a standard browser call for pass-through;
+			// set the path to one leading to appropriate HTML file in static directory
+			} else { path = '/passthrough.html'; }
+
+		} else if (request.method === 'GET' && path === '/twitter-stream') {
+
+			// Treat request as SSE subscription if SSE MIME type
+			// is explicitly listed in allowed response types
+			if ('accept' in request.headers && request.headers['accept'].indexOf('text/event-stream') !== -1) {
+
+				response.writeHead(200, _.extend(corsHeaders(request), {
+					'Content-Type': 'text/event-stream',
+					'Cache-Control': 'no-cache',
+					'Connection': 'keep-alive',
+					'Transfer-Encoding': 'chunked'
+				}));
+				return twitterSSE.addListener(request, response);
+
+			// In other cases, consider the request a standard browser call for pass-through;
+			// set the path to one leading to appropriate HTML file in static directory
+			} else { path = '/passthrough.html'; }
 
 		}
 
-		// PRODUCT FEED
+		// PRODUCT FEED CONTROLS
 		// ===============================
 		// Handlers for various actions related to realtime product feed.
 
@@ -260,7 +151,7 @@
 				response.writeHead(200, _.extend(corsHeaders(request), {
 					'Content-Type': 'application/json'
 				}));
-				return response.end(temp, 'utf-8');
+				return response.end(temp);
 
 			}
 
@@ -273,16 +164,21 @@
 				var json = '';
 				request.on('data', function (chunk) { json += chunk.toString(); });
 				request.on('end', function () {
-					try {
-						json = JSON.parse(json);
-						productFeed.push(json);
-						response.writeHead(200, corsHeaders(request));
-						response.end();
-					} catch (e) {
-						response.writeHead(400, corsHeaders(request));
-						response.end();
-					}
+
+					auth.apply(request, response, function () {
+						try {
+							json = JSON.parse(json);
+							productFeed.push(json);
+							response.writeHead(200, corsHeaders(request));
+							response.end();
+						} catch (e) {
+							response.writeHead(400, corsHeaders(request));
+							response.end();
+						}
+					});
 					request.removeAllListeners();
+
+
 				});
 
 				return;
@@ -303,56 +199,60 @@
 					}
 				});
 
-				if (typeof index === 'number') {
-					productFeed.splice(index, 1);
-					response.writeHead(200, corsHeaders(request));
-					response.end();
-				} else {
-					response.writeHead(404, corsHeaders(request));
-					response.end();
-				}
+				auth.apply(request, response, function () {
+					if (typeof index === 'number') {
+						productFeed.splice(index, 1);
+						response.writeHead(200, corsHeaders(request));
+						response.end();
+					} else {
+						response.writeHead(404, corsHeaders(request));
+						response.end();
+					}
+				});
 
 				return;
 
 			}
 
-			// STATIC CONTENT
-			// ===============================
-			// If no special handlers have been used, path could assume
-			// the static content. In such case, serve the file from local drive.
-			if (path === '/') { path = '/index.html'; }
-			path = './static' + path;
+		// STATIC CONTENT
+		// ===============================
+		// If no special handlers have been used, path could assume
+		// the static content. In such case, serve the file from local drive.
+		if (path === '/') { path = '/index.html'; }
+		path = './static' + path;
 
-			fs.exists(path, function (exists) {
-				if (exists) {
-					fs.readFile(path, function (error, content) {
-						if (error) {
-							response.writeHead(500, corsHeaders(request));
-							response.end();
-						} else {
-							response.writeHead(200, _.extend(corsHeaders(request), {
-								'Content-Type': 'text/html'
-							}));
-							response.end(
-								content.toString()
-									.replace("/* PRODUCT FEED */null", productFeed.toJSON())
-							);
-						}
-					});
-				} else {
-					response.writeHead(400, corsHeaders(request));
-					response.end();
-				}
-			});
-
+		fs.exists(path, function (exists) {
+			if (exists) {
+				fs.readFile(path, function (error, content) {
+					if (error) {
+						response.writeHead(500, corsHeaders(request));
+						response.end();
+					} else {
+						response.writeHead(200, _.extend(corsHeaders(request), {
+							'Content-Type': 'text/html'
+						}));
+						response.end(
+							content.toString()
+								.replace("/* APP OPTIONS */null", appOptions.toJSON())
+								.replace("/* PRODUCT FEED */null", productFeed.toJSON())
+								.replace("/* TWITTER FEED */null", twitterFeed.toJSON())
+						);
+					}
+				});
+			} else {
+				response.writeHead(404, corsHeaders(request));
+				response.end();
+			}
 		});
+
+	});
 
 	// DEBUG
 	productFeed.on('add', function (item) { console.log('New product added: ', item); });
 	productFeed.on('remove', function (item) { console.log('Product removed: ', item); });
 	server.on('request', function (request) { console.log(request.method + ' to ' + request.url); });
 
-	setInterval(SSEManager.emit.bind(SSEManager, 'message', 'This is a test message.'), 5000);
+	setInterval(publicSSE.emit.bind(publicSSE, 'message', 'This is a test message.'), 5000);
 	
 	server.listen(8888);
 	console.log('HTTP Server has been started.');

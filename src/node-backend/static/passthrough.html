@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>SSE Passthrough</title>
+		<!--<base href="">-->
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	</head>
+	<body></body>
+	<script type="text/javascript" src="common/scripts/vendor/EventSource.js"></script>
+	<script type="text/javascript" src="common/scripts/vendor/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="common/scripts/vendor/easyXDM/json3.min.js"></script>
+	<script type="text/javascript" src="common/scripts/vendor/easyXDM/easyXDM.min.js"></script>
+	<script type="text/javascript">
+
+	var appOptions = /* APP OPTIONS */null,
+		productFeed = /* PRODUCT FEED */null,
+		twitterFeed = /* TWITTER FEED */null,
+		baseUrl = document.getElementsByTagName('base').length ? document.getElementsByTagName('base')[0].href : '',
+
+		source,
+		socket;
+
+	socket = new easyXDM.Socket({
+		'interval': 1000,
+		'local': baseUrl + 'common/scripts/vendor/easyXDM/name.html',
+		'swf': baseUrl + 'common/scripts/vendor/easyXDM/easyXDM.swf',
+		'swfNoThrottle': true,
+		'onReady': function () {
+
+			if (typeof window.EventSource !== 'undefined') {
+
+				// Send over initial state of the object
+				socket.postMessage(JSON.stringify({'event': 'appOptions:reset', 'payload': appOptions}));
+				socket.postMessage(JSON.stringify({'event': 'productFeed:reset', 'payload': productFeed}));
+				socket.postMessage(JSON.stringify({'event': 'twitterFeed:reset', 'payload': twitterFeed}));
+
+				// Establish connection to SSE stream and establish message pass-through
+				source = new window.EventSource(window.location.href);
+				$(source).on("message", function (ev) {
+					console.log('Event: ' + ev.originalEvent.data);
+					socket.postMessage(ev.originalEvent.data);
+				});
+
+			} else { window.alert('This browser doesn\'t do server-sent events!'); }
+
+		}
+	});
+
+	</script>
+</html>

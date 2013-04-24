@@ -111,7 +111,7 @@ require([
 			'local': '../common/scripts/vendor/easyXDM/name.html',
 			'swf': '../common/scripts/vendor/easyXDM.swf',
 			'swfNoThrottle': true,
-			'remote': 'http://localhost:8888/',
+			'remote': 'http://localhost:8888/stream',
 			'onMessage': function (message) {
 
 				try {
