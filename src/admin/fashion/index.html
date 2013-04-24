@@ -12,32 +12,40 @@
 		-->
 	</head>
 	<body>
-		<div id="container" class="well span15"style="height:100%;">
-			<div class="span5 column">
+		<div id="container" class="well">
+			<div class="column">
+				<div class="columnHeader">
 				<h1> All outfits.</h1>
 				<input type="textarea" id="searchBox"><button class="btn btn-warning" onclick="(function(){search(document.getElementById('searchBox').value)})();">Search</button>
+				</div>
 				<ul id="fullList">
 					<li class="template">
 						<div class="container">
-							<h4 class="name"></h4>
-							<a class="url"></a>
 							<img class="img"/>
+						<div class="middleColumn">
+							<h4 class="name"></h4>
 							<div class="descriptions"></div>
+							<a class="url"></a>
+						</div>
 							<button class="btn btn-success"></button>
 						</div>
 					</li>
 				</ul>
 			</div>
-			<div class="span5 column">
+			<div class="column">
+				<div class="columnHeader">
 				<h1> Outfits selected.</h1>
-				<button class="btn btn-warning" onclick="(function(){partialClothes.reset([]) })();">Clear All</button>
+				<button class="btn btn-warning" onclick="(function(){partialClothes.reset([])})();">Clear All</button>
+				</div>
 				<ul id="partialList">
 					<li class="template">
 						<div class="container">
-							<h4 class="name"></h4>
-							<a class="url"></a>
 							<img class="img"/>
+						<div class="middleColumn">
+							<h4 class="name"></h4>
 							<div class="descriptions"></div>
+							<a class="url"></a>
+						</div>
 							<button class="btn btn-danger"></button>
 						</div>
 					</li>

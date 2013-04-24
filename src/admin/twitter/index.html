@@ -8,30 +8,40 @@
 		<script src="http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.js"></script>
 	</head>
 	<body>
-		<div id="container" class="well span15"style="height:100%;">
-			<div class="span5 column">
-				<h1> this is all the tweets.</h1>
+		<div id="container" class="well">
+			<div class="column">
+				<div class="columnHeader">
+				<h1> This is all the tweets.</h1>
 				<input type="textarea" id="searchBox"><button class="btn btn-warning" onclick="(function(){search(document.getElementById('searchBox').value)})();">Search</button>
+				</div>
 				<ul id="fullList">
 					<li class="template">
 						<div class="container">
 					<img class="img"/>
+					<div class="middleColumn">
 							<h4 class="tweeter"></h4>
 							<div class="content"></div>
+							<a class="url"></a>
+						</div>
 							<button class="btn btn-success"></button>
 						</div>
 					</li>
 				</ul>
 			</div>
-			<div class="span5 column">
-				<h1> tweets selected.</h1>
+			<div class="column">
+				<div class="columnHeader">
+				<h1> Tweets selected.</h1>
 				<button class="btn btn-warning" onclick="(function(){selectedTweets.reset([]) })();">Clear All</button>
+					</div>
 				<ul id="partialList">
 					<li class="template">
 						<div class="container">
 							<img class="img"/>
+							<div class="middleColumn">
 							<h4 class="tweeter"></h4>
 							<div class="content"></div>
+							<a class="url"></a>
+							</div>
 							<button class="btn btn-danger"></button>
 						</div>
 					</li>

@@ -46,8 +46,9 @@ console.log("calling render2");
 						.find('.content').html(model.get('tweet')).end()
 						.find('.url').attr('href', model.get('url')).html(model.get('name')).end()
 						.find('.btn-success').html("add").attr('onclick','(function(){modify('+JSON.stringify(model.get('url'))+',"add")})();').end()
-						.find('.url').attr('href', model.get('url')).html(model.get('name')).end()
+						.find('.url').attr('href', model.get('url')).html("View this tweet on twitter.").end()
 						.find('.img').attr('src', model.get('photo')).end();
+						
 						//.find('.descriptions').html(model.get('description')).end();
 						that.$el.append(element);
 				}
@@ -101,7 +102,7 @@ console.log("calling render");
 						var element = that.template.clone()
 						.find('.tweeter').html(model.get('name')).end()
 						.find('.content').html(model.get('tweet')).end()
-						.find('.url').attr('href', model.get('url')).html(model.get('name')).end()
+						.find('.url').attr('href', model.get('url')).html("View this tweet on twitter.").end()
 						.find('.btn-danger').html("remove").attr('onclick','(function(){modify('+JSON.stringify(model.get('url'))+',"remove")})();').end()
 						.find('.img').attr('src', model.get('photo')).end();
 						//.find('.descriptions').html(model.get('description')).end();

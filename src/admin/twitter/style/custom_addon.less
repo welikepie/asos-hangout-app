@@ -1,82 +1,128 @@
 html{
     body{
         #container{
+           float:left;
             .column{
-                ul{
-                    margin:0;
-                    margin-top:10px;
+                .columnHeader{
+                    margin-left:10px;
+                    #searchBox{
+                        margin-right:5px;
+                        }
                     }
+                width:45%;
+                min-width:590px;
+                min-height:700px;
+                float:left;
                 border-left:3px solid rgba(0,0,0,0.2);
                 border-right:3px solid rgba(0,0,0,0.2);
                      #partialList{
-                         height:80%;
-                            overflow-y:scroll;
-                            
-                        li{
-                               border-top:3px solid rgba(0,0,0,0.2);
-                            float:left;
-                            clear:both;
-                            width:100%;
-                            .container{
-                                padding:5px 0;
-                                margin-bottom:5px;
+                          border-top:3px solid rgba(0,0,0,0.2);                        
+                          margin: 10px 0 30px 0 !important;
+                            padding: 0;                       
+                            li{
                                 width:100%;
-                                .content{
-                                    height:40px;
-                                    overflow-y:auto;
-                                    }
-                                .url{
-                                    float:left;
-                                    }
+                            border-bottom:3px solid rgba(0,0,0,0.2);
+                            
+                            float:left;
+                            .container{
+                                max-height:200px;
+                                width:96%;
+                               padding:10px;
                               .btn-danger{
                                         float:right;
+                                        width:20%;
+                                        height:55px;
+                                        margin-top:10px;
                                     }
                                 .btn-success{
                                         float:right;
+                                        width:20%;
+                                        height:55px;
+                                        margin-top:10px;
                                     }
                                     img{
                                         width:60px;
-                                        height:60px;
-                                        
+                                        margin-right:2%;
                                         float:left;
+                                    }
+                            .middleColumn{
+                                float:left;
+                                width:58%;
+                                     .url{
+                                    float:left;
+                                    }
+                                    .content{
+                                        width:100%;
+                                        //height:60px;
+                                        text-overflow:ellipsis;
+                                        overflow:hidden;
+                                        font-size:11px;
+                                        line-height:12px;
+                                        float:left;
+                                         ul{
+                                            li{
+                                               border-top: 0px solid rgba(0,0,0,0); 
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     #fullList{
-                         height:80%;
-                            overflow-y:scroll;
-                        li{
-                          
-                            border-top:3px solid rgba(0,0,0,0.2);
-                            float:left;
-                            clear:both;
-                            width:100%;
-                            .container{
-                                padding:5px 0;
-                                margin-bottom:5px;
+                         border-top:3px solid rgba(0,0,0,0.2);    
+                          margin: 10px 0 30px 0 !important;
+                            padding: 0;                       
+                            li{
                                 width:100%;
-                                .content{
-                                    height:40px;
-                                    overflow-y:auto;
-                                    }
-                                .url{
-                                    float:left;
-                                    }
+                            border-bottom:3px solid rgba(0,0,0,0.2);
+                            float:left;
+                            .container{
+                                max-height:200px;
+                                width:96%;
+                               padding:10px;
                               .btn-danger{
                                         float:right;
+                                        width:20%;
+                                        height:55px;
+                                        margin-top:10px;
                                     }
                                 .btn-success{
                                         float:right;
+                                        width:20%;
+                                        height:55px;
+                                        margin-top:10px;
                                     }
                                     img{
                                         width:60px;
-                                        height:60px;
-                                        
+                                        margin-right:2%;
                                         float:left;
+                                    }
+                            .middleColumn{
+                                float:left;
+                                width:58%;
+                                     .url{
+                                    float:left;
+                                    }
+                                        .content{
+                                            width:100%;
+                                        //height:60px;
+                                        text-overflow:ellipsis;
+                                        overflow:hidden;
+                                        font-size:11px;
+                                        line-height:12px;
+                                        float:left;
+                                         ul{
+                                            li{
+                                               border-top: 0px solid rgba(0,0,0,0); 
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
+                        
+                        
                         }
                 }   
             }

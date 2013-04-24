@@ -39,9 +39,9 @@ var fullClothesList = Backbone.View.extend(function () {
 					//renderEach(model,this.$el);
 						var element = that.template.clone()
 						.find('.name').html(model.get('name')).end()
-						.find('.descriptions').html(model.get('description')).end()
+						.find('.descriptions').html($(model.get('description')).text().substring(0,140)+"...").end()
 						.find('.btn-success').html("add").attr('onclick','(function(){modify('+model.get('id')+',"add")})();').end()
-						.find('.url').attr('href', model.get('url')).html(model.get('name')).end()
+						.find('.url').attr('href', model.get('url')).html("View this item on the site.").end()
 						.find('.img').attr('src', model.get('photo_small')).end();
 						//.find('.descriptions').html(model.get('description')).end();
 
@@ -94,9 +94,11 @@ var partialClothesList = Backbone.View.extend(function () {
 				this.collection.each(function (model) {
 
 					//renderEach(model,this.$el);
+
 						var element = that.template.clone()
-						.find('.name').html(model.get('name')).end()
-						.find('.description').html(model.get('description')).end()
+	.find('.name').html(model.get('name')).end()
+						.find('.descriptions').html($(model.get('description')).text().substring(0,140)+"...").end()
+		
 						.find('.url').attr('href', model.get('url')).html(model.get('name')).end()
 						.find('.btn-danger').html("remove").attr('onclick','(function(){modify('+model.get('id')+',"remove")})();').end()
 						.find('.img').attr('src', model.get('photo_small')).end();
