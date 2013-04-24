@@ -1,3 +1,4 @@
+/*jshint plusplus:false */
 (function (define) {
 	"use strict";
 
@@ -38,7 +39,7 @@
 			this.getID = function (peek) {
 				if (peek) { return event_counter; }
 				else { return event_counter++; }
-			}
+			};
 
 		};
 
@@ -68,7 +69,7 @@
 				// Add event to the history, trim the history and, finally, push the event to stream
 				this._events.push(content);
 				console.log('Event log length: ', this._events.length + '(' + Math.max(0, this._events.length - this.event_limit) + ' over limit)');
-				while (this._events.length > this.event_limit) { events.shift(); }
+				while (this._events.length > this.event_limit) { this._events.shift(); }
 				this.pushToStream(content);
 
 			},

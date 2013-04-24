@@ -1,4 +1,3 @@
-/*jshint plusplus:false */
 (function (undefined) {
 	"use strict";
 
@@ -10,6 +9,7 @@
 
 	var fs = require('fs'),
 		http = require('http'),
+		path = require('path'),
 		url = require('url'),
 
 		_ = require('./vendor/lodash'),
@@ -39,14 +39,15 @@
 
 		// SSE managers, one for public feed, one for admin twitter feed
 		publicSSE,
-		twitterSSE;
+		twitterSSE,
+		auth;
 
 	// INITIALISE SSE AND AUTH MANAGERS
 	publicSSE = new SSEManager(100, 1000, 0);
 	twitterSSE = new SSEManager(50, 10, 10);
-	auth = require('./vendor/http-auth').auth({
+	auth = require('./vendor/http-auth')({
 		'authRealm': 'Admin Area',
-		'authFile': path.join(__dirname, 'users.htpasswd')
+		'authFile': path.join(__dirname, '../admin/.htpasswd')
 	});
 
 	// Bind modifications of the product feed collection to public SSE manager
@@ -90,6 +91,7 @@
 		// for cross-domain requests are handled in appropriate way.
 		if (request.method === 'OPTIONS') {
 			response.writeHead(200, corsHeaders(request));
+			console.log('Options sent');
 			return response.end();
 		}
 
@@ -101,7 +103,7 @@
 
 			// Treat request as SSE subscription if SSE MIME type
 			// is explicitly listed in allowed response types
-			if ('accept' in request.headers && request.headers['accept'].indexOf('text/event-stream') !== -1) {
+			if ('accept' in request.headers && request.headers.accept.indexOf('text/event-stream') !== -1) {
 
 				response.writeHead(200, _.extend(corsHeaders(request), {
 					'Content-Type': 'text/event-stream',
@@ -119,7 +121,7 @@
 
 			// Treat request as SSE subscription if SSE MIME type
 			// is explicitly listed in allowed response types
-			if ('accept' in request.headers && request.headers['accept'].indexOf('text/event-stream') !== -1) {
+			if ('accept' in request.headers && request.headers.accept.indexOf('text/event-stream') !== -1) {
 
 				response.writeHead(200, _.extend(corsHeaders(request), {
 					'Content-Type': 'text/event-stream',
@@ -165,17 +167,20 @@
 				request.on('data', function (chunk) { json += chunk.toString(); });
 				request.on('end', function () {
 
-					auth.apply(request, response, function () {
+					//auth.apply(request, response, function () {
 						try {
 							json = JSON.parse(json);
-							productFeed.push(json);
+							console.log(json);
+							if (!_.where(productFeed, {'id': json.id}).length) {
+								productFeed.push(json);
+							}
 							response.writeHead(200, corsHeaders(request));
 							response.end();
 						} catch (e) {
 							response.writeHead(400, corsHeaders(request));
 							response.end();
 						}
-					});
+					//});
 					request.removeAllListeners();
 
 
@@ -199,7 +204,7 @@
 					}
 				});
 
-				auth.apply(request, response, function () {
+				//auth.apply(request, response, function () {
 					if (typeof index === 'number') {
 						productFeed.splice(index, 1);
 						response.writeHead(200, corsHeaders(request));
@@ -208,7 +213,7 @@
 						response.writeHead(404, corsHeaders(request));
 						response.end();
 					}
-				});
+				//});
 
 				return;
 
@@ -252,7 +257,7 @@
 	productFeed.on('remove', function (item) { console.log('Product removed: ', item); });
 	server.on('request', function (request) { console.log(request.method + ' to ' + request.url); });
 
-	setInterval(publicSSE.emit.bind(publicSSE, 'message', 'This is a test message.'), 5000);
+	//setInterval(publicSSE.emit.bind(publicSSE, 'message', 'This is a test message.'), 5000);
 	
 	server.listen(8888);
 	console.log('HTTP Server has been started.');

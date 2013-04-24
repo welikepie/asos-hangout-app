@@ -35,14 +35,13 @@
 	var productFeed = /* PRODUCT FEED */null,
 		baseUrl = document.getElementsByTagName('base').length ? document.getElementsByTagName('base')[0].href : '',
 
-		source,
-		socket/*,
+		var source;
+		var socket;/*,
 
 		// DEBUG BITS
 		status = $('#status'),
 		events = $('#events'),
 		template = events.find('.template').remove()*/;
-
 	socket = new easyXDM.Socket({
 		'interval': 1000,
 		'local': baseUrl + 'common/scripts/vendor/easyXDM/name.html',

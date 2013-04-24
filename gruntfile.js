@@ -110,6 +110,23 @@ module.exports = function (grunt) {
 					'node': true
 				},
 				'src': ['src/node-backend/*.js', 'src/node-backend/!(vendor)/**/*.js']
+			},
+
+			'admin-dev': {
+				'options': {
+					'debug': true,
+					'devel': true,
+					'unused': false
+				},
+				'src': ['src/admin/**/scripts/*.js', 'src/admin/**/scripts/!(vendor)/**/*.js']
+			},
+			'admin-release': {
+				'options': {
+					'debug': false,
+					'devel': false,
+					'unused': true
+				},
+				'src': ['src/admin/**/scripts/*.js', 'src/admin/**/scripts/!(vendor)/**/*.js']
 			}
 		},
 
@@ -169,6 +186,41 @@ module.exports = function (grunt) {
 				},
 				'src': 'src/hangout-app/styles/*.less',
 				'dest': 'build/hangout-app/styles/styles.css'
+			},
+
+			'admin-lint': {
+				'src': 'src/admin/**/*.less',
+				'options': {
+					'compile': false,
+					'compress': false,
+					'noIDs': false,
+					'noOverqualifying': false,
+					'noUniversalSelectors': false
+				}
+			},
+			'admin-dev': {
+				'options': {
+					'compile': true,
+					'compress': false
+				},
+				'src': '**/*.less',
+				'cwd': 'src/admin/',
+				'dest': 'build/admin/',
+				'ext': '.css',
+				'expand': true,
+				'filter': 'isFile'
+			},
+			'admin-release': {
+				'options': {
+					'compile': true,
+					'compress': true
+				},
+				'src': '**/*.less',
+				'cwd': 'src/admin/',
+				'dest': 'build/admin/',
+				'ext': '.css',
+				'expand': true,
+				'filter': 'isFile'
 			}
 
 		},
@@ -180,6 +232,7 @@ module.exports = function (grunt) {
 			'hangout-app': { 'src': ['build/hangout-app'] },
 			'hangout-app-scripts-post': { 'src': ['src/hangout-app/main.js'] },
 			'hangout-app-cleanup': { 'src': ['build/hangout-app/index.html', 'build/hangout-app/styles'] },
+			'admin': { 'src': ['build/admin'] },
 			'node-backend': { 'src': ['build/node-backend'] }
 		},
 
@@ -190,6 +243,13 @@ module.exports = function (grunt) {
 				'dest': 'build/common/scripts/',
 				'expand': true,
 				'cwd': 'src/common/scripts/',
+				'filter': 'isFile'
+			},
+			'common-styling': {
+				'src': '**/*.!(less)',
+				'cwd': 'src/common/styles',
+				'dest': 'build/common/styles',
+				'expand': true,
 				'filter': 'isFile'
 			},
 
@@ -341,8 +401,8 @@ module.exports = function (grunt) {
 			},
 			'node-backend-release': {
 				'src': '**/*',
-				'cwd': 'src/node-backend',
-				'dest': 'build/node-backend',
+				'cwd': 'src/node-backend/',
+				'dest': 'build/node-backend/',
 				'expand': true,
 				'filter': 'isFile',
 				'options': {
@@ -357,6 +417,31 @@ module.exports = function (grunt) {
 						} else { return content; }
 					}
 				}
+			},
+
+			'admin-html': {
+				'src': ['**/*.html', '**/*.htm', '**/*.php'],
+				'cwd': 'src/admin/',
+				'dest': 'build/admin/',
+				'expand': true,
+				'filter': 'isFile',
+				'options': {
+					'processContent': grunt.template.process
+				}
+			},
+			'admin-scripts': {
+				'src': '**/*.js',
+				'dest': 'build/admin/',
+				'expand': true,
+				'cwd': 'src/admin/',
+				'filter': 'isFile'
+			},
+			'admin-misc': {
+				'src': ['.htaccess', '.htpasswd', 'data/products.json'],
+				'cwd': 'src/admin/',
+				'dest': 'build/admin/',
+				'expand': true,
+				'filter': 'isFile'
 			}
 			
 		},
@@ -386,7 +471,6 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-recess');
 
 	grunt.registerTask('landing-page-scripts-dev', [
-		'clean:common',
 		'jshint:common-dev',
 		'copy:common-scripts',
 		'jshint:landing-page-dev',
@@ -403,14 +487,12 @@ module.exports = function (grunt) {
 	]);
 
 	grunt.registerTask('hangout-app-scripts-dev', [
-		'clean:common',
 		'jshint:common-dev',
 		'copy:common-scripts',
 		'jshint:hangout-app-dev',
 		'copy:hangout-app-scripts'
 	]);
 	grunt.registerTask('hangout-app-scripts-compiled', [
-		'clean:common',
 		'jshint:common-dev',
 		'jshint:hangout-app-dev',
 		'copy:hangout-app-scripts-pre',
@@ -442,7 +524,6 @@ module.exports = function (grunt) {
 	]);
 
 	grunt.registerTask('node-backend-dev', [
-		'clean:common',
 		'jshint:common-dev',
 		'copy:common-scripts',
 		'clean:node-backend',
@@ -450,12 +531,21 @@ module.exports = function (grunt) {
 		'copy:node-backend-dev'
 	]);
 	grunt.registerTask('node-backend-release', [
-		'clean:common',
 		'jshint:common-release',
 		'copy:common-scripts',
 		'clean:node-backend',
 		'jshint:node-backend-release',
 		'copy:node-backend-release'
+	]);
+
+	grunt.registerTask('admin-dev', [
+		'copy:common-scripts',
+		'copy:common-styling',
+		//'recess:admin-lint',
+		'recess:admin-dev',
+		'copy:admin-scripts',
+		'copy:admin-html',
+		'copy:admin-misc'
 	]);
 
 };
