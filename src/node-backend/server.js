@@ -163,14 +163,14 @@
 			// appropriate stream events.
 			if (request.method === 'POST' && path === '/product-feed') {
 
-				var json = '';
-				request.on('data', function (chunk) { json += chunk.toString(); });
-				request.on('end', function () {
+				return auth.apply(request, response, function () {
 
-					//auth.apply(request, response, function () {
+					var json = '';
+					request.on('data', function (chunk) { json += chunk.toString(); });
+					request.on('end', function () {
+
 						try {
 							json = JSON.parse(json);
-							console.log(json);
 							if (!_.where(productFeed, {'id': json.id}).length) {
 								productFeed.push(json);
 							}
@@ -180,13 +180,11 @@
 							response.writeHead(400, corsHeaders(request));
 							response.end();
 						}
-					//});
-					request.removeAllListeners();
+						request.removeAllListeners();
 
+					});
 
 				});
-
-				return;
 
 			}
 
@@ -196,15 +194,16 @@
 			// The rest is a matter of automated entry addition to SSE.
 			if (request.method === 'DELETE' && (temp = path.match(/^\/product-feed\/([0-9]+)$/))) {
 
-				temp = parseInt(temp[1], 10);
-				_.each(productFeed, function (item, inx) {
-					if (item.id === temp) {
-						index = inx;
-						return false;
-					}
-				});
+				return auth.apply(request, response, function () {
 
-				//auth.apply(request, response, function () {
+					temp = parseInt(temp[1], 10);
+					_.each(productFeed, function (item, inx) {
+						if (item.id === temp) {
+							index = inx;
+							return false;
+						}
+					});
+
 					if (typeof index === 'number') {
 						productFeed.splice(index, 1);
 						response.writeHead(200, corsHeaders(request));
@@ -213,9 +212,8 @@
 						response.writeHead(404, corsHeaders(request));
 						response.end();
 					}
-				//});
 
-				return;
+				});
 
 			}
 
