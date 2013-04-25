@@ -22,88 +22,79 @@ require.config({
 });
 require([
 	'json3', 'jquery', 'underscore', 'backbone', 'easyXDM',
-	'common/scripts/data/Product', 'common/scripts/product-feed-slider', 'common/scripts/product-overlay-view'
+	'common/scripts/data/product', 'common/scripts/data/tweet',
+	'common/scripts/ui/collection-view',
+	'common/scripts/product-feed-slider', 'common/scripts/product-overlay-view'
 ], function (
 	JSON, $, _, Backbone, easyXDM,
-	Products, bindProductFeed, bindProductView
+	Products, Tweets,
+	CollectionView,
+	bindProductFeed, bindProductView
 ) {
 	"use strict";
+
+	var nodeUrlBase = window.location.protocol + '//' + window.location.hostname + ':8888',
+		productFeed = new Products.ProductCollection(),
+		twitterFeed = new Tweets.TweetCollection();
 
 	$(function () {
 
 		// Apply UI actions
 		bindProductFeed('#product-feed');
 		var showModel = bindProductView('.overlay', '.overlay .product-view');
+		var hangoutEmbed = $('#stream-embed iframe');
 
-		// Establish the Backbone collection, along with the managing view
-		var productFeed = new Products.ProductCollection();
-		var productsList = Backbone.View.extend(function () {
+		// Initialise the view for displaying current product feed
+		var productFeedView = new CollectionView({
 
-			var props = {
-				'collection': productFeed,
-				// In one swoop, we setup container element and DOM template for creating new product entries
-				'el': $('#product-feed .wrapper > ul').get(0),
-				'template': $('#product-feed .wrapper > ul > li.template').remove().removeClass('template'),
+			'collection': productFeed,
+			'el': $('#product-feed ul').get(0),
+			'template': $('#product-feed ul > li.template').remove().removeClass('template'),
 
-				'initialize': function () {
-					// These four simple bindings make it so that the view
-					// automatically rerenders after any change to the collection
-					this.listenTo(this.collection, 'add', this.render);
-					this.listenTo(this.collection, 'remove', this.render);
-					this.listenTo(this.collection, 'reset', this.render);
-					this.listenTo(this.collection, 'sort', this.render);
+			'populate': function (model, element) {
+				$(element)
+					.find('.name').html(model.get('name')).end()
+					.find('.url').attr('href', model.get('url')).end()
+					.find('.photo').attr('src', model.get('photo_small')).end()
+					.find('.price').html(model.get('price')).end()
+					.find('.description').html(model.get('description')).end();
+			},
+
+			'itemEvents': {
+				'click a': function (model, ev) {
+
+					ev.preventDefault();
+					var temp = model.toJSON();
+					temp.photo = typeof temp.photo_big !== 'undefined' ? temp.photo_big : temp.photo_small;
+					delete temp.photo_small; delete temp.photo_big;
+					showModel(temp);
+
 				}
-			};
+			}
 
-			// The actual render function, defined as property in name different than "render"
-			// due to the fact that the "render" will be debounced.
-			props.immediateRender = function () {
+		});
+		productFeedView.render();
 
-				var that = this;
+		// Initialise the view for displaying twitter feed
+		var twitterFeedView = new CollectionView({
 
-				// We be cleaning up any events and DOM in view's container...
-				this.$el
-					.find('a').off().end()
-					.off()
-					.empty();
+			'collection': twitterFeed,
+			'el': $('#twitter-feed ul').get(0),
+			'template': $('#twitter-feed ul > li.template').remove().removeClass('template'),
 
-				// ...then going over each model in collection to render it.
-				this.collection.each(function (model) {
+			'advancedFilter': function (collection) { return collection.first(10); },
 
-					// Cloning template and populating it.
-					var element = that.template.clone()
-						.find('.name').html(model.get('name')).end()
-						.find('.url').attr('href', model.get('url')).end()
-						.find('.photo').attr('src', model.get('photo_small')).end()
-						.find('.price').html(model.get('price')).end()
-						.find('.description').html(model.get('description')).end();
+			'populate': function (model, element) {
+				$(element)
+					.find('a h2').text(model.get('author').name).end()
+					.find('a img').attr('src', model.get('author').avatar).end()
+					.find('a').attr('href', model.get('author').url).end()
+					.find('time').html(model.get('timestamp').toString()).end()
+					.find('.content').html(model.get('text')).end();
+			}
 
-					// Modal overlay bound here
-					element.find('a').on('click', function (ev) {
-						ev.preventDefault();
-						var temp = model.toJSON();
-						temp.photo = typeof temp.photo_big !== 'undefined' ? temp.photo_big : temp.photo_small;
-						delete temp.photo_small; delete temp.photo_big;
-						showModel(temp);
-					});
-
-					// New product added to the list for ye eye feastin'
-					that.$el.append(element);
-
-				});
-
-				return this;
-
-			};
-			// And the debounced version of render, used as an official one.
-			// This way, the rendering doesn't go haywire on multiple
-			// consecutive changes.
-			props.render = _.debounce(props.immediateRender, 250);
-
-			return props;
-
-		}());
-		productsList = new productsList();
+		});
+		twitterFeedView.render();
 
 		var socket = new easyXDM.Socket({
 
@@ -111,13 +102,13 @@ require([
 			'local': '../common/scripts/vendor/easyXDM/name.html',
 			'swf': '../common/scripts/vendor/easyXDM.swf',
 			'swfNoThrottle': true,
-			'remote': 'http://localhost:8888/stream',
+			'remote': nodeUrlBase + '/stream',
 			'onMessage': function (message) {
-
 				try {
 
 					var data = JSON.parse(message),
-						ev = data.event.split(':', 2);
+						ev = data.event.split(':', 2),
+						model;
 
 					if (ev[0] === 'productFeed') {
 
@@ -126,16 +117,26 @@ require([
 						} else if (ev[1] === 'add') {
 							if (!productFeed.get(data.payload.id)) { productFeed.add(data.payload); }
 						} else if (ev[1] === 'remove') {
-							var model = productFeed.get(data.payload.id);
+							model = productFeed.get(data.payload.id);
 							if (model) { productFeed.remove(model); }
 						}
 
-					} else if (ev[0] === 'message') {
-						window.alert(data.payload);
+					} else if (ev[0] === 'twitterFeed') {
+
+						if (ev[1] === 'reset') {
+							twitterFeed.reset(data.payload, {'parse': true, 'validate': true});
+						} else if (ev[1] === 'add') {
+							if (!twitterFeed.get(data.payload.id)) { twitterFeed.add(data.payload, {'parse': true, 'validate': true}); }
+						} else if (ev[1] === 'remove') {
+							model = twitterFeed.get(data.payload.id);
+							if (model) { twitterFeed.remove(model); }
+						}
+
+					} else if (ev[0] === 'appOptions') {
+						if (_.has(data.payload, 'hangoutEmbed')) { hangoutEmbed.attr('src', data.payload.hangoutEmbed); }
 					}
 
 				} catch (e) {}
-
 			}
 
 		});

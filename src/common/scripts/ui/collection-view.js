@@ -2,90 +2,81 @@
 define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 	"use strict";
 
-	var CollectionView = Backbone.View.extend(function () {
+	var CollectionView = Backbone.View.extend({
 
-		var props = {
-			'el': null,
-			'template': null,
-			'collection': null,
+		'el': null,
+		'template': null,
+		'collection': null,
 
-			'filter': '',
-			'itemEvents': {},
+		'filter': _.identity,
+		'advancedFilter': null,
+		'itemEvents': {},
 
-			'initialize': function (opts) {
+		'initialize': function (opts) {
 
-				var result = Backbone.View.prototype.initialize.apply(this, arguments);
-				_.extend(this, _.pick(opts || {}, ['template', 'populate', 'filter', 'itemEvents']));
+			var result = Backbone.View.prototype.initialize.apply(this, arguments);
+			_.extend(this, _.pick(opts || {}, ['template', 'populate', 'filter', 'advancedFilter', 'itemEvents']));
 
-				this.listenTo(this.collection, 'add', this.render);
-				this.listenTo(this.collection, 'remove', this.render);
-				this.listenTo(this.collection, 'reset', this.render);
-				this.listenTo(this.collection, 'sort', this.render);
+			this.render = _.debounce(this.immediateRender, 250);
+			this.listenTo(this.collection, 'add', this.render);
+			this.listenTo(this.collection, 'remove', this.render);
+			this.listenTo(this.collection, 'reset', this.render);
+			this.listenTo(this.collection, 'sort', this.render);
 
-				this._eventSelectors = [];
+			this._eventSelectors = [];
 
-				return result;
+			return result;
 
-			},
-			'populate': function (model, element) {},
-			'immediateRender': function () {
+		},
+		'populate': function (model, element) {},
+		'immediateRender': function () {
 
-				var that = this;
+			var that = this;
 
-				// We be cleaning up any events and DOM in view's container...
-				_.each(this._eventSelectors, function (selector) { that.$el.find(selector).off(); });
-				this.$el.off().empty(); this._eventSelectors = [];
+			// We be cleaning up any events and DOM in view's container...
+			_.each(this._eventSelectors, function (selector) { that.$el.find(selector).off(); });
+			this.$el.off().empty(); this._eventSelectors = [];
 
-				// ...then going over each model in collection to render it.
-				_.each(
-					this.collection.filter(function (model) {
-						var sample = that.filter.replace(/^\s+|\s+$/g, "").toLowerCase();
-						return (
-							(model.get('name').toLowerCase().indexOf(sample) !== -1) ||
-							(model.get('description').toLowerCase().indexOf(sample) !== -1)
-						);
-					}),
-					function (model) {
+			// ...then going over each model in collection to render it.
+			_.each(
+				(typeof this.advancedFilter === 'function' ? this.advancedFilter(this.collection) : this.collection.filter(this.filter)),
+				function (model) {
 
-						// Perform basic model rendering
-						var element = that.template.clone();
-						that.populate(model, element.get(0));
+					// Perform basic model rendering
+					var element = that.template.clone();
+					that.populate(model, element.get(0));
 
-						// Apply any defined item events to the item render
-						_.each(that.itemEvents, function (callback, key) {
+					// Apply any defined item events to the item render
+					_.each(that.itemEvents, function (callback, key) {
 
-							// Format is "[eventtype] [selector]", where type is always
-							// a basic letter string, whereas selector is the rest.
-							var event = key.split(/\s+/, 1)[0],
-								selector = key.split(/\s+/).slice(1).join(' ');
+						// Format is "[eventtype] [selector]", where type is always
+						// a basic letter string, whereas selector is the rest.
+						var event = key.split(/\s+/, 1)[0],
+							selector = key.split(/\s+/).slice(1).join(' ');
 
-							if (selector.length) {
-								// If callback is a string, try to use view method with such name.
-								if (typeof callback === 'string') { callback = that[callback]; }
-								if (typeof callback === 'function') {
-									// Add to selector list for easier cleanup later on
-									that._eventSelectors.push(selector);
-									element.find(selector).on(event, function (ev) {
-										callback.apply(that, [model, ev, this]);
-									});
-								}
+						if (selector.length) {
+							// If callback is a string, try to use view method with such name.
+							if (typeof callback === 'string') { callback = that[callback]; }
+							if (typeof callback === 'function') {
+								// Add to selector list for easier cleanup later on
+								that._eventSelectors.push(selector);
+								element.find(selector).on(event, function (ev) {
+									callback.apply(that, [model, ev, this]);
+								});
 							}
+						}
 
-						});
+					});
 
-						that.$el.append(element);
-					}
-				);
+					that.$el.append(element);
+				}
+			);
 
-				return this;
+			return this;
 
-			}
-		};
+		}
 
-		props.render = _.debounce(props.immediateRender, 250);
-		return props;
-
-	}());
+	});
 
 	return CollectionView;
 

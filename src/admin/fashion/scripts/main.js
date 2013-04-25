@@ -48,6 +48,21 @@ require([
 			'el': $('#fullList').get(0),
 			'template': $('#fullList > li.template').remove().removeClass('template'),
 
+			'filter': (function () {
+
+				var filter_func = function (model) {
+					var sample = filter_func.phrase.replace(/^\s+|\s+$/g, "").toLowerCase();
+					return (
+						(model.get('name').toLowerCase().indexOf(sample) !== -1) ||
+						(model.get('description').toLowerCase().indexOf(sample) !== -1)
+					);
+				};
+				filter_func.phrase = '';
+
+				return filter_func;
+
+			}()),
+
 			'populate': function (model, element) {
 				var excerpt = $(model.get('description')).text().substring(0, 140) + "...";
 				$(element)
@@ -113,7 +128,7 @@ require([
 		// Search controls - bindings to pass the contents of search form
 		// to filter property on full DB product view and rerender.
 		$('#searchBox + button').on('click', function () {
-			allProductsView.filter = $('#searchBox').val().replace(/^\s+|\s+$/g, "");
+			allProductsView.filter.phrase = $('#searchBox').val().replace(/^\s+|\s+$/g, "");
 			allProductsView.render();
 		});
 
