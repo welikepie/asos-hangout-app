@@ -8,8 +8,14 @@
 		<link rel="stylesheet" href="styles/custom_addon.css" type="text/css">
 		<script type="text/javascript">
 		window.authToken = <?php
-			$headers = apache_request_headers();
-			echo(json_encode(isset($headers['Authorization']) ? $headers['Authorization'] : null));
+			if (function_exists("apache_request_headers")) {
+				$headers = apache_request_headers();
+				if (isset($headers['Authorization'])) { $token = $headers['Authorization']; }
+				else { $token = null; }
+			}
+			elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) { $token = $_SERVER['HTTP_AUTHORIZATION']; }
+			else { $token = null; }
+			echo(json_encode($token));
 		?>;
 		</script>
 		<script type="text/javascript" src="../../common/scripts/vendor/require.js" data-main="scripts/main"></script>

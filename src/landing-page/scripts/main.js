@@ -41,8 +41,9 @@ require([
 
 		// Apply UI actions
 		bindProductFeed('#product-feed');
-		var showModel = bindProductView('.overlay', '.overlay .product-view');
-		var hangoutEmbed = $('#stream-embed iframe');
+		var showModel = bindProductView('.overlay', '.overlay .product-view'),
+			hangoutEmbed = $('#stream-embed iframe'),
+			liveMessage = $('#live-message p.content');
 
 		// Initialise the view for displaying current product feed
 		var productFeedView = new CollectionView({
@@ -134,6 +135,9 @@ require([
 
 					} else if (ev[0] === 'appOptions') {
 						if (_.has(data.payload, 'hangoutEmbed')) { hangoutEmbed.attr('src', data.payload.hangoutEmbed); }
+						if (_.has(data.payload, 'liveMessage')) {
+							liveMessage.html(data.payload.liveMessage.replace(/\n/g, "<br>"));
+						}
 					}
 
 				} catch (e) {}
