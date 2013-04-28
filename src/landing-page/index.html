@@ -1,82 +1,131 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>ASOS Hangout App</title>
+		<title>ASOS Shop-Along</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="styles/styles.css">
-		<script type="text/javascript" src="../common/scripts/vendor/require.js" data-main="scripts/main"></script>
 	</head>
 	<body>
 
-		<!-- Landing Page Top Header -->
-		<header>
-			<a href="http://asos.com" target="_top">Shopalong</a>
-		</header>
+		<div class="top-nav">
+			<nav>
+				<a href="http://www.asos.com/?hrd=1" class="active">ASOS</a>
+				<a href="https://marketplace.asos.com/?WT.ac=ASOS_grpnav_UK">Marketplace</a>
+				<a href="http://fashionfinder.asos.com/?WT.ac=ASOS_grpnav_UK">Outfits &amp; Looks</a>
+				<a href="http://www.asos.com/blogs?WT.ac=ASOS_grpnav_UK">Blog</a>
+			</nav>
+		</div>
 
-		<div class="main-container">
+		<div class="container">
+			<header>
+				<a href="http://www.asos.com/?hrd=1" class="logo">ASOS</a>
+				<div class="categories">
+					<a class="home" href="http://www.asos.com/?hrd=1">Home</a>
+					<a href="http://www.asos.com/Women/?&amp;via=top">Women</a>
+					<a href="http://www.asos.com/Men/?&amp;via=top">Men</a>
+				</div>
+
+				<div class="banner">
+					<div class="shop-along-logo">Shopalong</div>
+					<p class="left">Tweet <span class="hashtag">#askasos</span> to look the part</p>
+					<p class="right">Special event style, sorted</p>
+				</div>
+			</header>
 
 			<section id="stream-embed">
-				<img src="images/ratio-16-9.gif">
-				<iframe style="width: 100%;" src="" frameborder="0" allowfullscreen></iframe>
+				<img class="ratio" src="images/ratio-16-10.gif">
+				<iframe src="" frameborder="0" allowfullscreen></iframe>
 			</section>
 
 			<section id="product-feed">
-				<h1>Shop The Look</h1>
-				<div class="wrapper">
-					<ul>
-						<li class="template">
-							<a target="_blank" class="url">
-								<img class="photo">
-								<h2 class="name"></h2>
-								<h3 class="price"></h3>
-								<div class="description"></div>
+				<h1>Shop-Along</h1>
+
+				<div class="switcher">
+					<ul><li class="template">
+							<a href="http://www.asos.com/ASOS/ASOS-Sweatshirt-with-Woven-Front-Tiger-Print-with-Studs/Prod/pgeproduct.aspx?iid=2847110&amp;cid=11321&amp;sh=0&amp;pge=0&amp;pgesize=20&amp;sort=-1&amp;clr=Black" target="_blank">
+								<img src="http://images.asos-media.com/inv/media/0/1/1/7/2847110/black/image1xl.jpg">
+								<h2 class="title">ASOS Sweatshirt with Woven Front Tiger Print with Studs</h2>
+								<h3 class="price">£28.00</h3>
 							</a>
-						</li>
-					</ul>
-					<a class="prev">&lt;</a>
-					<a class="next">&gt;</a>
+						</li><li class="template">
+							<a href="http://www.asos.com/ASOS/ASOS-Sweatshirt-with-Woven-Front-Tiger-Print-with-Studs/Prod/pgeproduct.aspx?iid=2847110&amp;cid=11321&amp;sh=0&amp;pge=0&amp;pgesize=20&amp;sort=-1&amp;clr=Black" target="_blank">
+								<img src="http://images.asos-media.com/inv/media/0/1/1/7/2847110/black/image1xl.jpg">
+								<h2 class="title">ASOS Sweatshirt with Woven Front Tiger Print with Studs</h2>
+								<h3 class="price">£28.00</h3>
+							</a>
+					</li></ul>
+					<a class="prev"></a>
+					<a class="next"></a>
+
+					<h2 class="title">ASOS Sweatshirt with Woven Front Tiger Print with Studs</h2>
+					<h3 class="price">£28.00</h3>
 				</div>
-			</section>
 
-		</div>
-
-		<div class="aux-container">
-
-			<section id="live-message">
-				<h1>Current message</h1>
-				<p class="content">&nbsp;</p>
+				<a href="" target="_blank" class="shop">Shop Special Events ›</a>
 			</section>
 
 			<section id="twitter-feed">
-				<h1>Latest Tweets</h1>
-				<ul>
-					<li class="template">
-						<a href="" target="_blank">
-							<img src="" class="avatar">
-							<h2></h2>
-						</a>
-						<time></time>
-						<div class="content"></div>
-					</li>
-				</ul>
+				<h1>#askasos</h1>
+				<div id="live-message" class="blink">this is a test of a live message</div>
+				<a href="https://twitter.com/asos" target="_blank" class="twitter">Join us</a>
+
+				<div class="switcher">
+					<ul><li class="template">
+							<a href="https://twitter.com/GooglePoetics" target="_blank">
+								<img class="avatar" src="https://si0.twimg.com/profile_images/1695239906/me_normal.jpg">
+								<h2>Jake Archibald</h2>
+							</a>
+							<time>2 minutes ago</time>
+							<p class="tweet">Looks like my Sunday morning drum lessons were not well received by my neighbors who suck and are most likely communists.</p>
+						</li><li class="template">
+							<a href="https://twitter.com/GooglePoetics" target="_blank">
+								<img class="avatar" src="https://si0.twimg.com/profile_images/1695239906/me_normal.jpg">
+								<h2>Jake Archibald</h2>
+							</a>
+							<time>2 minutes ago</time>
+							<p class="tweet">Looks like my Sunday morning drum lessons were not well received by my neighbors who suck and are most likely communists.</p>
+						</li><li class="template">
+							<a href="https://twitter.com/GooglePoetics" target="_blank">
+								<img class="avatar" src="https://si0.twimg.com/profile_images/1695239906/me_normal.jpg">
+								<h2>Jake Archibald</h2>
+							</a>
+							<time>2 minutes ago</time>
+							<p class="tweet">Looks like my Sunday morning drum lessons were not well received by my neighbors who suck and are most likely communists.</p>
+					</li></ul>
+					<a class="prev"></a>
+					<a class="next"></a>
+				</div>
 			</section>
 
+			<section id="sharing">
+				<iframe allowtransparency="true" frameborder="0" scrolling="no" src="https://platform.twitter.com/widgets/tweet_button.1366232305.html#_=1367186321262&amp;count=horizontal&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=https%3A%2F%2Ftwitter.com%2Fabout%2Fresources%2Fbuttons%23tweet&amp;size=m&amp;text=Twitter%20%2F%20Twitter%20buttons&amp;url=https%3A%2F%2Ftwitter.com%2Fabout%2Fresources%2Fbuttons" class="twitter twitter-share-button twitter-count-horizontal" style="width: 110px; height: 20px;" title="Twitter Tweet Button" data-twttr-rendered="true"></iframe>
+				<iframe class="facebook" src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fexample.com&amp;send=false&amp;layout=button_count&amp;width=100&amp;show_faces=false&amp;font=segoe+ui&amp;colorscheme=light&amp;action=like&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:21px;" allowTransparency="true"></iframe>
+			</section>
 		</div>
 
-		<div class="overlay">
+		<footer>
 
-			<div class="product-view">
-				<a class="close">X</a>
-				<img src="">
-				<div class="info">
-					<h2 class="title"></h2>
-					<h3 class="price"></h3>
-					<div class="description"></div>
-					<a href="" target="_blank" class="shop">See in shop</a>
-				</div>
-			</div>
+			<section class="social">
+				<p>Our social places:</p>
+				<a href="https://www.facebook.com/ASOS" target="_blank" class="facebook">Facebook</a>
+				<a href="https://twitter.com/ASOS" target="_blank" class="twitter">Twitter</a>
+				<a href="http://pinterest.com/asos/" target="_blank" class="pinterest">Pinterest</a>
+				<a href="https://plus.google.com/+ASOS" target="_blank" class="google">Google Plus</a>
+			</section>
 
-		</div>
+			<section class="misc">
+				&copy; 2013 ASOS |
+				<a href="http://www.asos.com/infopages/pgetandc.aspx">T&amp;C's</a> |
+				<a href="http://www.asos.com/infopages/pgeprivacy.aspx">Privacy &amp; Cookies</a> |
+				<a href="https://www.asos.com/account/pgereceipttracking.aspx">Track order</a> |
+				<a href="http://www.asos.com/infopages/pgehelpdesk.aspx#/level11">Delivery</a> |
+				<a href="http://www.asos.com/infopages/pgehelpdesk.aspx#/level11">Returns</a> |
+				<a href="http://www.asos.com/infopages/pgehelpdesk.aspx#/level10">Help &amp; Contact</a> |
+				<a href="http://www.asos.com/infopages/pgecontactcare.aspx">Contact us</a> |
+				<a href="http://www.asos.com/?hrd=1">ASOS Full Site</a>
+			</section>
+
+		</footer>
 
 	</body>
 </html>

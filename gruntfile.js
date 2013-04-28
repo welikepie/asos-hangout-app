@@ -478,6 +478,7 @@ module.exports = function (grunt) {
 	]);
 	grunt.registerTask('landing-page-dev', [
 		'clean:landing-page',
+		'copy:common-styling',
 		'recess:landing-page-lint',
 		'recess:landing-page-dev',
 		'landing-page-scripts-dev',

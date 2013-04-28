@@ -1,198 +1,508 @@
 @import '../../common/styles/settings.less';
-@import '../../common/styles/feeds.less';
 
-html {
+@container-width: 970px;
+@main-section-width: 656px;
+@aux-section-width: @container-width - 10px - @main-section-width;
+
+@pretty-font: "FuturaStd", Tahoma, sans-serif;
+
+@font-face {
+	font-family: 'FuturaStd';
+	src: url('../../common/styles/fonts/futurastd-book-webfont.eot');
+	src: url('../../common/styles/fonts/futurastd-book-webfont.eot?#iefix') format('embedded-opentype'),
+	     url('../../common/styles/fonts/futurastd-book-webfont.woff') format('woff'),
+	     url('../../common/styles/fonts/futurastd-book-webfont.ttf') format('truetype'),
+	     url('../../common/styles/fonts/futurastd-book-webfont.svg#FuturaStdBook') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'FuturaStdBookOblique'; 
+	src: url('../../common/styles/fonts/futurastd-bookoblique-webfont.eot');
+	src: url('../../common/styles/fonts/futurastd-bookoblique-webfont.eot?#iefix') format('embedded-opentype'),
+	     url('../../common/styles/fonts/futurastd-bookoblique-webfont.woff') format('woff'),
+	     url('../../common/styles/fonts/futurastd-bookoblique-webfont.ttf') format('truetype'),
+	     url('../../common/styles/fonts/futurastd-bookoblique-webfont.svg#FuturaStdBookOblique') format('svg');
+	font-weight: normal;
+	font-style: italic;
+}
+
+html, body { width: 100%; padding: 0; margin: 0; }
+
+.top-nav, footer { width: 100%; }
+
+.top-nav nav,
+.container,
+footer .social,
+footer .misc {
+	display: block;
+	width: @container-width;
+	margin: 0 auto;
+}
+
+// Slider buttons
+a.prev, a.next {
+	position: absolute;
+	display: block;
+	width: 32px;
+	height: 48px;
+
+	background-repeat: no-repeat;
+	background-position: center center;
+
+	cursor: pointer;
+}
+
+// Top black bar with site navigation
+// (only on desktop, hidden in mobile mode)
+.top-nav {
+	margin: 0 0 20px;
+	background: #242424;
+	nav {
+		overflow: hidden;
+		a {
+			position: relative;
+			display: block;
+			float: left;
+			height: 30px;
+			padding: 0 16px;
+			margin: 4px 0 0;
+
+			font: normal 10px/26px @serif-font;
+			color: white;
+			text-decoration: none;
+			text-transform: uppercase;
+
+			&:after {
+				content: '';
+				position: absolute;
+				top: 0; right: 0; bottom: 0;
+				display: block;
+				width: 1px; height: 100%;
+
+				background: -webkit-linear-gradient(center top, #242424 0, #5C5C5C 50%, #242424 100%);
+				background: -moz-linear-gradient(center top, #242424 0, #5C5C5C 50%, #242424 100%);
+				background: -ms-linear-gradient(center top, #242424 0, #5C5C5C 50%, #242424 100%);
+				background: -o-linear-gradient(center top, #242424 0, #5C5C5C 50%, #242424 100%);
+				background: linear-gradient(center top, #242424 0, #5C5C5C 50%, #242424 100%);
+			}
+
+			&:hover, &:focus { color: #999; }
+			&.active {
+				color: #242424;
+				background: white;
+				text-decoration: underline;
+				&:hover, &:focus { color: #242424; }
+			}
+		}
+	}
+}
+
+// Website Header (ASOS logo, product logo, intro text)
+.container header {
 	position: relative;
-	width: 100%;
-	padding: 0;
-	margin: 0;
-
-	font: normal 14px/16px @serif-font;
-	color: black;
-
-	background: white;
-}
-
-body {
-	width: @small-screen-threshold;
-	padding: (@baseline * 2) 0;
-	margin: 0 auto 32px;
-	overflow: auto;
-
-	@media (max-width: @small-screen-threshold) {
-		width: 100%;
-		padding: @baseline;
-		margin: 0;
-	}
-}
-
-.main-container {
 	display: block;
-	float: left;
-	width: @video-width;
-	clear: left;
+	margin: 0 0 4px;
 
-	@media (max-width: @small-screen-threshold) {
-		width: 100%;
-		float: none;
-	}
-}
-
-.aux-container {
-	display: block;
-	float: right;
-	width: @small-screen-threshold - @baseline - @video-width;
-	clear: right;
-
-	@media (max-width: @small-screen-threshold) {
-		width: 100%;
-		float: none;
-	}
-}
-
-header {
-	display: block;
-	height: 80px;
-	margin: 0 0 @baseline;
-
-	a {
+	// ASOS logo (left corner in desktop version)
+	.logo {
+		position: absolute;
+		top: 0; left: 0;
 		display: block;
-		width: 100%;
-		height: 100%;
-		padding-top: 10px;
+		width: 120px;
+		height: 35px;
+		overflow: hidden;
 
-		font-size: 48px;
-		font-weight: bold;
-		line-height: 60px;
-		color: black;
-		text-decoration: none;
-		text-indent: 240px;
+		text-indent: -9999px;
+		background: url('../images/asos-logo-desktop.png') no-repeat center center;
+	}
 
-		background: url('../images/asos-logo.gif') no-repeat left center;
+	// Category menu (matching the styles on official ASOS site, hidden on mobile)
+	.categories {
+		position: absolute;
+		top: 0; right: 0;
+		display: block;
+		overflow: hidden;
+
+		a {
+			display: block;
+			float: left;
+			height: 38px;
+			margin: 0 -1px 0 0;
+			padding: 0 14px;
+
+			font: normal 14px @serif-font;
+			color: black;
+			line-height: 34px;
+			text-decoration: none;
+			text-transform: uppercase;
+
+			background: url("http://assets.asosservices.com/asos-web/images/nav/nav-divider.gif") no-repeat scroll 100% 10px transparent;
+
+			&:focus, &:hover {
+				color: white;
+				text-decoration: underline;
+				background: url("http://assets.asosservices.com/asos-web/images/nav/nav-bg.png") repeat-x scroll 0 0 transparent;
+			}
+
+			&.home {
+				width: 28px;
+				overflow: hidden;
+
+				text-indent: -9999px;
+				background-image: url("http://assets.asosservices.com/asos-web/images/nav/nav-bg.png");
+				background-position: 0 -39px;
+
+				&:focus, &:hover { background-position: 0 -77px; }
+			}
+		}
+	}
+
+	.banner {
+		display: block;
+		height: 185px;
+		padding: 100px 0 56px;
+		overflow: hidden;
+
+		background: url('../images/banner-background-desktop.png') repeat-x center 100px;
+
+		.shop-along-logo {
+			position: absolute;
+			bottom: 0; left: 50%;
+			display: block;
+			width: 170px;
+			height: 170px;
+			margin-left: -85px;
+			overflow: hidden;
+
+			text-indent: -9999px;
+			background: url('../images/shopalong-logo-desktop.png') no-repeat center center;
+		}
+
+		p {
+			height: 29px;
+			margin: 0;
+
+			font: normal 16px/29px @pretty-font;
+			color: white;
+			text-transform: uppercase;
+
+			span { color: #fbb3ff; }
+			&.left { float: left; margin-left: 68px; }
+			&.right { float: right; margin-right: 68px; }
+		}
+
+		&:before, &:after {
+			content: '';
+			position: absolute;
+			top: 100px;
+			display: block;
+			width: 26px;
+			height: 29px;
+			background-repeat: no-repeat;
+			background-position: center center;
+		}
+		&:before { left: 0; background-image: url('../images/banner-left-desktop.png'); }
+		&:after { right: 0; background-image: url('../images/banner-right-desktop.png'); }
 	}
 }
 
 #stream-embed {
 	position: relative;
 	display: block;
-	margin: 0 0 @baseline;
-	img {
-		position: relative;
-		z-index: 1;
-		width: 100%;
-		background: #333;
-	}
+	float: left;
+	width: @main-section-width;
+	height: floor(@main-section-width * 10 / 16);
+	margin: 0 0 16px;
+
+	background: #333;
+
+	img { display: block; width: 100%; margin: 0; }
 	iframe {
 		position: absolute;
 		top: 0; right: 0; bottom: 0; left: 0;
-		z-index: 2;
 		display: block;
 		width: 100%;
 		height: 100%;
 	}
 }
 
-#live-message {
-	.live-message(300px);
-	margin: 0 0 @baseline;
-}
-
 #product-feed {
-	.product-feed(300px);
-	margin: 0 0 @baseline;
+	position: relative;
+	display: block;
+	float: right;
+	width: @aux-section-width;
+	height: floor(@main-section-width * 10 / 16) + 16px + 188px;
+
+	font-family: @pretty-font;
+	font-weight: normal;
+	text-align: center;
+	text-transform: uppercase;
+
+	background: #71efad url('../images/product-feed-background-desktop.png') repeat-y -304px 0;
+	&:before, &:after {
+		content: '';
+		position: absolute;
+		left: 0;
+		display: block;
+		width: 100%;
+		height: 6px;
+	}
+	&:before { top: 0; background: url('../images/product-feed-background-desktop.png') no-repeat 0 top; }
+	&:after { bottom: 0; background: url('../images/product-feed-background-desktop.png') no-repeat -608px bottom; }
+
+	h1 {
+		padding: 0;
+		margin: 24px 0 20px;
+
+		font-size: 22px;
+		font-weight: inherit;
+		color: black;
+		letter-spacing: 0.1em;
+		line-height: 24px;
+
+		&:before, &:after {
+			content: '';
+			display: inline-block;
+			width: 38px;
+			height: 23px;
+			vertical-align: top;
+			background-repeat: no-repeat;
+			background-position: center center;
+		}
+		&:before {
+			margin-right: 15px;
+			background-image: url('../images/product-feed-header-left.png');
+		}
+		&:after {
+			margin-left: 15px;
+			background-image: url('../images/product-feed-header-right.png');
+		}
+	}
+
+	.switcher {
+		position: relative;
+		display: block;
+		height: 466px;
+		margin: 0 6px 26px;
+		ul {
+			display: block;
+			height: 368px;
+			padding: 0;
+			margin: 0 0 28px;
+			overflow: hidden;
+
+			text-indent: -50px;
+			white-space: nowrap;
+
+			background: white;
+
+			li {
+				display: inline-block;
+				width: 100%;
+				text-indent: 0;
+				a, img { display: block; width: 100%; }
+				.title, .price { display: none; }
+			}
+		}
+
+		.title, .price {
+			display: block;
+			margin: 0 8px;
+
+			font-size: 15px;
+			line-height: 18px;
+		}
+		.title {
+			max-height: (3 * 18px);
+			font-weight: normal;
+		}
+		.price {
+			max-height: 18px;
+			font-weight: bold;
+		}
+
+		a.prev { top: 152px; left: 0; background-image: url('../images/product-feed-chevron-left.png'); }
+		a.next { top: 152px; right: 0; background-image: url('../images/product-feed-chevron-right.png'); }
+	}
+
+	.shop {
+		display: block;
+		width: 212px;
+		height: 34px;
+		margin: 0 auto;
+
+		font-size: 15px;
+		color: inherit;
+		line-height: 34px;
+		text-decoration: none;
+
+		background: white url('../images/shop-button-background.png') no-repeat center center;
+	}
 }
 
 #twitter-feed {
-	.twitter-feed();
-}
+	position: relative;
+	display: block;
+	float: left;
+	width: @main-section-width;
+	height: 188px;
+	padding: 16px 36px 24px;
 
-.overlay {
-	position: absolute;
-	top: 0; right: 0; bottom: 0; left: 0;
-	z-index: 10;
-	display: none;
-	&.open { display: block; }
-	width: 100%;
-	height: 100%;
+	background: #fcb1ff url('../images/twitter-feed-background-desktop.png') repeat-y -656px 0;
+	&:before, &:after {
+		content: '';
+		position: absolute;
+		left: 0;
+		display: block;
+		width: 100%;
+		height: 6px;
+	}
+	&:before { top: 0; background: url('../images/twitter-feed-background-desktop.png') no-repeat 0 top; }
+	&:after { bottom: 0; background: url('../images/twitter-feed-background-desktop.png') no-repeat -1312px bottom; }
 
-	background: rgba(0, 0, 0, 0.5);
+	h1 {
+		float: left;
+		padding: 0;
+		margin: 0 16px 16px 0;
 
-	.product-view {
+		font: normal 20px/20px @pretty-font;
+		text-transform: uppercase;
+	}
+	#live-message {
+		float: left;
+		margin-top: 4px;
+
+		font-size: 14px;
+		line-height: 16px;
+
+		&.blink:after { content: ' |'; color: #333; }
+	}
+	a.twitter {
+		position: absolute;
+		top: 8px; right: 8px;
+		display: block;
+
+		color: black;
+		text-decoration: none;
+
+		&:after {
+			content: '';
+			display: inline-block;
+			width: 26px;
+			height: 18px;
+			margin-left: 4px;
+
+			vertical-align: middle;
+			background: url('../images/twitter-feed-twitter-icon.png') no-repeat center center;
+		}
+	}
+
+	.switcher {
 		position: relative;
 		display: block;
-		width: 500px + (@baseline * 2);
-		padding: @baseline;
-		margin: 40px auto;
+		clear: both;
+		width: 100%;
+		height: 112px;
+		margin: 0;
 
-		background: white;
-
-		> img {
-			position: relative;
-			z-index: 11;
-			display: block;
-			width: 500px;
-		}
-		> .close {
-			position: absolute;
-			top: 0; right: 0;
-			z-index: 12;
-			display: block;
-			width: 16px + (@baseline * 2);
-			height: 16px + (@baseline * 2);
-			padding: @baseline;
-			overflow: hidden;
-
-			text-indent: -9999px;
-			background: white url('../images/close.png') no-repeat center center;
-			cursor: pointer;
-		}
-		> .info {
-			position: absolute;
-			bottom: 0; left: 0;
-			z-index: 13;
+		ul {
 			display: block;
 			width: 100%;
+			height: 100%;
+			padding: 0;
+			margin: 0;
 			overflow: hidden;
 
 			font-family: @sans-serif-font;
-			background: rgba(255, 255, 255, 0.5);
+			text-indent: 0;
+			white-space: nowrap;
 
-			> h2 {
-				padding: @baseline (@baseline * 2) (@baseline * 0.5);
-				margin: 0;
-				line-height: 1.3em;
-				a {
-					color: inherit;
-					text-decoration: none;
-					&:hover { text-decoration: underline; }
+			list-style: none;
+			background: white;
+
+			li {
+				display: inline-block;
+				width: 50%;
+				height: 100%;
+				padding: 4px;
+
+				text-indent: 0;
+				white-space: normal;
+
+				img {
+					display: block;
+					float: left;
+					width: 48px;
+					height: 48px;
 				}
-			}
-			> .price {
-				padding: 0 (@baseline * 2) @baseline;
-				margin: 0;
-				color: #444;
-			}
-			> .description {
-				padding: 0 (@baseline * 2) @baseline;
-				ul { margin: 0; }
-				li { margin: 0; +li { margin-top: 4px; } }
-			}
-			> a.shop {
-				display: block;
-				float: left;
-				height: 28px;
-				padding: 5px;
-				margin: 0 (@baseline * 2) (@baseline * 2);
 
-				font: bold 12px/14px @sans-serif-font;
-				color: black;
-				text-decoration: none;
-				text-transform: uppercase;
+				a { color: inherit; text-decoration: none; }
 
-				background: white;
-				border: 2px solid black;
-				&:after { content: ' >'; }
+				h2, time, p {
+					display: block;
+					padding: 0;
+					margin: 0 0 4px 58px;
+					line-height: 16px;
+				}
+				h2 { font-size: 14px; }
+				time { font-size: 11px; color: #0074ff; }
+				p { font-size: 11px; }
 			}
 		}
+
+		a.prev { top: 32px; right: 100%; background-image: url('../images/twitter-feed-chevron-left.png'); }
+		a.next { top: 32px; left: 100%; background-image: url('../images/twitter-feed-chevron-right.png'); }
+	}
+}
+
+#sharing {
+	clear: both;
+	padding: 24px 0 32px;
+	text-align: center;
+	> * {
+		display: inline-block;
+		margin: 0 4px;
+		vertical-align: middle;
+	}
+}
+
+footer {
+	display: block;
+	width: 100%;
+
+	background: #f9f9f9;
+	border-top: 1px solid #b1b1b1;
+
+	.social {
+		margin: 28px auto 32px;
+		font: normal 24px/24px @pretty-font;
+		text-align: center;
+
+		p { margin: 0 0 16px; }
+		a {
+			display: inline-block;
+			width: 32px;
+			height: 32px;
+			margin: 0 12px;
+			overflow: hidden;
+
+			text-indent: -9999px;
+
+			background-repeat: no-repeat;
+			background-position: center center;
+
+			&.facebook { background-image: url('../images/social-facebook-desktop.png'); }
+			&.twitter { background-image: url('../images/social-twitter-desktop.png'); }
+			&.pinterest { background-image: url('../images/social-pinterest-desktop.png'); }
+			&.google { background-image: url('../images/social-google-desktop.png'); }
+		}
+	}
+	.misc {
+		margin: 0 auto 32px;
+		font: normal 12px/14px @pretty-font;
+		color: #232323;
+		text-align: center;
+		a { color: inherit; text-decoration: none; &:hover, &:focus { text-decoration: underline; } }
 	}
 }
