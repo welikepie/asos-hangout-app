@@ -292,7 +292,7 @@ a.prev, a.next {
 			margin: 0 0 28px;
 			overflow: hidden;
 
-			text-indent: -50px;
+			text-indent: 0;
 			white-space: nowrap;
 
 			background: white;
@@ -376,7 +376,7 @@ a.prev, a.next {
 		font-size: 14px;
 		line-height: 16px;
 
-		&.blink:after { content: ' |'; color: #333; }
+		&.blink:after { content: ' |'; color: #666; }
 	}
 	a.twitter {
 		position: absolute;
@@ -506,3 +506,5 @@ footer {
 		a { color: inherit; text-decoration: none; &:hover, &:focus { text-decoration: underline; } }
 	}
 }
+
+@import 'mobile';

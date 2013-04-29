@@ -148,7 +148,7 @@ module.exports = function (grunt) {
 					'compile': true,
 					'compress': false
 				},
-				'src': 'src/landing-page/styles/*.less',
+				'src': 'src/landing-page/styles/styles.less',
 				'dest': 'build/landing-page/styles/styles.css'
 			},
 			'landing-page-release': {
@@ -156,7 +156,7 @@ module.exports = function (grunt) {
 					'compile': true,
 					'compress': true
 				},
-				'src': 'src/landing-page/styles/*.less',
+				'src': 'src/landing-page/styles/styles.less',
 				'dest': 'build/landing-page/styles/styles.css'
 			},
 
