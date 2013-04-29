@@ -4,8 +4,6 @@
 @main-section-width: 656px;
 @aux-section-width: @container-width - 10px - @main-section-width;
 
-@pretty-font: "FuturaStd", Tahoma, sans-serif;
-
 @font-face {
 	font-family: 'FuturaStd';
 	src: url('../../common/styles/fonts/futurastd-book-webfont.eot');
@@ -292,7 +290,7 @@ a.prev, a.next {
 			margin: 0 0 28px;
 			overflow: hidden;
 
-			text-indent: 0;
+			text-indent: 0 !important;
 			white-space: nowrap;
 
 			background: white;
@@ -371,6 +369,7 @@ a.prev, a.next {
 	}
 	#live-message {
 		float: left;
+		min-height: 22px;
 		margin-top: 4px;
 
 		font-size: 14px;
@@ -415,7 +414,7 @@ a.prev, a.next {
 			overflow: hidden;
 
 			font-family: @sans-serif-font;
-			text-indent: 0;
+			text-indent: 0 !important;
 			white-space: nowrap;
 
 			list-style: none;

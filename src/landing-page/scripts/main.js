@@ -40,10 +40,8 @@ require([
 	$(function () {
 
 		// Apply UI actions
-		bindProductFeed('#product-feed');
-		var showModel = bindProductView('.overlay', '.overlay .product-view'),
-			hangoutEmbed = $('#stream-embed iframe'),
-			liveMessage = $('#live-message p.content');
+		var hangoutEmbed = $('#stream-embed iframe'),
+			liveMessage = $('#live-message');
 
 		// Initialise the view for displaying current product feed
 		var productFeedView = new CollectionView({
@@ -54,23 +52,10 @@ require([
 
 			'populate': function (model, element) {
 				$(element)
-					.find('.name').html(model.get('name')).end()
-					.find('.url').attr('href', model.get('url')).end()
-					.find('.photo').attr('src', model.get('photo_small')).end()
-					.find('.price').html(model.get('price')).end()
-					.find('.description').html(model.get('description')).end();
-			},
-
-			'itemEvents': {
-				'click a': function (model, ev) {
-
-					ev.preventDefault();
-					var temp = model.toJSON();
-					temp.photo = typeof temp.photo_big !== 'undefined' ? temp.photo_big : temp.photo_small;
-					delete temp.photo_small; delete temp.photo_big;
-					showModel(temp);
-
-				}
+					.find('a').attr('href', model.get('url')).end()
+					.find('h2').html(model.get('name')).end()
+					.find('h3').html(model.get('price')).end()
+					.find('img').attr('src', model.get('photo_small')).end();
 			}
 
 		});
@@ -87,11 +72,11 @@ require([
 
 			'populate': function (model, element) {
 				$(element)
-					.find('a h2').text(model.get('author').name).end()
-					.find('a img').attr('src', model.get('author').avatar).end()
+					.find('h2').text(model.get('author').name).end()
+					.find('img').attr('src', model.get('author').avatar).end()
 					.find('a').attr('href', model.get('author').url).end()
 					.find('time').html(model.get('timestamp').toString()).end()
-					.find('.content').html(model.get('text')).end();
+					.find('.tweet').html(model.get('text')).end();
 			}
 
 		});
@@ -136,7 +121,7 @@ require([
 					} else if (ev[0] === 'appOptions') {
 						if (_.has(data.payload, 'hangoutEmbed')) { hangoutEmbed.attr('src', data.payload.hangoutEmbed); }
 						if (_.has(data.payload, 'liveMessage')) {
-							liveMessage.html(data.payload.liveMessage.replace(/\n/g, "<br>"));
+							liveMessage.html(data.payload.liveMessage.replace(/\n/g, " "));
 						}
 					}
 
@@ -144,6 +129,10 @@ require([
 			}
 
 		});
+
+		// Misc UI bits
+		window.setInterval(_.bind(liveMessage.toggleClass, liveMessage, 'blink'), 600);
+		$('footer .misc').one('click', function () { $(this).addClass('open'); });
 
 	});
 

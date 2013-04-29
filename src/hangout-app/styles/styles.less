@@ -1,5 +1,25 @@
 @import '../../common/styles/settings.less';
-@import '../../common/styles/feeds.less';
+
+@font-face {
+	font-family: 'FuturaStd';
+	src: url('../../common/styles/fonts/futurastd-book-webfont.eot');
+	src: url('../../common/styles/fonts/futurastd-book-webfont.eot?#iefix') format('embedded-opentype'),
+	     url('../../common/styles/fonts/futurastd-book-webfont.woff') format('woff'),
+	     url('../../common/styles/fonts/futurastd-book-webfont.ttf') format('truetype'),
+	     url('../../common/styles/fonts/futurastd-book-webfont.svg#FuturaStdBook') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'FuturaStdBookOblique'; 
+	src: url('../../common/styles/fonts/futurastd-bookoblique-webfont.eot');
+	src: url('../../common/styles/fonts/futurastd-bookoblique-webfont.eot?#iefix') format('embedded-opentype'),
+	     url('../../common/styles/fonts/futurastd-bookoblique-webfont.woff') format('woff'),
+	     url('../../common/styles/fonts/futurastd-bookoblique-webfont.ttf') format('truetype'),
+	     url('../../common/styles/fonts/futurastd-bookoblique-webfont.svg#FuturaStdBookOblique') format('svg');
+	font-weight: normal;
+	font-style: italic;
+}
 
 html {
 	position: relative;
@@ -23,120 +43,228 @@ body {
 	overflow-y: auto;
 }
 
+a.prev, a.next {
+	position: absolute;
+	top: 50%;
+	display: block;
+	width: 32px;
+	height: 48px;
+	margin-top: -24px;
+
+	background-repeat: no-repeat;
+	background-position: center center;
+
+	cursor: pointer;
+}
+
 header {
 	display: block;
 	width: 100%;
-	margin: @baseline 0;
-	text-align: center;
-}
+	height: 150px;
+	overflow: hidden;
 
-#live-message {
-	.live-message();
-	margin: 0 @baseline @baseline;
+	text-indent: -9999px;
+	background: #7ff3ae url('../images/shopalong-logo-desktop.png') no-repeat center bottom;
 }
-
 #product-feed {
-	.product-feed(300px);
-	margin: 0 @baseline @baseline;
-}
-
-#twitter-feed {
-	.twitter-feed();
-	margin: 0 @baseline @baseline;
-}
-
-.overlay {
-	position: absolute;
-	top: 0; right: 0; bottom: 0; left: 0;
-	z-index: 10;
-	display: none;
+	display: block;
 	width: 100%;
-	height: 100%;
+	padding: 16px 6px 12px;
+	background: #7ff3ae;
 
-	background: rgba(0, 0, 0, 0.5);
+	font-family: @pretty-font;
+	font-weight: normal;
+	text-align: center;
+	text-transform: uppercase;
 
-	.product-view {
+	h1 {
+		margin: 0 0 20px;
+
+		font-size: 22px;
+		font-weight: inherit;
+		color: black;
+		letter-spacing: 0.1em;
+		line-height: 24px;
+
+		&:before, &:after {
+			content: '';
+			display: inline-block;
+			width: 38px;
+			height: 23px;
+			vertical-align: top;
+			background-repeat: no-repeat;
+			background-position: center center;
+		}
+		&:before {
+			margin-right: 8px;
+			background-image: url('../images/product-feed-header-left.png');
+		}
+		&:after {
+			margin-left: 8px;
+			background-image: url('../images/product-feed-header-right.png');
+		}
+	}
+
+	.switcher {
 		position: relative;
+		width: 100%;
+		margin: 0 0 12px;
+		img {
+			display: block;
+			width: 100%;
+		}
+		ul {
+			position: absolute;
+			top: 0; right: 0; bottom: 0; left: 0;
+			display: block;
+			width: 100%;
+			height: 100%;
+			padding: 0;
+			margin: 0;
+			overflow: hidden;
+
+			text-indent: 0;
+			white-space: nowrap;
+
+			list-style: none;
+			background: white;
+
+			li {
+				display: inline-block;
+				width: 100%;
+				text-indent: 0;
+				a, img { display: block; width: 100%; }
+				.title, .price { display: none; }
+			}
+		}
+		a.prev { left: 0; background-image: url('../images/product-feed-chevron-left.png'); }
+		a.next { right: 0; background-image: url('../images/product-feed-chevron-right.png'); }
+	}
+
+	.title {
+		display: inline;
+		padding: 0;
+		margin: 0;
+
+		font-size: 13px;
+		font-weight: normal;
+		line-height: 16px;
+	}
+	.price {
+		display: inline;
+		padding: 0;
+		margin: 0;
+
+		font-size: 13px;
+		font-weight: bold;
+		line-height: 16px;
+	}
+}
+#twitter-feed {
+	display: block;
+	width: 100%;
+	padding: 20px 20px 12px;
+	background: #f9abff;
+
+	h1 {
+		padding: 0;
+		margin: 0 0 16px;
+
+		font: normal 20px/20px @pretty-font;
+		text-align: center;
+		text-transform: uppercase;
+	}
+	#live-message {
 		display: block;
-		padding: (@baseline * 0.5);
-		margin: 40px (@baseline * 0.5);
+		min-height: 22px;
+		margin: 0 0 16px;
 
-		background: white;
+		font-size: 14px;
+		line-height: 16px;
+		text-align: center;
 
-		> img {
-			position: relative;
-			z-index: 11;
+		&.blink:after { content: ' |'; color: #666; }
+	}
+
+	.switcher {
+		position: relative;
+		width: 100%;
+		margin: 0 0 12px;
+		ul {
 			display: block;
 			width: 100%;
-		}
-		> .close {
-			position: absolute;
-			top: 0; right: 0;
-			z-index: 12;
-			display: block;
-			width: 16px + @baseline;
-			height: 16px + @baseline;
-			padding: (@baseline * 0.5);
+			height: 100%;
+			min-height: 210px;
+			padding: 0;
+			margin: 0;
 			overflow: hidden;
 
-			text-indent: -9999px;
-			background: white url('../images/close.png') no-repeat center center;
-			cursor: pointer;
+			text-indent: 0;
+			white-space: nowrap;
+
+			list-style: none;
+			background: white;
+
+			li {
+				display: inline-block;
+				width: 100%;
+				height: 100%;
+				padding: 8px;
+				margin: 0;
+
+				text-indent: 0;
+				white-space: normal;
+
+				a { color: inherit; text-decoration: none; }
+				img {
+					display: block;
+					width: 48px;
+					height: 48px;
+					margin: 0 0 6px;
+				}
+				h2 {
+					margin: 0 0 6px;
+					font-size: 20px;
+					line-height: 20px;
+				}
+				time {
+					display: block;
+					margin: 0 0 6px;
+					font-size: 14px;
+					color: #0074ff;
+					line-height: 14px;
+					text-transform: uppercase;
+				}
+				p {
+					margin: 0 0 6px;
+					font-size: 14px;
+					line-height: 18px;
+				}
+			}
 		}
-		> .info {
-			position: absolute;
-			bottom: 0; left: 0;
-			z-index: 12;
-			display: block;
-			width: 100%;
-			overflow: hidden;
+		a.prev { right: 100%; margin-right: -8px; background-image: url('../images/twitter-feed-chevron-left.png'); }
+		a.next { left: 100%; margin-left: -8px; background-image: url('../images/twitter-feed-chevron-right.png'); }
+	}
 
-			font-family: @sans-serif-font;
-			background: rgba(255, 255, 255, 0.5);
+	.twitter {
+		display: block;
 
-			> h2 {
-				padding: (@baseline * 0.5) @baseline (@baseline * 0.25);
-				margin: 0;
-				font-size: 16px;
-				line-height: 1.3em;
-				a {
-					color: inherit;
-					text-decoration: none;
-					&:hover { text-decoration: underline; }
-				}
-			}
-			> .price {
-				padding: 0 @baseline (@baseline * 0.5);
-				margin: 0;
-				font-size: 14px;
-				line-height: 1.2em;
-				color: #444;
-			}
-			> .description {
-				padding: 0 @baseline (@baseline * 0.5);
-				ul {
-					padding-left: @baseline;
-					margin: 0;
-					font-size: 10px;
-				}
-				li { margin: 0; +li { margin-top: 2px; } }
-			}
-			> a.shop {
-				display: block;
-				float: left;
-				height: 28px;
-				padding: 5px;
-				margin: 0 @baseline @baseline;
+		color: inherit;
+		text-align: center;
+		text-decoration: none;
 
-				font: bold 12px/14px @sans-serif-font;
-				color: black;
-				text-decoration: none;
-				text-transform: uppercase;
+		&:hover, &:focus { text-decoration: underline; }
 
-				background: white;
-				border: 2px solid black;
-				&:after { content: ' >'; }
-			}
+		&:after {
+			content: '';
+			display: inline-block;
+			width: 26px;
+			height: 18px;
+			padding: 0;
+			margin: 0 0 0 4px;
+
+			vertical-align: middle;
+			background: url('../images/twitter-feed-twitter-icon.png') no-repeat center center;
 		}
 	}
 }
