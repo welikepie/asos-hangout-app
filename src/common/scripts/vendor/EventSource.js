@@ -1,5 +1,7 @@
 ;(function (global) {
 
+console.log('Checking for presence of EventSource: ', !!global.EventSource);
+
 if ("EventSource" in global) return;
 
 var reTrim = /^(\s|\u00A0)+|(\s|\u00A0)+$/g;
@@ -32,7 +34,8 @@ var EventSource = function (url) {
 
       // NOTE: IE7 and upwards support
       var xhr = new XMLHttpRequest();
-      xhr.open('GET', eventsource.URL, true);
+      console.log('Calling with URL: ', eventsource.URL + '?_=' + (new Date()).getTime());
+      xhr.open('GET', eventsource.URL + '?_=' + (new Date()).getTime(), true);
       xhr.setRequestHeader('Accept', 'text/event-stream');
       xhr.setRequestHeader('Cache-Control', 'no-cache');
       // we must make use of this on the server side if we're working with Android - because they don't trigger 

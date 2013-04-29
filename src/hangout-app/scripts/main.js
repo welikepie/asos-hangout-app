@@ -6,7 +6,8 @@ require.config({
 		"jquery": "common/scripts/vendor/jquery-1.9.1.min",
 		"backbone": "common/scripts/vendor/backbone",
 		"underscore": "common/scripts/vendor/underscore",
-		"easyXDM": "common/scripts/vendor/easyXDM/easyXDM.min"
+		"easyXDM": "common/scripts/vendor/easyXDM/easyXDM.min",
+		"moment": "common/scripts/vendor/moment"
 	},
 	"shim": {
 		"underscore": {"exports": "_"},
@@ -19,33 +20,31 @@ require.config({
 	"waitSeconds": 10
 });
 require([
-	'jquery', 'underscore', 'backbone', 'easyXDM',
+	'jquery', 'underscore', 'backbone', 'easyXDM', 'moment',
 	'common/scripts/data/product', 'common/scripts/data/tweet',
-	'common/scripts/ui/collection-view',
-	'common/scripts/product-feed-slider', 'common/scripts/product-overlay-view'
+	'common/scripts/ui/collection-view', 'common/scripts/ui/slider'
 ], function (
-	$, _, Backbone, easyXDM,
+	$, _, Backbone, easyXDM, moment,
 	Products, Tweets,
-	CollectionView,
-	bindProductFeed, bindProductView
+	CollectionView, Slider
 ) {
 	"use strict";
 
-	gapi.hangout.onApiReady.add(function init () {
+	// DATA STRUCTURES
+	// Establish collections for product and Twitter feeds,
+	// as well as URL base for the node SSE server.
+	var productFeed = new Products.ProductCollection(),
+		twitterFeed = new Tweets.TweetCollection();
 
-		var nodeUrlBase = 'http://ks3310759.kimsufi.com:8888',
-			productFeed = new Products.ProductCollection(),
-			twitterFeed = new Tweets.TweetCollection();
+	// DOM-dependent scripts go here
+	$(function () {
 
-		$(function () {
+		var baseUrl = $('base').eq(0).attr('data-base-url'),
+			nodeUrl = $('base').eq(0).attr('data-node-url');
 
-			// Apply UI actions
-			bindProductFeed('#product-feed');
-			var showModel = bindProductView('.overlay', '.overlay .product-view'),
-				liveMessage = $('#live-message p.content');
-
-			// Initialise the view for displaying current product feed
-			var productFeedView = new CollectionView({
+		// Create DOM and Backbone controls for realtime data
+		var liveMessage = $('#live-message'),
+			productFeedView = new CollectionView({
 
 				'collection': productFeed,
 				'el': $('#product-feed ul').get(0),
@@ -53,30 +52,14 @@ require([
 
 				'populate': function (model, element) {
 					$(element)
-						.find('.name').html(model.get('name')).end()
-						.find('.url').attr('href', model.get('url')).end()
-						.find('.photo').attr('src', model.get('photo_small')).end()
+						.find('.title').html(model.get('name')).end()
 						.find('.price').html(model.get('price')).end()
-						.find('.description').html(model.get('description')).end();
-				},
-
-				'itemEvents': {
-					'click a': function (model, ev) {
-
-						ev.preventDefault();
-						var temp = model.toJSON();
-						temp.photo = typeof temp.photo_big !== 'undefined' ? temp.photo_big : temp.photo_small;
-						delete temp.photo_small; delete temp.photo_big;
-						showModel(temp);
-
-					}
+						.find('a').attr('href', model.get('url')).end()
+						.find('img').attr('src', model.get('photo_small')).end();
 				}
 
-			});
-			productFeedView.render();
-
-			// Initialise the view for displaying twitter feed
-			var twitterFeedView = new CollectionView({
+			}),
+			twitterFeedView = new CollectionView({
 
 				'collection': twitterFeed,
 				'el': $('#twitter-feed ul').get(0),
@@ -86,65 +69,128 @@ require([
 
 				'populate': function (model, element) {
 					$(element)
-						.find('a h2').text(model.get('author').name).end()
-						.find('a img').attr('src', model.get('author').avatar).end()
+						.find('h2').text(model.get('author').name).end()
+						.find('img').attr('src', model.get('author').avatar).end()
 						.find('a').attr('href', model.get('author').url).end()
-						.find('time').html(model.get('timestamp').toString()).end()
-						.find('.content').html(model.get('text')).end();
+						.find('time').html(moment(model.get('timestamp')).fromNow()).end()
+						.find('p').html(model.get('text')).end();
 				}
 
 			});
-			twitterFeedView.render();
 
-			var socket = new easyXDM.Socket({
+		// Init rendering of the collection views
+		productFeedView.render();
+		twitterFeedView.render();
 
-				'interval': 1000,
-				'local': 'http://ks3310759.kimsufi.com/common/scripts/vendor/easyXDM/name.html',
-				'swf': 'http://ks3310759.kimsufi.com/common/scripts/vendor/easyXDM.swf',
-				'swfNoThrottle': true,
-				'remote': nodeUrlBase + '/stream',
-				'onMessage': function (message) {
-					try {
+		var productSlider = new Slider(productFeedView.$el, 'li');
+		productSlider.animate = function (oldIndex, newIndex, oldEl, newEl) {
+			var result = Slider.prototype.animate.apply(this, arguments);
+			if (result) {
+				$('#product-feed > .title')
+					.fadeOut(150)
+					.queue('fx', function (next) { this.innerHTML = newEl.find('.title').html() || ''; next(); })
+					.fadeIn(150);
+				$('#product-feed > .price')
+					.fadeOut(150)
+					.queue('fx', function (next) { this.innerHTML = newEl.find('.price').html() || ''; next(); })
+					.fadeIn(150);
+			}
+			return true;
+		};
+		$('#product-feed a.prev').on('click', function (ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			console.log('Switching from ', productSlider.currentIndex, ' to ', (productSlider.currentIndex - 1));
+			productSlider.changeTo(productSlider.currentIndex - 1);
+		});
+		$('#product-feed a.next').on('click', function (ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			console.log('Switching from ', productSlider.currentIndex, ' to ', (productSlider.currentIndex + 1));
+			productSlider.changeTo(productSlider.currentIndex + 1);
+		});
+		(function () {
+			var oldRender = productFeedView.immediateRender;
+			productFeedView.immediateRender = function () {
+				var result = oldRender.apply(this, arguments);
+				_.delay(function () { productSlider.changeTo(productSlider.currentIndex); }, 100);
+			};
+		}());
 
-						var data = JSON.parse(message),
-							ev = data.event.split(':', 2),
-							model;
+		var twitterSlider = new Slider(twitterFeedView.$el, 'li');
+		$('#twitter-feed a.prev').on('click', function (ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			console.log('Switching from ', twitterSlider.currentIndex, ' to ', (twitterSlider.currentIndex - 1));
+			twitterSlider.changeTo(twitterSlider.currentIndex - 1);
+		});
+		$('#twitter-feed a.next').on('click', function (ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			console.log('Switching from ', twitterSlider.currentIndex, ' to ', (twitterSlider.currentIndex + 1));
+			twitterSlider.changeTo(twitterSlider.currentIndex + 1);
+		});
+		(function () {
+			var oldRender = twitterFeedView.immediateRender;
+			twitterFeedView.immediateRender = function () {
+				var result = oldRender.apply(this, arguments);
+				_.delay(function () { twitterSlider.changeTo(twitterSlider.currentIndex); }, 100);
+			};
+		}());
 
-						if (ev[0] === 'productFeed') {
+		// Blinking cursor on live message
+		window.setInterval(_.bind(liveMessage.toggleClass, liveMessage, 'blink'), 800);
 
-							if (ev[1] === 'reset') {
-								productFeed.reset(data.payload);
-							} else if (ev[1] === 'add') {
-								if (!productFeed.get(data.payload.id)) { productFeed.add(data.payload); }
-							} else if (ev[1] === 'remove') {
-								model = productFeed.get(data.payload.id);
-								if (model) { productFeed.remove(model); }
-							}
+		// Connect to the SSE server and set up appropriate modifications to local collections
+		var socket = new easyXDM.Socket({
 
-						} else if (ev[0] === 'twitterFeed') {
+			'interval': 1000,
+			'local': baseUrl + 'common/scripts/vendor/easyXDM/name.html',
+			'swf': baseUrl + 'common/scripts/vendor/easyXDM.swf',
+			'swfNoThrottle': true,
+			'remote': nodeUrl + 'stream',
+			'onMessage': function (message) {
+				try {
 
-							if (ev[1] === 'reset') {
-								twitterFeed.reset(data.payload, {'parse': true, 'validate': true});
-							} else if (ev[1] === 'add') {
-								if (!twitterFeed.get(data.payload.id)) { twitterFeed.add(data.payload, {'parse': true, 'validate': true}); }
-							} else if (ev[1] === 'remove') {
-								model = twitterFeed.get(data.payload.id);
-								if (model) { twitterFeed.remove(model); }
-							}
+					var data = JSON.parse(message),
+						ev = data.event.split(':', 2),
+						model;
 
-						} else if (ev[0] === 'appOptions') {
-							if (_.has(data.payload, 'liveMessage')) {
-								liveMessage.html(data.payload.liveMessage.replace(/\n/g, "<br>"));
-							}
+					if (ev[0] === 'productFeed') {
+
+						if (ev[1] === 'reset') {
+							productFeed.reset(data.payload);
+						} else if (ev[1] === 'add') {
+							if (!productFeed.get(data.payload.id)) { productFeed.add(data.payload); }
+						} else if (ev[1] === 'remove') {
+							model = productFeed.get(data.payload.id);
+							if (model) { productFeed.remove(model); }
 						}
 
-					} catch (e) {}
-				}
+					} else if (ev[0] === 'twitterFeed') {
 
-			});
+						if (ev[1] === 'reset') {
+							twitterFeed.reset(data.payload, {'parse': true, 'validate': true});
+						} else if (ev[1] === 'add') {
+							if (!twitterFeed.get(data.payload.id)) { twitterFeed.add(data.payload, {'parse': true, 'validate': true}); }
+						} else if (ev[1] === 'remove') {
+							model = twitterFeed.get(data.payload.id);
+							if (model) { twitterFeed.remove(model); }
+						}
+
+					} else if (ev[0] === 'appOptions') {
+						if (_.has(data.payload, 'liveMessage')) {
+							liveMessage.html(data.payload.liveMessage.replace(/\n/g, " "));
+						}
+					}
+
+				} catch (e) {}
+			}
 
 		});
 
 	});
+
+	gapi.hangout.onApiReady.add(function init () {});
 
 });

@@ -35,7 +35,11 @@
 				socket.postMessage(JSON.stringify({'event': 'twitterFeed:reset', 'payload': twitterFeed}));
 
 				// Establish connection to SSE stream and establish message pass-through
-				source = new window.EventSource(window.location.href);
+				source = new window.EventSource(
+					window.location.href
+						.replace(window.location.hash, '')
+						.replace(window.location.search, '')
+				);
 				$(source).on("message", function (ev) {
 					console.log('Event: ' + ev.originalEvent.data);
 					socket.postMessage(ev.originalEvent.data);

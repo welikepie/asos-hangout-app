@@ -287,7 +287,7 @@ module.exports = function (grunt) {
 				'filter': 'isFile',
 				'options': {
 					'processContent': function (content) {
-						return content.replace('https://hangoutsapi.talkgadget.google.com/hangouts/api/', '');
+						return grunt.template.process(content.replace('https://hangoutsapi.talkgadget.google.com/hangouts/api/', ''));
 					}
 				}
 			},
@@ -297,10 +297,12 @@ module.exports = function (grunt) {
 				'options': {
 					'processContent': function (content) {
 						return grunt.template.process(content
+							.replace('<base href=""', '<base href="<%= pkg.app.hangoutUrl %>"')
+							.replace( /src="..\/common\/scripts\/vendor\/require\.js"/gi, 'src="scripts/require.js"' )
 							.replace(
 								/<link(?:[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*|[^>]*href="([^"]+)"[^>]*rel="stylesheet"[^>]*)>/gi,
 								function (match, file) {
-									var baseUrl = grunt.config.get('pkg.app.baseSslUrl'),
+									var baseUrl = grunt.config.get('pkg.app.hangoutUrl'),
 										css = grunt.file.read('build/hangout-app/' + file).replace(
 											/\.\.\/images/gi,
 											baseUrl + 'images'
@@ -308,13 +310,7 @@ module.exports = function (grunt) {
 									return '<style type="text/css">' + css + '</style>';
 								}
 							)
-							.replace(
-								/<!--<base[^>]*>-->/i,
-								"<base href=\"<%= pkg.app.baseSslUrl %>\">"
-							).replace(
-								/src="..\/common\/scripts\/vendor\/require\.js"/gi,
-								'src="scripts/require.js"'
-							));
+						);
 					}
 				}
 			},

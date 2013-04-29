@@ -17,7 +17,7 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 			var result = Backbone.View.prototype.initialize.apply(this, arguments);
 			_.extend(this, _.pick(opts || {}, ['template', 'populate', 'filter', 'advancedFilter', 'itemEvents']));
 
-			this.render = _.debounce(this.immediateRender, 250);
+			this.render = _.debounce(_.bind(function () { this.immediateRender(); }, this), 250);
 			this.listenTo(this.collection, 'add', this.render);
 			this.listenTo(this.collection, 'remove', this.render);
 			this.listenTo(this.collection, 'reset', this.render);
