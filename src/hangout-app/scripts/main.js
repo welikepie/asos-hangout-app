@@ -100,13 +100,11 @@ require([
 		$('#product-feed a.prev').on('click', function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
-			console.log('Switching from ', productSlider.currentIndex, ' to ', (productSlider.currentIndex - 1));
 			productSlider.changeTo(productSlider.currentIndex - 1);
 		});
 		$('#product-feed a.next').on('click', function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
-			console.log('Switching from ', productSlider.currentIndex, ' to ', (productSlider.currentIndex + 1));
 			productSlider.changeTo(productSlider.currentIndex + 1);
 		});
 		(function () {
@@ -114,6 +112,7 @@ require([
 			productFeedView.immediateRender = function () {
 				var result = oldRender.apply(this, arguments);
 				_.delay(function () { productSlider.changeTo(productSlider.currentIndex); }, 100);
+				return result;
 			};
 		}());
 
@@ -121,13 +120,11 @@ require([
 		$('#twitter-feed a.prev').on('click', function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
-			console.log('Switching from ', twitterSlider.currentIndex, ' to ', (twitterSlider.currentIndex - 1));
 			twitterSlider.changeTo(twitterSlider.currentIndex - 1);
 		});
 		$('#twitter-feed a.next').on('click', function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
-			console.log('Switching from ', twitterSlider.currentIndex, ' to ', (twitterSlider.currentIndex + 1));
 			twitterSlider.changeTo(twitterSlider.currentIndex + 1);
 		});
 		(function () {
@@ -135,6 +132,7 @@ require([
 			twitterFeedView.immediateRender = function () {
 				var result = oldRender.apply(this, arguments);
 				_.delay(function () { twitterSlider.changeTo(twitterSlider.currentIndex); }, 100);
+				return result;
 			};
 		}());
 
@@ -142,7 +140,7 @@ require([
 		window.setInterval(_.bind(liveMessage.toggleClass, liveMessage, 'blink'), 800);
 
 		// Connect to the SSE server and set up appropriate modifications to local collections
-		var socket = new easyXDM.Socket({
+		new easyXDM.Socket({
 
 			'interval': 1000,
 			'local': baseUrl + 'common/scripts/vendor/easyXDM/name.html',

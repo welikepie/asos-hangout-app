@@ -24,7 +24,8 @@
 		appOptions = observed.observeModel({
 			'twitterSearch': '',
 			'hangoutEmbed': '',
-			'liveMessage': ''
+			'liveMessage': '',
+			'categoryLink': ''
 		}),
 
 		// Product feed collection is established here, along with bindings to pass

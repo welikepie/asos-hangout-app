@@ -40,13 +40,8 @@ define(['jquery', 'underscore'], function ($, _) {
 
 			if (newIndex < 0) { newIndex = 0; }
 			if (newIndex > this.maxIndex) { newIndex = this.maxIndex; }
-			if (newIndex !== this.currentIndex) {
-
-				oldIndex = this.currentIndex;
-				this.currentIndex = newIndex;
-				this.animate(oldIndex, newIndex, children.eq(oldIndex), children.eq(newIndex));
-
-			}
+			this.currentIndex = newIndex;
+			this.animate(oldIndex, newIndex, children.eq(oldIndex), children.eq(newIndex));
 		}
 	});
 

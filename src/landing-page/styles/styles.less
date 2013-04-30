@@ -25,7 +25,7 @@
 	font-style: italic;
 }
 
-html, body { width: 100%; padding: 0; margin: 0; }
+html, body { width: 100%; padding: 0; margin: 0; font-family: @sans-serif-font; }
 
 .top-nav, footer { width: 100%; }
 
@@ -281,6 +281,58 @@ a.prev, a.next {
 	.switcher {
 		position: relative;
 		display: block;
+		height: 368px;
+		margin: 0 6px 28px;
+
+		img {
+			display: block;
+			width: 100%;
+		}
+		ul {
+			position: absolute;
+			top: 0; right: 0; bottom: 0; left: 0;
+			display: block;
+			width: 100%;
+			height: 100%;
+			padding: 0;
+			margin: 0;
+			overflow: hidden;
+
+			text-indent: 0;
+			white-space: nowrap;
+
+			background: white;
+
+			li {
+				display: inline-block;
+				width: 100%;
+				vertical-align: top;
+				a, img { display: block; width: 100%; }
+				.title, .price { display: none; }
+			}
+		}
+
+		a.prev { top: 50%; margin-top: -24px; left: 0; background-image: url('../images/product-feed-chevron-left.png'); }
+		a.next { top: 50%; margin-top: -24px; right: 0; background-image: url('../images/product-feed-chevron-right.png'); }
+	}
+
+	.desc {
+		margin: 0 0 26px;
+		min-height: (4 * 18px);
+		text-align: center;
+		.title, .price {
+			display: block;
+			margin: 0 8px;
+			font-size: 15px;
+			line-height: 18px;
+		}
+		.title { font-weight: normal; }
+		.price { font-weight: bold; }
+	}
+
+	/*.switcher {
+		position: relative;
+		display: block;
 		height: 466px;
 		margin: 0 6px 26px;
 		ul {
@@ -290,7 +342,7 @@ a.prev, a.next {
 			margin: 0 0 28px;
 			overflow: hidden;
 
-			text-indent: 0 !important;
+			text-indent: 0;
 			white-space: nowrap;
 
 			background: white;
@@ -298,7 +350,6 @@ a.prev, a.next {
 			li {
 				display: inline-block;
 				width: 100%;
-				text-indent: 0;
 				a, img { display: block; width: 100%; }
 				.title, .price { display: none; }
 			}
@@ -311,18 +362,10 @@ a.prev, a.next {
 			font-size: 15px;
 			line-height: 18px;
 		}
-		.title {
-			max-height: (3 * 18px);
-			font-weight: normal;
-		}
-		.price {
-			max-height: 18px;
-			font-weight: bold;
-		}
 
 		a.prev { top: 152px; left: 0; background-image: url('../images/product-feed-chevron-left.png'); }
 		a.next { top: 152px; right: 0; background-image: url('../images/product-feed-chevron-right.png'); }
-	}
+	}*/
 
 	.shop {
 		display: block;
@@ -375,7 +418,7 @@ a.prev, a.next {
 		font-size: 14px;
 		line-height: 16px;
 
-		&.blink:after { content: ' |'; color: #666; }
+		&.blink:after { content: '|'; position: absolute; margin-left: 4px; color: #666; }
 	}
 	a.twitter {
 		position: absolute;
@@ -414,7 +457,7 @@ a.prev, a.next {
 			overflow: hidden;
 
 			font-family: @sans-serif-font;
-			text-indent: 0 !important;
+			text-indent: 0;
 			white-space: nowrap;
 
 			list-style: none;
@@ -428,6 +471,7 @@ a.prev, a.next {
 
 				text-indent: 0;
 				white-space: normal;
+				vertical-align: top;
 
 				img {
 					display: block;
@@ -438,15 +482,15 @@ a.prev, a.next {
 
 				a { color: inherit; text-decoration: none; }
 
-				h2, time, p {
+				h2, p {
 					display: block;
 					padding: 0;
 					margin: 0 0 4px 58px;
 					line-height: 16px;
 				}
 				h2 { font-size: 14px; }
-				time { font-size: 11px; color: #0074ff; }
 				p { font-size: 11px; }
+				p.time { color: #0074ff; }
 			}
 		}
 
@@ -459,10 +503,10 @@ a.prev, a.next {
 	clear: both;
 	padding: 24px 0 32px;
 	text-align: center;
-	> * {
-		display: inline-block;
+	* {
+		display: inline-block !important;
 		margin: 0 4px;
-		vertical-align: middle;
+		vertical-align: middle !important;
 	}
 }
 

@@ -2,9 +2,39 @@
 <html>
 	<head>
 		<title>ASOS Shop-Along</title>
+		<base href="" data-base-url="<%= pkg.app.baseUrl %>" data-node-url="<%= pkg.app.nodeUrl %>">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 		<link rel="stylesheet" href="styles/styles.css">
+		<script type="text/javascript" src="../common/scripts/vendor/json3.js"></script>
+		<script type="text/javascript" src="../common/scripts/vendor/modernizr.js"></script>
 		<script type="text/javascript" src="../common/scripts/vendor/require.js" data-main="scripts/main"></script>
+		<script type="text/javascript">
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-1005942-86']);
+			_gaq.push(['_setDomainName', 'asos.com']);
+			_gaq.push(['_setAllowLinker', true]);
+			_gaq.push(['_trackPageview']);
+
+			(function () {
+				var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			})();
+			!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+			(function(d, s, id) {
+			  var js, fjs = d.getElementsByTagName(s)[0];
+			  if (d.getElementById(id)) return;
+			  js = d.createElement(s); js.id = id;
+			  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1";
+			  fjs.parentNode.insertBefore(js, fjs);
+			}(document, 'script', 'facebook-jssdk'));
+			(function() {
+			    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+			    po.src = 'https://apis.google.com/js/plusone.js';
+			    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+			  })();
+		</script>
 	</head>
 	<body>
 
@@ -27,7 +57,7 @@
 				</div>
 
 				<div class="banner">
-					<div class="shop-along-logo">Shopalong</div>
+					<div class="shop-along-logo">Shop-Along</div>
 					<p class="left">Tweet <span class="hashtag">#askasos</span> to look the part</p>
 					<p class="right">Special event style, sorted</p>
 				</div>
@@ -42,18 +72,21 @@
 				<h1>Shop-Along</h1>
 
 				<div class="switcher">
+					<img src="images/ratio-27-39.gif">
 					<ul><li class="template">
-							<a href="http://www.asos.com/ASOS/ASOS-Sweatshirt-with-Woven-Front-Tiger-Print-with-Studs/Prod/pgeproduct.aspx?iid=2847110&amp;cid=11321&amp;sh=0&amp;pge=0&amp;pgesize=20&amp;sort=-1&amp;clr=Black" target="_blank">
-								<img src="http://images.asos-media.com/inv/media/0/1/1/7/2847110/black/image1xl.jpg">
-								<h2 class="title">ASOS Sweatshirt with Woven Front Tiger Print with Studs</h2>
-								<h3 class="price">£28.00</h3>
+							<a href="" target="_blank">
+								<img src="">
+								<h2 class="title"></h2>
+								<h3 class="price"></h3>
 							</a>
 						</li></ul>
 					<a class="prev"></a>
 					<a class="next"></a>
+				</div>
 
-					<h2 class="title">ASOS Sweatshirt with Woven Front Tiger Print with Studs</h2>
-					<h3 class="price">£28.00</h3>
+				<div class="desc">
+					<h2 class="title"></h2>
+					<h3 class="price"></h3>
 				</div>
 
 				<a href="" target="_blank" class="shop">Shop Special Events ›</a>
@@ -66,12 +99,12 @@
 
 				<div class="switcher">
 					<ul><li class="template">
-							<a href="https://twitter.com/GooglePoetics" target="_blank">
-								<img class="avatar" src="https://si0.twimg.com/profile_images/1695239906/me_normal.jpg">
-								<h2>Jake Archibald</h2>
+							<a href="" target="_blank">
+								<img class="avatar" src="">
+								<h2></h2>
 							</a>
-							<time>2 minutes ago</time>
-							<p class="tweet">Looks like my Sunday morning drum lessons were not well received by my neighbors who suck and are most likely communists.</p>
+							<p class="time"></p>
+							<p class="tweet"></p>
 						</li></ul>
 					<a class="prev"></a>
 					<a class="next"></a>
@@ -79,8 +112,9 @@
 			</section>
 
 			<section id="sharing">
-				<iframe allowtransparency="true" frameborder="0" scrolling="no" src="https://platform.twitter.com/widgets/tweet_button.1366232305.html#_=1367186321262&amp;count=horizontal&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=https%3A%2F%2Ftwitter.com%2Fabout%2Fresources%2Fbuttons%23tweet&amp;size=m&amp;text=Twitter%20%2F%20Twitter%20buttons&amp;url=https%3A%2F%2Ftwitter.com%2Fabout%2Fresources%2Fbuttons" class="twitter twitter-share-button twitter-count-horizontal" style="width: 110px; height: 20px;" title="Twitter Tweet Button" data-twttr-rendered="true"></iframe>
-				<iframe class="facebook" src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fexample.com&amp;send=false&amp;layout=button_count&amp;width=100&amp;show_faces=false&amp;font=segoe+ui&amp;colorscheme=light&amp;action=like&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:21px;" allowTransparency="true"></iframe>
+				<div class="fb-like" data-send="false" data-layout="button_count" data-width="120" data-show-faces="false"></div>
+				<g:plus action="share" annotation="bubble"></g:plus>
+				<a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
 			</section>
 		</div>
 

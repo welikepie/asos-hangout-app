@@ -229,6 +229,7 @@ module.exports = function (grunt) {
 			'build': { 'src': ['build'] },
 			'common': { 'src': ['build/common'] },
 			'landing-page': { 'src': ['build/landing-page'] },
+			'landing-page-scripts-post': { 'src': ['src/landing-page/main.js'] },
 			'hangout-app': { 'src': ['build/hangout-app'] },
 			'hangout-app-scripts-post': { 'src': ['src/hangout-app/main.js'] },
 			'hangout-app-cleanup': { 'src': ['build/hangout-app/index.html', 'build/hangout-app/styles'] },
@@ -253,10 +254,23 @@ module.exports = function (grunt) {
 				'filter': 'isFile'
 			},
 
-			'landing-page-html': {
+			'landing-page-html-dev': {
 				'src': 'src/landing-page/index.html',
-				'dest': 'build/landing-page/index.html'
+				'dest': 'build/landing-page/index.html',
+				'options': { 'processContent': grunt.template.process }
 			},
+			'landing-page-html-release': {
+				'src': 'src/landing-page/index.html',
+				'dest': 'build/landing-page/index.html',
+				'options': {
+					'processContent': function (content) {
+						return grunt.template.process(content
+							.replace( /src="..\/common\/scripts\/vendor\/([a-zA-Z0-9_-]+)\.js"/gi, 'src="scripts/$1.js"' )
+						);
+					}
+				}
+			},
+
 			'landing-page-styling': {
 				'src': '**/*.!(less)',
 				'cwd': 'src/landing-page/styles/',
@@ -278,6 +292,35 @@ module.exports = function (grunt) {
 				'cwd': 'src/landing-page/scripts/',
 				'filter': 'isFile'
 			},
+			'landing-page-scripts-pre': {
+				'src': 'src/landing-page/scripts/main.js',
+				'dest': 'src/landing-page/main.js'
+			},
+			'landing-page-amd': {
+				'src': ['require.js', 'modernizr.js', 'json3.js'],
+				'cwd': 'src/common/scripts/vendor/',
+				'dest': 'build/landing-page/scripts/',
+				'expand': true,
+				'filter': 'isFile'
+			},
+			'landing-page-compile-lint': {
+				'src': 'build/landing-page/scripts/main.js',
+				'dest': 'build/landing-page/scripts/main.js',
+				'options': {
+					'processContent': function (content) {
+						/*jshint boss:true */
+						var config;
+						if (config = content.match(/require\.config\((\{[^\v]+?\})\);/i)) {
+							config = JSON.parse(config[1]);
+							if ('config' in config) { config = 'require.config(' + JSON.stringify({'config': config.config}) + ');'; }
+							else { config = ''; }
+						} else { config = ''; }
+						return content
+							.replace(/require\.config\(\{[^\v]+?\}\);/i, config)
+							.replace(/define\("landing-page\/scripts\/main", function\(\)\{\}\);/i, "");
+					}
+				}
+			},
 
 			'hangout-app-html-dev': {
 				'src': ['index.html', 'hangout.js'],
@@ -298,7 +341,7 @@ module.exports = function (grunt) {
 					'processContent': function (content) {
 						return grunt.template.process(content
 							.replace('<base href=""', '<base href="<%= pkg.app.hangoutUrl %>"')
-							.replace( /src="..\/common\/scripts\/vendor\/require\.js"/gi, 'src="scripts/require.js"' )
+							.replace( /src="..\/common\/scripts\/vendor\/([a-zA-Z0-9_-]+)\.js"/gi, 'src="scripts/$1.js"' )
 							.replace(
 								/<link(?:[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*|[^>]*href="([^"]+)"[^>]*rel="stylesheet"[^>]*)>/gi,
 								function (match, file) {
@@ -332,8 +375,11 @@ module.exports = function (grunt) {
 				'dest': 'src/hangout-app/main.js'
 			},
 			'hangout-app-amd': {
-				'src': 'src/common/scripts/vendor/require.js',
-				'dest': 'build/hangout-app/scripts/require.js'
+				'src': ['require.js', 'modernizr.js', 'json3.js'],
+				'cwd': 'src/common/scripts/vendor/',
+				'dest': 'build/hangout-app/scripts/',
+				'expand': true,
+				'filter': 'isFile'
 			},
 			'hangout-app-compile-lint': {
 				'src': 'build/hangout-app/scripts/main.js',
@@ -384,14 +430,8 @@ module.exports = function (grunt) {
 				'filter': 'isFile',
 				'options': {
 					'processContent': function (content, path) {
-						if (!path.match(/\/vendor\//i)) {
-							return grunt.template.process(content
-								.replace(
-									/<!--<base[^>]*>-->/i,
-									"<base href=\"http://localhost/asos-hangout-app/build/\">"
-								)
-							);
-						} else { return content; }
+						if (!path.match(/\/vendor\//i)) { return grunt.template.process(content); }
+						else { return content; }
 					}
 				}
 			},
@@ -403,14 +443,8 @@ module.exports = function (grunt) {
 				'filter': 'isFile',
 				'options': {
 					'processContent': function (content, path) {
-						if (!path.match(/\/vendor\//i)) {
-							return grunt.template.process(content
-								.replace(
-									/<!--<base[^>]*>-->/i,
-									"<base href=\"<%= pkg.app.baseUrl %>\">"
-								)
-							);
-						} else { return content; }
+						if (!path.match(/\/vendor\//i)) { return grunt.template.process(content); }
+						else { return content; }
 					}
 				}
 			},
@@ -442,9 +476,42 @@ module.exports = function (grunt) {
 			
 		},
 
+		// Minifies and optimised both the compiled scripts file
+		// and the require.js loader straight into the build directory.
+		'uglify': {
+			'options': {
+				'mangle': true,
+				'compress': true,
+				'preserveComments': false
+			},
+			'landing-page': {
+				'src': ['main.js', 'modernizr.js', 'require.js'],
+				'cwd': 'build/landing-page/scripts/',
+				'dest': 'build/landing-page/scripts/',
+				'expand': true,
+				'filter': 'isFile'
+			},
+			'hangout-app': {
+				'src': ['main.js', 'modernizr.js', 'require.js'],
+				'cwd': 'build/hangout-app/scripts/',
+				'dest': 'build/hangout-app/scripts/',
+				'expand': true,
+				'filter': 'isFile'
+			}
+		},
+
 		'requirejs': {
 			// Compilation of modular scripts into one file for ease of
 			// loading, less requests and minification (less space = more awesome)
+			'landing-page': {
+				'options': {
+					'baseUrl': 'src',
+					'mainConfigFile': 'src/landing-page/main.js',
+					'optimize': 'none',
+					'include': 'landing-page/scripts/main',
+					'out': 'build/landing-page/scripts/main.js'
+				}
+			},
 			'hangout-app': {
 				'options': {
 					'baseUrl': 'src',
@@ -472,6 +539,17 @@ module.exports = function (grunt) {
 		'jshint:landing-page-dev',
 		'copy:landing-page-scripts'
 	]);
+	grunt.registerTask('landing-page-scripts-release', [
+		'jshint:common-dev',
+		'copy:common-scripts',
+		'jshint:landing-page-release',
+		'copy:landing-page-scripts-pre',
+		'requirejs:landing-page',
+		'copy:landing-page-compile-lint',
+		'clean:landing-page-scripts-post',
+		'copy:landing-page-amd',
+		'uglify:landing-page'
+	]);
 	grunt.registerTask('landing-page-dev', [
 		'clean:landing-page',
 		'copy:common-styling',
@@ -480,7 +558,17 @@ module.exports = function (grunt) {
 		'landing-page-scripts-dev',
 		'copy:landing-page-styling',
 		'copy:landing-page-images',
-		'copy:landing-page-html'
+		'copy:landing-page-html-dev'
+	]);
+	grunt.registerTask('landing-page-release', [
+		'clean:landing-page',
+		'copy:common-styling',
+		'recess:landing-page-lint',
+		'recess:landing-page-release',
+		'landing-page-scripts-release',
+		'copy:landing-page-styling',
+		'copy:landing-page-images',
+		'copy:landing-page-html-release'
 	]);
 
 	grunt.registerTask('hangout-app-scripts-dev', [
@@ -495,7 +583,13 @@ module.exports = function (grunt) {
 		'copy:hangout-app-scripts-pre',
 		'requirejs:hangout-app',
 		'copy:hangout-app-compile-lint',
-		'clean:hangout-app-scripts-post'
+		'clean:hangout-app-scripts-post',
+		'copy:hangout-app-amd'
+	]);
+	grunt.registerTask('hangout-app-scripts-release', [
+		'jshint:hangout-app-release',
+		'hangout-app-scripts-compiled',
+		'uglify:hangout-app'
 	]);
 	grunt.registerTask('hangout-app-dev', [
 		'clean:hangout-app',
@@ -511,7 +605,18 @@ module.exports = function (grunt) {
 		'recess:hangout-app-lint',
 		'recess:hangout-app-dev',
 		'hangout-app-scripts-compiled',
-		'copy:hangout-app-amd',
+		'copy:hangout-app-styling',
+		'copy:hangout-app-images',
+		'copy:hangout-app-branding',
+		'copy:hangout-app-html-release',
+		'copy:hangout-app-xml',
+		'clean:hangout-app-cleanup'
+	]);
+	grunt.registerTask('hangout-app-release', [
+		'clean:hangout-app',
+		'recess:hangout-app-lint',
+		'recess:hangout-app-release',
+		'hangout-app-scripts-release',
 		'copy:hangout-app-styling',
 		'copy:hangout-app-images',
 		'copy:hangout-app-branding',
