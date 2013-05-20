@@ -46,7 +46,7 @@
 		monitor;
 
 	// INITIALISE SSE AND AUTH MANAGERS
-	publicSSE = new SSEManager(100, 1000, 0);
+	publicSSE = new SSEManager(100, 100000, 0);
 	twitterSSE = new SSEManager(50, 10, 10);
 	auth = require('./vendor/http-auth')({
 		'authRealm': 'Admin Area',
@@ -75,7 +75,6 @@
 		var pendingChanges = {},
 			streamChanges = _.debounce(function () {
 				var localPending = pendingChanges;
-				console.log(localPending);
 				pendingChanges = {};
 				publicSSE.emit('appOptions:change', localPending);
 			}, 100);
@@ -206,6 +205,7 @@
 
 						try {
 							json = JSON.parse(json);
+							json.addedAt = (new Date()).getTime();
 							if (!_.where(productFeed, {'id': json.id}).length) {
 								productFeed.push(json);
 							}
@@ -249,6 +249,17 @@
 						response.writeHead(404, corsHeaders(request));
 						response.end();
 					}
+
+				});
+
+			} else if (request.method === 'DELETE' && path === '/product-feed') {
+
+				return auth.apply(request, response, function () {
+
+					productFeed.length = 0;
+					publicSSE.emit('productFeed:reset', []);
+					response.writeHead(200, corsHeaders(request));
+					response.end();
 
 				});
 
@@ -438,8 +449,8 @@
 	});
 
 	// DEBUG
-	productFeed.on('add', function (item) { console.log('New product added: ', item); });
-	productFeed.on('remove', function (item) { console.log('Product removed: ', item); });
+	productFeed.on('add', function (item) { console.log('New product added.'); });
+	productFeed.on('remove', function (item) { console.log('Product removed.'); });
 	server.on('request', function (request) { console.log(request.method + ' to ' + request.url); });
 	
 	server.listen(8888);

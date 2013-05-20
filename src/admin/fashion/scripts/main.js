@@ -30,6 +30,7 @@ require([
 	// store the state of global product feed.
 	var allProducts = new Products.ProductCollection(),
 		productFeed = new Products.ProductCollection();
+	productFeed.comparator = function (a, b) { return (b.get('addedAt') || (new Date()).getTime()) - (a.get('addedAt') || (new Date()).getTime()); };
 
 	// Fetch the complete collection into the page for
 	// filtering, searching and addition to general feed.
@@ -131,6 +132,15 @@ require([
 			allProductsView.filter.phrase = $('#searchBox').val().replace(/^\s+|\s+$/g, "");
 			allProductsView.render();
 		});
+		$('button.clear-all').on('click', function () {
+			$.ajax({
+				'url': nodeUrlBase + '/product-feed',
+				'type': 'DELETE',
+				'dataType': 'text',
+				'cache': false,
+				'headers': { 'Authorization': window.authToken }
+			});
+		});
 
 		// SSE BINDINGS
 		// =======================
@@ -140,7 +150,7 @@ require([
 			'local': '../../common/scripts/vendor/easyXDM/name.html',
 			'swf': '../../common/scripts/vendor/easyXDM.swf',
 			'swfNoThrottle': true,
-			'remote': nodeUrlBase + '/stream',
+			'remote': nodeUrlBase + '/stream?' + (new Date()).getTime(),
 			'onMessage': function (message) {
 
 				try {

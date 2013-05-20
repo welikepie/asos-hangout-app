@@ -28,6 +28,7 @@
 html, body { width: 100%; padding: 0; margin: 0; font-family: @sans-serif-font; }
 
 .top-nav, footer { width: 100%; }
+.mobile { display: none; }
 
 .top-nav nav,
 .container,
@@ -103,16 +104,19 @@ a.prev, a.next {
 	margin: 0 0 4px;
 
 	// ASOS logo (left corner in desktop version)
-	.logo {
-		position: absolute;
-		top: 0; left: 0;
-		display: block;
-		width: 120px;
-		height: 35px;
-		overflow: hidden;
+	.nav {
+		display: inline;
+		.logo {
+			position: absolute;
+			top: 0; left: 0;
+			display: block;
+			width: 120px;
+			height: 35px;
+			overflow: hidden;
 
-		text-indent: -9999px;
-		background: url('../images/asos-logo-desktop.png') no-repeat center center;
+			text-indent: -9999px;
+			background: url('../images/asos-logo-desktop.png') no-repeat center center;
+		}
 	}
 
 	// Category menu (matching the styles on official ASOS site, hidden on mobile)
@@ -178,16 +182,19 @@ a.prev, a.next {
 		}
 
 		p {
-			height: 29px;
+			width: 50%;
 			margin: 0;
 
-			font: normal 16px/29px @pretty-font;
+			font-family: @pretty-font;
+			font-size: 16px;
 			color: white;
+			line-height: 29px;
+			text-align: center;
 			text-transform: uppercase;
 
 			span { color: #fbb3ff; }
-			&.left { float: left; margin-left: 68px; }
-			&.right { float: right; margin-right: 68px; }
+			&.left { float: left; padding-right: 65px; }
+			&.right { float: right; padding-left: 65px; letter-spacing: 1px; }
 		}
 
 		&:before, &:after {
@@ -278,11 +285,19 @@ a.prev, a.next {
 		}
 	}
 
+	.switcher-ext {
+		position: relative;
+		display: block;
+		margin: 0 6px 28px;
+
+		a.prev { top: 50%; margin-top: -24px; left: 0; background-image: url('../images/product-feed-chevron-left.png'); }
+		a.next { top: 50%; margin-top: -24px; right: 0; background-image: url('../images/product-feed-chevron-right.png'); }
+	}
 	.switcher {
 		position: relative;
 		display: block;
 		height: 368px;
-		margin: 0 6px 28px;
+		margin: 0;
 
 		img {
 			display: block;
@@ -311,15 +326,14 @@ a.prev, a.next {
 				.title, .price { display: none; }
 			}
 		}
-
-		a.prev { top: 50%; margin-top: -24px; left: 0; background-image: url('../images/product-feed-chevron-left.png'); }
-		a.next { top: 50%; margin-top: -24px; right: 0; background-image: url('../images/product-feed-chevron-right.png'); }
 	}
 
 	.desc {
-		margin: 0 0 26px;
+		display: block;
 		min-height: (4 * 18px);
+		margin: 0 0 26px;
 		text-align: center;
+		text-decoration: underline;
 		.title, .price {
 			display: block;
 			margin: 0 8px;
@@ -329,43 +343,6 @@ a.prev, a.next {
 		.title { font-weight: normal; }
 		.price { font-weight: bold; }
 	}
-
-	/*.switcher {
-		position: relative;
-		display: block;
-		height: 466px;
-		margin: 0 6px 26px;
-		ul {
-			display: block;
-			height: 368px;
-			padding: 0;
-			margin: 0 0 28px;
-			overflow: hidden;
-
-			text-indent: 0;
-			white-space: nowrap;
-
-			background: white;
-
-			li {
-				display: inline-block;
-				width: 100%;
-				a, img { display: block; width: 100%; }
-				.title, .price { display: none; }
-			}
-		}
-
-		.title, .price {
-			display: block;
-			margin: 0 8px;
-
-			font-size: 15px;
-			line-height: 18px;
-		}
-
-		a.prev { top: 152px; left: 0; background-image: url('../images/product-feed-chevron-left.png'); }
-		a.next { top: 152px; right: 0; background-image: url('../images/product-feed-chevron-right.png'); }
-	}*/
 
 	.shop {
 		display: block;
@@ -390,6 +367,7 @@ a.prev, a.next {
 	height: 188px;
 	padding: 16px 36px 24px;
 
+	font-family: @sans-serif-font;
 	background: #fcb1ff url('../images/twitter-feed-background-desktop.png') repeat-y -656px 0;
 	&:before, &:after {
 		content: '';
@@ -425,6 +403,7 @@ a.prev, a.next {
 		top: 8px; right: 8px;
 		display: block;
 
+		font-size: 11px;
 		color: black;
 		text-decoration: none;
 
@@ -467,7 +446,7 @@ a.prev, a.next {
 				display: inline-block;
 				width: 50%;
 				height: 100%;
-				padding: 4px;
+				padding: 8px;
 
 				text-indent: 0;
 				white-space: normal;
@@ -490,7 +469,7 @@ a.prev, a.next {
 				}
 				h2 { font-size: 14px; }
 				p { font-size: 11px; }
-				p.time { color: #0074ff; }
+				p.time { color: #0074ff; text-transform: uppercase; }
 			}
 		}
 
@@ -513,6 +492,7 @@ a.prev, a.next {
 footer {
 	display: block;
 	width: 100%;
+	padding: 0 0 32px;
 
 	background: #f9f9f9;
 	border-top: 1px solid #b1b1b1;
@@ -522,12 +502,12 @@ footer {
 		font: normal 24px/24px @pretty-font;
 		text-align: center;
 
-		p { margin: 0 0 16px; }
+		p { margin: 0; }
 		a {
 			display: inline-block;
 			width: 32px;
 			height: 32px;
-			margin: 0 12px;
+			margin: 16px 12px 0;
 			overflow: hidden;
 
 			text-indent: -9999px;
@@ -542,12 +522,13 @@ footer {
 		}
 	}
 	.misc {
-		margin: 0 auto 32px;
+		margin: 0 auto;
 		font: normal 12px/14px @pretty-font;
 		color: #232323;
 		text-align: center;
 		a { color: inherit; text-decoration: none; &:hover, &:focus { text-decoration: underline; } }
 	}
+	.misc-mobile { .mobile; }
 }
 
 @import 'mobile';

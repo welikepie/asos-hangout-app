@@ -35,6 +35,7 @@ require([
 	// as well as URL base for the node SSE server.
 	var productFeed = new Products.ProductCollection(),
 		twitterFeed = new Tweets.TweetCollection();
+	productFeed.comparator = function (a, b) { return (b.get('addedAt') || (new Date()).getTime()) - (a.get('addedAt') || (new Date()).getTime()); };
 
 	// DOM-dependent scripts go here
 	$(function () {
@@ -72,8 +73,8 @@ require([
 						.find('h2').text(model.get('author').name).end()
 						.find('img').attr('src', model.get('author').avatar).end()
 						.find('a').attr('href', model.get('author').url).end()
-						.find('time').html(moment(model.get('timestamp')).fromNow()).end()
-						.find('p').html(model.get('text')).end();
+						.find('.time').html(moment(model.get('timestamp')).fromNow()).end()
+						.find('.tweet').html(model.get('text')).end();
 				}
 
 			});
@@ -85,17 +86,16 @@ require([
 		var productSlider = new Slider(productFeedView.$el, 'li');
 		productSlider.animate = function (oldIndex, newIndex, oldEl, newEl) {
 			var result = Slider.prototype.animate.apply(this, arguments);
-			if (result) {
-				$('#product-feed > .title')
-					.fadeOut(150)
-					.queue('fx', function (next) { this.innerHTML = newEl.find('.title').html() || ''; next(); })
-					.fadeIn(150);
-				$('#product-feed > .price')
-					.fadeOut(150)
-					.queue('fx', function (next) { this.innerHTML = newEl.find('.price').html() || ''; next(); })
-					.fadeIn(150);
-			}
-			return true;
+			$('#product-feed .desc').attr('href', newEl.find('a').attr('href'));
+			$('#product-feed .desc .title')
+				.fadeOut(150)
+				.queue('fx', function (next) { this.innerHTML = newEl.find('.title').html() || ''; next(); })
+				.fadeIn(150);
+			$('#product-feed .desc .price')
+				.fadeOut(150)
+				.queue('fx', function (next) { this.innerHTML = newEl.find('.price').html() || ''; next(); })
+				.fadeIn(150);
+			return result;
 		};
 		$('#product-feed a.prev').on('click', function (ev) {
 			ev.preventDefault();
@@ -146,7 +146,7 @@ require([
 			'local': baseUrl + 'common/scripts/vendor/easyXDM/name.html',
 			'swf': baseUrl + 'common/scripts/vendor/easyXDM.swf',
 			'swfNoThrottle': true,
-			'remote': nodeUrl + 'stream',
+			'remote': nodeUrl + 'stream?' + (new Date()).getTime(),
 			'onMessage': function (message) {
 				try {
 

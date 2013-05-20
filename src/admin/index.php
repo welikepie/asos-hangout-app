@@ -30,6 +30,10 @@
 				<input type="text" name="hangoutEmbed">
 				<button type="button">Embed Hangout</button>
 			</div>
+			<div id="categoryLink">
+				<input type="text" name="categoryLink">
+				<button type="button">Change Category Link</button>
+			</div>
 			<div id="liveMessage">
 				<p>Message typed below will be updated live for everyone in the app.</p>
 				<textarea></textarea>

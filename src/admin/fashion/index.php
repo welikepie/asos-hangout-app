@@ -45,7 +45,7 @@
 			<div class="column">
 				<div class="columnHeader">
 					<h1> Outfits selected.</h1>
-					<button class="btn btn-warning">Clear All</button>
+					<button class="btn btn-warning clear-all">Clear All</button>
 				</div>
 				<ul id="partialList">
 					<li class="template">

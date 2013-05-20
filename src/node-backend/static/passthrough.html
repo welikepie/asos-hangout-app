@@ -18,7 +18,31 @@
 		baseUrl = document.getElementsByTagName('base').length ? document.getElementsByTagName('base')[0].href : '',
 
 		source,
-		socket;
+		source_reconnect_timeout = null,
+		socket,
+
+		createSource = function () {
+			if (source) {
+				try { $(source).off(); } catch (e) {}
+				try { $(source).close(); } catch (e) {}
+				source = null;
+			}
+			source = new window.EventSource(
+				window.location.href
+					.replace(window.location.hash, '')
+					.replace(window.location.search, '')
+			);
+			$(source).on("message", function (ev) { socket.postMessage(ev.originalEvent.data); });
+			$(source).on("open", function (ev) {
+				if (source_reconnect_timeout) {
+					window.clearInterval(source_reconnect_timeout);
+					source_reconnect_timeout = null;
+				}
+			});
+			$(source).on("error", function (ev) {
+				if (!source_reconnect_timeout) { source_reconnect_timeout = window.setInterval(createSource, 10000); }
+			});
+		};
 
 	socket = new easyXDM.Socket({
 		'interval': 1000,
@@ -35,15 +59,7 @@
 				socket.postMessage(JSON.stringify({'event': 'twitterFeed:reset', 'payload': twitterFeed}));
 
 				// Establish connection to SSE stream and establish message pass-through
-				source = new window.EventSource(
-					window.location.href
-						.replace(window.location.hash, '')
-						.replace(window.location.search, '')
-				);
-				$(source).on("message", function (ev) {
-					//console.log('Event: ' + ev.originalEvent.data);
-					socket.postMessage(ev.originalEvent.data);
-				});
+				createSource();
 
 			} else { window.alert('This browser doesn\'t do server-sent events!'); }
 

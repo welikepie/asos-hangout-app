@@ -8,7 +8,8 @@
 		<link rel="stylesheet" href="styles/styles.css">
 		<script type="text/javascript" src="../common/scripts/vendor/json3.js"></script>
 		<script type="text/javascript" src="../common/scripts/vendor/modernizr.js"></script>
-		<script type="text/javascript" src="../common/scripts/vendor/require.js" data-main="scripts/main"></script>
+		<script type="text/javascript" src="../common/scripts/vendor/require.js"></script>
+		<script type="text/javascript" src="scripts/main.js"></script>
 		<script type="text/javascript">
 			var _gaq = _gaq || [];
 			_gaq.push(['_setAccount', 'UA-1005942-86']);
@@ -49,7 +50,12 @@
 
 		<div class="container">
 			<header>
-				<a href="http://www.asos.com/?hrd=1" class="logo">ASOS</a>
+				<div class="nav">
+					<a href="http://m.asos.com/mt/www.asos.com/Women/?un_jtt_v_show=navigation" class="mobile navigation">Menu</a>
+					<a href="http://www.asos.com/?hrd=1" class="logo">ASOS</a>
+					<a href="http://m.asos.com/mt/www.asos.com/basket/pgebasket.aspx" class="mobile cart">Shopping Cart</a>
+					<a href="http://m.asos.com/mt/www.asos.com/basket/pgebasket.aspx?un_jtt_v_show=wishlist" class="mobile wishlist">Wishlist</a>
+				</div>
 				<div class="categories">
 					<a class="home" href="http://www.asos.com/?hrd=1">Home</a>
 					<a href="http://www.asos.com/Women/?&amp;via=top">Women</a>
@@ -57,8 +63,8 @@
 				</div>
 
 				<div class="banner">
-					<div class="shop-along-logo">Shop-Along</div>
-					<p class="left">Tweet <span class="hashtag">#askasos</span> to look the part</p>
+					<div class="shop-along-logo">ASOS Shop-Along</div>
+					<p class="left">Tweet <span class="hashtag">#askasos</span> to look&nbsp;the&nbsp;part</p>
 					<p class="right">Special event style, sorted</p>
 				</div>
 			</header>
@@ -71,25 +77,27 @@
 			<section id="product-feed">
 				<h1>Shop-Along</h1>
 
-				<div class="switcher">
-					<img src="images/ratio-27-39.gif">
-					<ul><li class="template">
+				<div class="switcher-ext">
+					<div class="switcher">
+						<img src="images/ratio-27-39.gif">
+						<ul><li class="template">
 							<a href="" target="_blank">
 								<img src="">
 								<h2 class="title"></h2>
 								<h3 class="price"></h3>
 							</a>
 						</li></ul>
+					</div>
 					<a class="prev"></a>
 					<a class="next"></a>
 				</div>
 
-				<div class="desc">
+				<a href="" target="_blank" class="desc">
 					<h2 class="title"></h2>
 					<h3 class="price"></h3>
-				</div>
+				</a>
 
-				<a href="" target="_blank" class="shop">Shop Special Events ›</a>
+				<a href="" target="_blank" class="shop">Shop Special Events&nbsp;›</a>
 			</section>
 
 			<section id="twitter-feed">
@@ -138,6 +146,16 @@
 				<a href="http://www.asos.com/infopages/pgehelpdesk.aspx#/level10">Help &amp; Contact</a> |
 				<a href="http://www.asos.com/infopages/pgecontactcare.aspx">Contact us</a> |
 				<a href="http://www.asos.com/?hrd=1">ASOS Full Site</a>
+			</section>
+			<section class="misc-mobile closed">
+				<a href="https://www.asos.com/account/pgereceipttracking.aspx">Track order ›</a>
+				<a href="http://www.asos.com/infopages/pgehelpdesk.aspx#/level11">Delivery ›</a>
+				<a href="http://www.asos.com/infopages/pgehelpdesk.aspx#/level11">Returns ›</a>
+				<a href="http://www.asos.com/infopages/pgehelpdesk.aspx#/level10">Help &amp; Contact ›</a>
+				<a href="http://www.asos.com/?hrd=1">ASOS Full Site ›</a>
+				<div class="bottom">
+					&copy; 2013 ASOS <a href="http://www.asos.com/infopages/pgeprivacy.aspx">Privacy &amp; Cookies</a><a href="http://www.asos.com/infopages/pgetandc.aspx">T&amp;C's</a>
+				</div>
 			</section>
 
 		</footer>

@@ -27,12 +27,16 @@ html {
 	height: 100%;
 	padding: 0;
 	margin: 0;
+	background: #f9abff;
 }
 body {
 	width: 100%;
 	height: 100%;
 	padding: 0;
 	margin: 0;
+
+	font-family: @sans-serif-font;
+	background: #f9abff;
 }
 .root {
 	display: block;
@@ -41,6 +45,7 @@ body {
 	padding: 0;
 	overflow-x: hidden;
 	overflow-y: auto;
+	background: #f9abff;
 }
 
 a.prev, a.next {
@@ -71,11 +76,6 @@ header {
 	width: 100%;
 	padding: 16px 6px 12px;
 	background: #7ff3ae;
-	border: 6px solid transparent;
-	-webkit-border-image: url("../images/product-feed-border-mobile.png") 6 6 stretch; /* Safari */
-	-moz-border-image: url("../images/product-feed-border-mobile.png") 6 6 stretch; /* Old firefox */
-	-o-border-image: url("../images/product-feed-border-mobile.png") 6 6 stretch; /* Opera */
-	border-image: url("../images/product-feed-border-mobile.png") 6 6 stretch;
 
 	font-family: @pretty-font;
 	font-weight: normal;
@@ -137,7 +137,6 @@ header {
 			li {
 				display: inline-block;
 				width: 100%;
-				text-indent: 0;
 				a, img { display: block; width: 100%; }
 				.title, .price { display: none; }
 			}
@@ -146,23 +145,23 @@ header {
 		a.next { right: 0; background-image: url('../images/product-feed-chevron-right.png'); }
 	}
 
-	.title {
-		display: inline;
-		padding: 0;
-		margin: 0;
+	.desc {
+		display: block;
+		font-family: @sans-serif-font;
+		color: inherit;
+		text-align: center;
+		text-decoration: underline;
 
-		font-size: 13px;
-		font-weight: normal;
-		line-height: 16px;
-	}
-	.price {
-		display: inline;
-		padding: 0;
-		margin: 0;
+		.title, .price {
+			display: inline;
+			padding: 0;
+			margin: 0;
 
-		font-size: 13px;
-		font-weight: bold;
-		line-height: 16px;
+			font-size: 13px;
+			line-height: 16px;
+		}
+		.title { font-weight: normal; }
+		.price { font-weight: bold; }
 	}
 }
 #twitter-feed {
@@ -170,10 +169,6 @@ header {
 	width: 100%;
 	padding: 20px 20px 12px;
 	background: #f9abff;
-	-webkit-border-image: url("../images/twitter-feed-border-mobile.png") 6 6 stretch; /* Safari */
-	-moz-border-image: url("../images/twitter-feed-border-mobile.png") 6 6 stretch; /* Old firefox */
-	-o-border-image: url("../images/twitter-feed-border-mobile.png") 6 6 stretch; /* Opera */
-	border-image: url("../images/twitter-feed-border-mobile.png") 6 6 stretch;
 
 	h1 {
 		padding: 0;
@@ -188,6 +183,7 @@ header {
 		min-height: 22px;
 		margin: 0 0 16px;
 
+		font-family: @sans-serif-font;
 		font-size: 14px;
 		line-height: 16px;
 		text-align: center;
@@ -238,18 +234,14 @@ header {
 					font-size: 20px;
 					line-height: 20px;
 				}
-				time {
-					display: block;
-					margin: 0 0 6px;
-					font-size: 12px;
-					color: #0074ff;
-					line-height: 14px;
-					text-transform: uppercase;
-				}
 				p {
 					margin: 0 0 6px;
 					font-size: 12px;
 					line-height: 18px;
+				}
+				p.time {
+					color: #0074ff;
+					text-transform: uppercase;
 				}
 			}
 		}

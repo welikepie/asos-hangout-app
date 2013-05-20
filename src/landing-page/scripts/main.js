@@ -33,8 +33,9 @@ require([
 	// DATA STRUCTURES
 	// Establish collections for product and Twitter feeds,
 	// as well as URL base for the node SSE server.
-	var productFeed = new Products.ProductCollection(),
+	var productFeed = new Products.ProductCollection({'comparator': function (a, b) { return a.get('addedAt') - b.get('addedAt'); }}),
 		twitterFeed = new Tweets.TweetCollection();
+	productFeed.comparator = function (a, b) { return (b.get('addedAt') || (new Date()).getTime()) - (a.get('addedAt') || (new Date()).getTime()); };
 
 	// DOM-dependent scripts go here
 	$(function () {
@@ -44,6 +45,7 @@ require([
 
 		// Create DOM and Backbone controls for realtime data
 		var liveMessage = $('#live-message'),
+			categoryLink = $('#product-feed a.shop'),
 			streamEmbed = $('#stream-embed iframe'),
 			productFeedView = new CollectionView({
 
@@ -89,17 +91,16 @@ require([
 		};
 		productSlider.animate = function (oldIndex, newIndex, oldEl, newEl) {
 			var result = Slider.prototype.animate.apply(this, arguments);
-			if (result) {
-				$('#product-feed .desc .title')
-					.fadeOut(150)
-					.queue('fx', function (next) { this.innerHTML = newEl.find('.title').html() || ''; next(); })
-					.fadeIn(150);
-				$('#product-feed .desc .price')
-					.fadeOut(150)
-					.queue('fx', function (next) { this.innerHTML = newEl.find('.price').html() || ''; next(); })
-					.fadeIn(150);
-			}
-			return true;
+			$('#product-feed .desc').attr('href', newEl.find('a').attr('href'));
+			$('#product-feed .desc .title')
+				.fadeOut(150)
+				.queue('fx', function (next) { this.innerHTML = newEl.find('.title').html() || ''; next(); })
+				.fadeIn(150);
+			$('#product-feed .desc .price')
+				.fadeOut(150)
+				.queue('fx', function (next) { this.innerHTML = newEl.find('.price').html() || ''; next(); })
+				.fadeIn(150);
+			return result;
 		};
 		$('#product-feed a.prev').on('click', function (ev) {
 			ev.preventDefault();
@@ -143,7 +144,7 @@ require([
 
 		// Blinking cursor on live message
 		window.setInterval(_.bind(liveMessage.toggleClass, liveMessage, 'blink'), 800);
-		$('footer .misc').one('click', function () { $(this).addClass('open'); });
+		$('footer .misc-mobile').one('click', function () { $(this).removeClass('closed'); });
 
 		// Connect to the SSE server and set up appropriate modifications to local collections
 		new easyXDM.Socket({
@@ -152,7 +153,7 @@ require([
 			'local': baseUrl + 'common/scripts/vendor/easyXDM/name.html',
 			'swf': baseUrl + 'common/scripts/vendor/easyXDM.swf',
 			'swfNoThrottle': true,
-			'remote': nodeUrl + 'stream',
+			'remote': nodeUrl + 'stream?' + (new Date()).getTime(),
 			'onMessage': function (message) {
 				try {
 
@@ -185,6 +186,7 @@ require([
 					} else if (ev[0] === 'appOptions') {
 						if (_.has(data.payload, 'liveMessage')) { liveMessage.html(data.payload.liveMessage.replace(/\n/g, " ")); }
 						if (_.has(data.payload, 'hangoutEmbed')) { streamEmbed.attr('src', data.payload.hangoutEmbed); }
+						if (_.has(data.payload, 'categoryLink')) { categoryLink.attr('href', data.payload.categoryLink); }
 					}
 
 				} catch (e) {}

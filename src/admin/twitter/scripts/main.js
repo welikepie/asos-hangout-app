@@ -130,7 +130,7 @@ require([
 			'local': '../../common/scripts/vendor/easyXDM/name.html',
 			'swf': '../../common/scripts/vendor/easyXDM.swf',
 			'swfNoThrottle': true,
-			'remote': nodeUrlBase + '/twitter-stream',
+			'remote': nodeUrlBase + '/twitter-stream?' + (new Date()).getTime(),
 			'onMessage': function (message) {
 				try {
 					var data = JSON.parse(message);
@@ -145,7 +145,7 @@ require([
 			'local': '../../common/scripts/vendor/easyXDM/name.html',
 			'swf': '../../common/scripts/vendor/easyXDM.swf',
 			'swfNoThrottle': true,
-			'remote': nodeUrlBase + '/stream',
+			'remote': nodeUrlBase + '/stream?' + (new Date()).getTime(),
 			'onMessage': function (message) {
 				try {
 

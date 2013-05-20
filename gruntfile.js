@@ -253,6 +253,13 @@ module.exports = function (grunt) {
 				'expand': true,
 				'filter': 'isFile'
 			},
+			'apache': {
+				'src': ['**/.htaccess', '**/.htpasswd'],
+				'cwd': 'src/',
+				'dest': 'build/',
+				'expand': true,
+				'filter': 'isFile'
+			},
 
 			'landing-page-html-dev': {
 				'src': 'src/landing-page/index.html',
@@ -346,10 +353,10 @@ module.exports = function (grunt) {
 								/<link(?:[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*|[^>]*href="([^"]+)"[^>]*rel="stylesheet"[^>]*)>/gi,
 								function (match, file) {
 									var baseUrl = grunt.config.get('pkg.app.hangoutUrl'),
-										css = grunt.file.read('build/hangout-app/' + file).replace(
-											/\.\.\/images/gi,
-											baseUrl + 'images'
-										).replace(/\s+/gi, ' ');
+										css = grunt.file.read('build/hangout-app/' + file)
+											.replace(/\.\.\/images/gi, baseUrl + 'images')
+											.replace(/\.\.\/\.\.\/common\/styles\/fonts/gi, grunt.config.get('pkg.app.baseSslUrl') + 'common/styles/fonts')
+											.replace(/\s+/gi, ' ');
 									return '<style type="text/css">' + css + '</style>';
 								}
 							)
@@ -467,7 +474,7 @@ module.exports = function (grunt) {
 				'filter': 'isFile'
 			},
 			'admin-misc': {
-				'src': ['.htaccess', '.htpasswd', 'data/products.json'],
+				'src': ['data/products.json'],
 				'cwd': 'src/admin/',
 				'dest': 'build/admin/',
 				'expand': true,

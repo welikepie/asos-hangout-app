@@ -1,4 +1,5 @@
-@media (max-width: 640px) {
+@import '../../common/styles/settings.less';
+@media (max-width: 768px) {
 
 	.top-nav,
 	.container header .categories,
@@ -8,48 +9,89 @@
 
 	.container {
 		width: 100% !important;
-	}
-
-	.container {
 		header {
 			margin: 0;
-			.logo {
-				position: relative;
-				top: auto; left: 0;
-				z-index: 2;
-				width: 100%;
-				height: 88px;
 
-				background-color: white;
-				border-bottom: 2px solid #CCC;
+			.nav {
+				position: relative;
+				z-index: 2;
+				display: block;
+				width: 100%;
+				height: 44px;
+				padding: 0 6px;
+				overflow: hidden;
+
+				line-height: 44px;
+				text-align: center;
+				background: white;
+				border-bottom: 1px solid #CCC;
+
+				.logo {
+					position: static;
+					display: inline-block;
+					width: 76px;
+					height: 22px;
+					margin: 0 -88px 0 -44px;
+
+					vertical-align: middle;
+					background-image: url('http://m.asos.com/img?url=images%2Fheader%2Flogo.png&d=asos.com&ttl=30d');
+					background-size: 76px 22px;
+				}
+
+				.mobile {
+					display: block;
+					width: 44px;
+					height: 44px;
+					overflow: hidden;
+					text-indent: -9999px;
+
+					background-color: white;
+					background-repeat: no-repeat;
+					background-position: center center;
+					background-size: 24px auto;
+				}
+				.navigation {
+					float: left;
+					background-image: url("http://m.asos.com/img?url=images%2Fheader%2Fmenu.png&d=asos.com&ttl=30d");
+				}
+				.cart {
+					float: right;
+					background-image: url("http://m.asos.com/img?url=images%2Fheader%2Fbasket.png&d=asos.com&ttl=30d");
+				}
+				.wishlist {
+					float: right;
+					background-image: url("http://m.asos.com/img?url=images%2Fheader%2Fwishlist.png&d=asos.com&ttl=30d");
+				}
 			}
 
 			.banner {
 				position: relative;
-				height: 320px;
-				padding: 252px 0 0;
+				height: auto;
+				margin: 200px 0 0;
+				padding: 48px 0 8px;
+				overflow: visible;
 
-				background: white url('../images/header-background-2-mobile.png') repeat-x 0 bottom;
-				&:before, &:after {
-					top: auto;
-					bottom: 0;
-					width: 6px;
-					height: 102px;
-					background: url('../images/header-background-mobile.png') repeat-x;
-				}
-				&:before { background-position: 0 0; }
-				&:after { background-position: 0 -204px; }
+				background: #1a1a1a;
+				border: 6px solid transparent;
+				-webkit-border-image: url("../images/header-border-mobile.png") 6 6 stretch; /* Safari */
+				-moz-border-image: url("../images/header-border-mobile.png") 6 6 stretch; /* Old firefox */
+				-o-border-image: url("../images/header-border-mobile.png") 6 6 stretch; /* Opera */
+				border-image: url("../images/header-border-mobile.png") 6 6 stretch;
+				&:before, &:after { display: none; }
 
 				.shop-along-logo {
-					top: -32px; bottom: auto;
+					top: -230px; bottom: auto;
 					width: 272px;
 					height: 272px;
 					margin-left: -136px;
 					background-image: url('../images/shopalong-logo-mobile.png');
 				}
 				p {
+					width: 100% !important;
 					float: none !important;
 					margin: 0 !important;
+					padding: 0 !important;
+					letter-spacing: 0 !important;
 					font-size: 22px;
 					text-align: center;
 				}
@@ -67,7 +109,8 @@
 			float: none;
 			width: 100%;
 			height: auto;
-			padding: 0 32px 20px;
+			//padding: 0 32px 20px;
+			padding: 0 0 20px;
 			overflow: hidden;
 
 			background-image: none;
@@ -78,6 +121,14 @@
 			-o-border-image: url("../images/product-feed-border-mobile.png") 6 6 stretch; /* Opera */
 			border-image: url("../images/product-feed-border-mobile.png") 6 6 stretch;
 
+			//h1 { margin-left: -32px; margin-right: -32px; }
+
+			.switcher-ext {
+				padding: 0 32px;
+				margin-left: 0;
+				margin-right: 0;
+			}
+
 			.switcher {
 				width: 100%;
 				max-width: 345px;
@@ -85,20 +136,16 @@
 				margin-left: auto;
 				margin-right: auto;
 				ul { overflow: visible; }
-				/*a.prev, a.next { top: 220px; }
-				.title, .price {
-					max-height: auto;
-					font-size: 18px;
-					line-height: 24px;
-				}*/
 			}
 
 			.shop {
-				width: 100%;
-				height: 68px;
+				width: auto;
+				height: auto;
+				padding: 16px 0;
+				margin: 0 32px;
 
 				font-size: 22px;
-				line-height: 68px;
+				line-height: 36px;
 				background-image: none;
 				border: 6px solid transparent;
 				-webkit-border-image: url("../images/shop-button-border-mobile.png") 6 6 stretch; /* Safari */
@@ -154,6 +201,7 @@
 	}
 
 	footer {
+		padding: 0;
 		background: white;
 		border: none;
 		.social {
@@ -161,42 +209,70 @@
 			font-size: 32px;
 			line-height: 36px;
 			a {
-				width: 50px;
-				height: 50px;
-
 				&.facebook { background-image: url('../images/social-facebook-mobile.png'); }
 				&.twitter { background-image: url('../images/social-twitter-mobile.png'); }
 				&.pinterest { background-image: url('../images/social-pinterest-mobile.png'); }
 				&.google { background-image: url('../images/social-google-mobile.png'); }
 			}
 		}
-		.misc {
-			position: relative;
-			width: 100%;
-			min-height: 96px;
-			padding: 0 32px 32px;
-			margin: 0;
-			font-size: 14px;
-			line-height: 18px;
+		.misc { display: none; }
+		.misc-mobile {
+			display: block;
+			padding: 16px 14px 4px;
 
-			&:before {
+			background: #242424;
+
+			font: 400 15px/35px @pretty-font;
+			color: white;
+
+			&:after {
 				content: 'More +';
-				position: absolute;
-				top: 0; right: 32px; bottom: 32px; left: 32px;
-				z-index: 2;
-				display: block;
+				display: none;
+				width: 100%;
+				height: 64px;
 
-				font-size: 30px;
-				line-height: 64px;
+				font: normal 22px/64px @pretty-font;
+				color: black;
+				text-align: center;
 
 				background: #d6d6d6;
 				border-top: 2px solid #666;
 
 				cursor: pointer;
 			}
+			&.closed {
+				padding: 0;
+				> * { display: none !important; }
+				&:after { display: block !important; }
+			}
 
-			&.open:before { display: none; }
+			> a {
+				display: block;
+				letter-spacing: 1px;
+				text-decoration: none;
+			}
+			.bottom {
+				margin-top: 10px;
+				border-top: 1px solid #4E4E4E;
+
+				font-size: 12px;
+
+				a {
+					display: block;
+					float: right;
+					text-decoration: underline;
+					&:first-child:before {
+						content: '';
+						display: inline-block;
+						width: 0;
+						height: 12px;
+						margin: 0 6px;
+						border-left: 1px solid white;
+						vertical-align: middle;
+					}
+				}
+			}
 		}
-	}
 
+	}
 }

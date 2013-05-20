@@ -16,6 +16,8 @@ require(['jquery', 'underscore'], function ($, _) {
 
 		var embedField = $('#hangoutEmbed input'),
 			embedButton = $('#hangoutEmbed  button'),
+			categoryField = $('#categoryLink input'),
+			categoryButton = $('#categoryLink button'),
 
 			liveMessage = $('#liveMessage textarea');
 
@@ -26,23 +28,31 @@ require(['jquery', 'underscore'], function ($, _) {
 			'success': function (data) {
 
 				try { embedField.val('http://youtu.be/' + data.hangoutEmbed.match(/^https?:\/\/(?:www\.)?youtube\.com\/embed\/(.+)$/i)[1]); } catch (e) {}
+				try { categoryField.val(data.categoryLink); } catch (e) {}
 				try { liveMessage.val(data.liveMessage); } catch (e) {}
 
 				embedButton.on('click', function () {
 					var match = embedField.val().match(/^https?:\/\/youtu\.be\/(.+)$/i);
-					if (match) {
-						match = 'http://youtube.com/embed/' + match[1];
-						$.ajax({
-							'url': nodeUrlBase + '/app-options',
-							'type': 'POST',
-							'dataType': 'text',
-							'cache': false,
-							'data': {'hangoutEmbed': match},
-							'headers': { 'Authorization': window.authToken }
-						});
-					} else {
-						window.alert('Invalid URL');
-					}
+					if (match) { match = 'http://youtube.com/embed/' + match[1]; } else { match = ''; }
+					$.ajax({
+						'url': nodeUrlBase + '/app-options',
+						'type': 'POST',
+						'dataType': 'text',
+						'cache': false,
+						'data': {'hangoutEmbed': match},
+						'headers': { 'Authorization': window.authToken }
+					});
+				});
+
+				categoryButton.on('click', function () {
+					$.ajax({
+						'url': nodeUrlBase + '/app-options',
+						'type': 'POST',
+						'dataType': 'text',
+						'cache': false,
+						'data': {'categoryLink': categoryField.val()},
+						'headers': { 'Authorization': window.authToken }
+					});
 				});
 
 				liveMessage.on('keypress', _.debounce(function () {

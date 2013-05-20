@@ -3,10 +3,10 @@
   "version": "0.0.1",
   "app": {
     "title": "ASOS Hangout App",
-    "baseUrl": "http://10.88.1.2/asos-hangout-app/build/",
-    "baseSslUrl": "https://10.88.1.2/asos-hangout-app/build/",
-    "hangoutUrl": "http://10.88.1.2/asos-hangout-app/build/hangout-app/",
-    "nodeUrl": "http://10.88.1.2:8888/"
+    "baseUrl": "http://ukcampaign.asos.com/",
+    "baseSslUrl": "https://ukcampaign.asos.com/",
+    "hangoutUrl": "https://ukcampaign.asos.com/hangout-app/",
+    "nodeUrl": "http://ukcampaign.asos.com:8888/"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
