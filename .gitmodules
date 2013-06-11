@@ -1,0 +1,3 @@
+[submodule "src/admin/gateway/zaphpa"]
+	path = src/admin/gateway/zaphpa
+	url = git://github.com/zaphpa/zaphpa.git

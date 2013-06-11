@@ -1,4 +1,4 @@
-AuthUserFile /srv/Websites/asos-hangout/admin/.htpasswd
+AuthUserFile E:\Code\asos-hangout-app\src\admin\.htpasswd
 AuthGroupFile /dev/null
 AuthName "Admin Area"
 AuthType Basic

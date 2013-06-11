@@ -474,7 +474,7 @@ module.exports = function (grunt) {
 				'filter': 'isFile'
 			},
 			'admin-misc': {
-				'src': ['data/products.json'],
+				'src': ['data/products.json', 'gateway/.htaccess'],
 				'cwd': 'src/admin/',
 				'dest': 'build/admin/',
 				'expand': true,
