@@ -3,6 +3,9 @@
 	<head>
 		<title>Product Feed Management</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="stylesheet" href="../../common/styles/flat-ui.css" type="text/css">
+		<link rel="stylesheet" href="styles/styles.css" type="text/css">
+		<script type="text/javascript" src="../../common/scripts/vendor/require.js" data-main="scripts/main"></script>
 		<?php
 
 		require_once('../gateway/gateway.php');
@@ -37,7 +40,7 @@
 				} ?></div>
 			</fieldset>
 			<fieldset class="misc">
-
+				<legend>&nbsp;</legend>
 				<label>Name: <input type="text" name="name" value=""></label>
 				<label>Gender: <div>
 					<label><input type="radio" name="gender" value="female"> Woman</label>
@@ -47,8 +50,7 @@
 
 			</fieldset>
 			<div class="buttons">
-				<button type="submit">Search</button>
-				<span class="loading"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAABc0lEQVQ4jbWUW4ujQBBG8/9/myAdtJEoIZA0EcWkvESjdHL2YUmPmswos+wHPlh2na6btWGF6rqmrus1R9nMDdZamqbBWutsIoKIuPdhGMjznGEYloF93yMik4jmwCzLMMbQNM0y8Pl8UlUVIkLf92/A2+2GMYY0Tb9P+fF4OOdXSiJCWZbAtIbn8xljDF3XAX9LVBSFS3/zchARqqpyH7quc05jjaOtqoo4jtFaczgcvoDWWgcVkY+gudI0RWuN1pr9fu98JjXs+56yLFcDoyjier1O7G9N+VdtxqnOx2VJSZIQBIF7kiT5D8DfpPWTPjblfr8vOqZpShAEXC6Xd+BvxsYYg1IKpRS73Y62bb+A3w3269BYx+OR0+kEQFmWaK1RSpEkyTTCn369MAwJwxCA7XaL7/uTZZHn+TTCsT4tB8/z8DwPgKIo8H3fXTDXqvU1BgJEUYTv+2RZtgx8NWi8YOfAtm2J4/hjjVfN4biGS/oDazIVUuCNuEcAAAAASUVORK5CYII=" width="20" height="20"> Searching...</span>
+				<button type="submit" class="btn btn-success">Search</button>
 			</div>
 		</form>
 
@@ -60,23 +62,27 @@
 					<img src="" class="image">
 					<h3 class="name"></h3>
 					<div class="description"></div>
-					<a href="" target="_blank" class="url">View on site</a>
-					<button type="button">Add to product feed</button>
+					<div class="actions">
+						<a href="" target="_blank" class="url">View on site</a>
+						<button type="button" class="btn btn-success">Add to product feed</button>
+					</div>
 				</li>
 
 			</ul>
 		</div>
 
 		<div id="product-feed" class="product-list">
-			<h2>Product Feed</h2>
+			<h2>Product Feed <button type="button" class="btn btn-warning clear-all">Clear All</button></h2>
 			<ul>
 
 				<li class="template">
 					<img src="" class="image">
 					<h3 class="name"></h3>
 					<div class="description"></div>
-					<a href="" target="_blank" class="url">View on site</a>
-					<button type="button">Remove from product feed</button>
+					<div class="actions">
+						<a href="" target="_blank" class="url">View on site</a>
+						<button type="button" class="btn btn-danger">Remove from product feed</button>
+					</div>
 				</li>
 
 			</ul>

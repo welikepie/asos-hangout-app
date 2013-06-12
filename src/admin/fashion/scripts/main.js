@@ -25,40 +25,26 @@ require([
 ) {
 	"use strict";
 
-	// Two product collections - one will hold all the products
-	// currently residing in DB, the other one will be used to
-	// store the state of global product feed.
-	var allProducts = new Products.ProductCollection(),
-		productFeed = new Products.ProductCollection();
+	var loadedProducts = new Products.ProductCollection(),
+		productFeed = new Products.ProductCollection(),
+		searchCache = {},
+		nodeUrlBase = window.location.protocol + '//' + window.location.hostname + ':8888';
+
 	productFeed.comparator = function (a, b) { return (b.get('addedAt') || (new Date()).getTime()) - (a.get('addedAt') || (new Date()).getTime()); };
-
-	// Fetch the complete collection into the page for
-	// filtering, searching and addition to general feed.
-	allProducts.fetch({'url': '../data/products.json'});
-
-	// Base URL for communication with Node SSE server;
-	// needed for both SSE bindings and feed modification.
-	var nodeUrlBase = window.location.protocol + '//' + window.location.hostname + ':8888';
 
 	$(function () {
 
-		// Initialise the view for displaying all products currently in the DB
-		var allProductsView = new CollectionView({
+		var productSearchView = new CollectionView({
 
-			'collection': allProducts,
-			'el': $('#fullList').get(0),
-			'template': $('#fullList > li.template').remove().removeClass('template'),
+			'collection': loadedProducts,
+			'el': $('#search-results ul').get(0),
+			'template': $('#search-results ul > li.template').remove().removeClass('template'),
 
 			'filter': (function () {
 
 				var filter_func = function (model) {
-					var sample = filter_func.phrase.replace(/^\s+|\s+$/g, "").toLowerCase();
-					return (
-						(model.get('name').toLowerCase().indexOf(sample) !== -1) ||
-						(model.get('description').toLowerCase().indexOf(sample) !== -1)
-					);
-				};
-				filter_func.phrase = '';
+					return _.contains(filter_func.collection, model.id);
+				}; filter_func.collection = [];
 
 				return filter_func;
 
@@ -91,14 +77,14 @@ require([
 			}
 
 		});
-		allProductsView.render();
+		productSearchView.render();
 
 		// Initialise the view for displaying current product feed
 		var productFeedView = new CollectionView({
 
 			'collection': productFeed,
-			'el': $('#partialList').get(0),
-			'template': $('#partialList > li.template').remove().removeClass('template'),
+			'el': $('#product-feed ul').get(0),
+			'template': $('#product-feed ul > li.template').remove().removeClass('template'),
 
 			'populate': function (model, element) {
 				var excerpt = $(model.get('description')).text().substring(0, 140) + "...";
@@ -124,14 +110,94 @@ require([
 			}
 
 		});
+		productFeedView.listenTo(productFeed, 'add remove sort change sync reset', _.debounce(productFeedView.render, 250));
 		productFeedView.render();
 
-		// Search controls - bindings to pass the contents of search form
-		// to filter property on full DB product view and rerender.
-		$('#searchBox + button').on('click', function () {
-			allProductsView.filter.phrase = $('#searchBox').val().replace(/^\s+|\s+$/g, "");
-			allProductsView.render();
+		$('form').on('submit', function (ev) {
+
+			var temp,
+				$this = $(this),
+				activator = $this.find('button[type="submit"]'),
+				parameters = {};
+
+			ev.preventDefault();
+			ev.stopPropagation();
+
+			if (!activator.attr('disabled')) {
+
+				// Assemble the search parameters
+				var allCategories = $this.find('input[name="category"]'),
+					enabledCategories = allCategories.filter(':checked');
+
+				if (enabledCategories.length <= 0) {
+					window.alert('You need to keep at least one category selected.');
+					return false;
+				}
+
+				if (allCategories.length !== enabledCategories.length) {
+					parameters['category'] = [];
+					enabledCategories.each(function () { parameters['category'].push(this.value); });
+					parameters['category'] = parameters['category'].join(',');
+				}
+
+				temp = $this.find('input[name="name"]').val().replace(/^\s+|\s+$/g, '');
+				if (temp.length) { parameters['name'] = temp; }
+
+				temp = $this.find('input[name="gender"]').filter(':checked').val();
+				if (temp && temp.length) { parameters['gender'] = temp; }
+
+				// Check if search results are already in hash
+				var hash = JSON.stringify(parameters);
+				if (_.has(searchCache, hash)) {
+
+					productSearchView.filter.collection = searchCache[hash];
+					productSearchView.render();
+
+				} else {
+
+					activator
+						.attr('disabled', 'disabled')
+						.removeClass('btn-success');
+
+					$.ajax({
+
+						'url': '../gateway/products',
+						'type': 'GET',
+						'dataType': 'json',
+						'data': parameters,
+
+						'success': function (data) {
+
+							// Add search signature to cache
+							var collection = _.pluck(data, 'id');
+							collection.sort();
+							searchCache[hash] = collection;
+							productSearchView.filter.collection = collection;
+
+							loadedProducts.set(data, {'add': true, 'remove': false, 'merge': false});
+							productSearchView.render();
+
+						},
+						'error': function () {
+							window.alert('There was an issue with retrieving the products. Please try again in a moment.');
+						},
+						'complete': function () {
+							activator
+								.removeAttr('disabled')
+								.addClass('btn-success');
+						}
+
+					});
+
+				}
+
+			}
+
+			return false;
+
 		});
+
+		// Bind clearing product feed
 		$('button.clear-all').on('click', function () {
 			$.ajax({
 				'url': nodeUrlBase + '/product-feed',
@@ -140,6 +206,22 @@ require([
 				'cache': false,
 				'headers': { 'Authorization': window.authToken }
 			});
+		});
+
+		// Category listing bindings
+		var selectAll = $('form input.all-categories').get(0),
+			allCategories = $('form input[name="category"]');
+
+		allCategories.on('change', function () {
+			var checkCategories = allCategories.filter(':checked');
+			selectAll.checked = allCategories.length === checkCategories.length;
+		});
+		$(selectAll).on('change', function () {
+			allCategories.each(
+				this.checked ?
+				function () { this.checked = true; } :
+				function () { this.checked = false; }
+			);
 		});
 
 		// SSE BINDINGS
