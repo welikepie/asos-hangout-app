@@ -193,12 +193,12 @@
 						'photo_big' => $row['image'],
 						'price' => self::$currencies[$filters['currency']] . number_format(floatval($row['price']), 2),
 						'url' => 'http://www.asos.com/pgeproduct.aspx?iid=' . $product_id,
+						'description' => ($row['description'] && ($row['description'] !== null) ? $row['description'] : null),
 						'categories' => array()
 					);
 				}
 				$temp = &$result[$product_id];
 
-				if ($row['description']) { $temp['description'] = $row['description']; }
 				$category_id = strval($row['category_id']);
 				if (!array_key_exists($category_id, $temp['categories'])) {
 					$temp['categories'][$category_id] = $row['category_name'];
@@ -209,7 +209,7 @@
 
 			$result = array_values($result);
 			$res->setFormat('json');
-			$res->add(str_replace('\/', '/', json_encode($id !== null ? $result[0] : $result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)));
+			$res->add(str_replace('\/', '/', json_encode($id !== null ? $result[0] : $result, JSON_PRETTY_PRINT)));
 			$res->send(200);
 
 		}
