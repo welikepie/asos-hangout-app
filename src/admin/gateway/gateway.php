@@ -131,7 +131,8 @@
 				'name' => isset($_GET['name']) ? '%' . $_GET['name'] . '%' : null,
 				'gender' => isset($_GET['gender']) && in_array(strtolower($_GET['gender']), array('male', 'female')) ? strtolower($_GET['gender']) : null,
 				'category' => isset($_GET['category']) ? array_map(function ($val) { return intval($val, 10); }, explode(',', $_GET['category'])) : null,
-				'currency' => isset($_GET['currency']) && array_key_exists(strtoupper($_GET['currency']), self::$currencies) ? strtoupper($_GET['currency']) : 'GBP'
+				'currency' => isset($_GET['currency']) && array_key_exists(strtoupper($_GET['currency']), self::$currencies) ? strtoupper($_GET['currency']) : 'GBP',
+				'limit' => isset($_GET['limit']) && is_numeric($_GET['limit']) ? intval($_GET['limit'], 10) : 1000
 			);
 
 			// BUILD SQL QUERY
@@ -158,8 +159,8 @@
 				$sql_params[] = $id;
 			} else {
 				if ($filters['name']) {
-					$sql_filters[] = 'products.name LIKE ?';
-					$sql_params[] = $filters['name'];
+					$sql_filters[] = 'products.name LIKE ? OR products.description LIKE ?';
+					$sql_params[] = $filters['name']; $sql_params[] = $filters['name'];
 				}
 				if ($filters['gender']) {
 					$sql_filters[] = 'products.gender = ?';
@@ -169,20 +170,16 @@
 					$sql_filters[] = 'product_categories.category_id IN (' . implode(', ', $filters['category']) . ')';
 				}
 			}
-			if (count($sql_filters)) { $sql_query = array_merge($sql_query, array('WHERE'), $sql_filters); }
+			if (count($sql_filters)) { $sql_query = array_merge($sql_query, array('WHERE', implode(' AND ', $sql_filters))); }
 
 			$sql_query = array_merge($sql_query, array(
 				'ORDER BY',
 					'products.id ASC,',
-					'product_categories.category_id ASC'
+					'product_categories.category_id ASC',
+				'LIMIT ?'
 			));
+			$sql_params[] = $filters['limit'];
 
-			/*$res->setFormat('txt');
-			$res->add(implode("\n", $sql_query));
-			$res->send(200);
-			exit();*/
-
-			// Assemble and run the query
 			self::open_db();
 			$result = array();
 			self::execute_query(implode(' ', $sql_query), $sql_params, function ($row) use (&$result, &$filters) {

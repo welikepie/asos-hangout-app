@@ -51,7 +51,9 @@ require([
 			}()),
 
 			'populate': function (model, element) {
-				var excerpt = $(model.get('description')).text().substring(0, 140) + "...";
+				var excerpt = document.createElement('div');
+				excerpt.innerHTML = model.get('description');
+				excerpt = $(excerpt).text().substring(0, 140) + "...";
 				$(element)
 					.find('.name').html(model.get('name')).end()
 					.find('.description').html(excerpt).end()
@@ -87,7 +89,9 @@ require([
 			'template': $('#product-feed ul > li.template').remove().removeClass('template'),
 
 			'populate': function (model, element) {
-				var excerpt = $(model.get('description')).text().substring(0, 140) + "...";
+				var excerpt = document.createElement('div');
+				excerpt.innerHTML = model.get('description');
+				excerpt = $(excerpt).text().substring(0, 140) + "...";
 				$(element)
 					.find('.name').html(model.get('name')).end()
 					.find('.description').html(excerpt).end()
@@ -195,6 +199,11 @@ require([
 
 			return false;
 
+		});
+
+		$('button.clear').on('click', function () {
+			productSearchView.filter.collection = [];
+			productSearchView.render();
 		});
 
 		// Bind clearing product feed

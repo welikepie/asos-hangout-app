@@ -42,15 +42,16 @@
 			<fieldset class="misc">
 				<legend>&nbsp;</legend>
 				<label>Name: <input type="text" name="name" value=""></label>
-				<label>Gender: <div>
+				<span>Gender: <div>
 					<label><input type="radio" name="gender" value="female"> Woman</label>
 					<label><input type="radio" name="gender" value="male"> Man</label>
 					<label><input type="radio" name="gender" value="" checked> Either</label>
-				</div></label>
+				</div></span>
 
 			</fieldset>
 			<div class="buttons">
 				<button type="submit" class="btn btn-success">Search</button>
+				<button type="button" class="btn clear">Clear</button>
 			</div>
 		</form>
 
