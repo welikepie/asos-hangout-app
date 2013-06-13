@@ -11,7 +11,7 @@ define(['jquery', 'underscore'], function ($, _) {
 	};
 
 	_.extend(Slider.prototype, {
-		'animate': function (oldIndex, newIndex, oldElement, newElement) {
+		'animate': function (oldIndex, newIndex/*, oldElement, newElement*/) {
 
 			var offsetWidth = 0,
 				totalWidth = 0,

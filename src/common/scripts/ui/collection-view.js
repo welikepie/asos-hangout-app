@@ -28,7 +28,7 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 			return result;
 
 		},
-		'populate': function (model, element) {},
+		'populate': function (/*model, element*/) {},
 		'immediateRender': function () {
 
 			var that = this;
