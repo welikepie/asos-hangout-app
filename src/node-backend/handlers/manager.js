@@ -8,7 +8,6 @@
 		var fs          = require('fs'),
 			url         = require('url'),
 			_           = require('../vendor/lodash'),
-			Q           = require('../vendor/q'),
 			corsHeaders = require('../util/cors').corsHeaders;
 
 		var staticFunc = function (request, response, path, done) {
