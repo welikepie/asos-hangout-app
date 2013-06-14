@@ -38,7 +38,7 @@
 			userQueueGet = function (request, response) {
 
 				response.writeHead(200, _.extend(corsHeaders(request), { 'Content-Type': 'application/json' }));
-				response.end(JSON.stringify(_.invoke(userQueue, 'toJSON')));
+				response.end(JSON.stringify(_.map(userQueue, function (item) { return JSON.parse(item.toJSON()); })));
 
 			};
 
@@ -66,15 +66,18 @@
 
 						if (!_.where(userQueue, {'id': json.id}).length) {
 
-							temp = observed.observedModel();
+							temp = observed.observeModel();
 							_.extend(temp, json);
 							setChangeListener(temp);
 
 							userQueue.push(temp);
+							response.writeHead(200, corsHeaders(request));
+							response.end();
 
+						} else {
+							response.writeHead(403, corsHeaders(request));
+							response.end();
 						}
-						response.writeHead(200, corsHeaders(request));
-						response.end();
 					} catch (e) {
 						try {
 							response.writeHead(400, corsHeaders(request));

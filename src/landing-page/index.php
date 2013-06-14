@@ -35,6 +35,12 @@
 			    po.src = 'https://apis.google.com/js/plusone.js';
 			    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
 			  })();
+
+			window.localID = <?php
+				session_start();
+				$local_id = isset($_SESSION['user_data']) ? $_SESSION['user_data']['id'] : null;
+				echo(json_encode($local_id));
+			?>;
 		</script>
 	</head>
 	<body>
@@ -116,6 +122,25 @@
 						</li></ul>
 					<a class="prev"></a>
 					<a class="next"></a>
+				</div>
+			</section>
+
+			<section id="audience-queue">
+				<h1>Queue</h1>
+				<a class="join-queue visible" href="join.php">Join Queue</a>
+
+				<div class="switcher">
+					<ul><li class="template">
+							<a href="" target="_blank">
+								<img class="avatar" src="">
+								<h2></h2>
+							</a>
+						</li></ul>
+					<a class="prev"></a>
+					<a class="next"></a>
+				</div>
+				<div class="invitation">
+					You have been invited to hangout:<br><a href=""></a>
 				</div>
 			</section>
 

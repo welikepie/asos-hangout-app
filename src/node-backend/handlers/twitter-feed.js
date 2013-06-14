@@ -21,7 +21,7 @@
 			twitterFeedGet = function (request, response) {
 
 				response.writeHead(200, _.extend(corsHeaders(request), { 'Content-Type': 'application/json' }));
-				response.end(twitterFeed.toJSON());
+				response.end(JSON.stringify(twitterFeed));
 
 			};
 

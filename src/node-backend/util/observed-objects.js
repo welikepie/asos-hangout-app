@@ -65,7 +65,7 @@ that emit change events on property changes (for models) or addition/removal of 
 					// Overriding property getter to provide JSON.stringify
 					// on target object for property name 'toJSON'.
 					'get': function (target, name, receiver) {
-						if (name === 'toJSON') { return function () { return JSON.stringify(target); }; }
+						if (name === 'toJSON') { return function () { return _.clone(target); }; }
 						else { return Reflect.get(target, name, receiver); }
 					},
 					// Overriding property setter to emit "change" event on new values
@@ -150,7 +150,7 @@ that emit change events on property changes (for models) or addition/removal of 
 					// Overriding property getter to serve toJSON function and wrap
 					// base collection's push, pop, shift, unshift and splice for emitting events.
 					'get': function (target, name, receiver) {
-						if (name === 'toJSON') { return function () { return JSON.stringify(target); }; }
+						if (name === 'toJSON') { return function () { return target.slice(); }; }
 						else if (name === 'pop') { return _.partial(this.modifiedPop, target); }
 						else if (name === 'push') { return _.partial(this.modifiedPush, target); }
 						else if (name === 'shift') { return _.partial(this.modifiedShift, target); }

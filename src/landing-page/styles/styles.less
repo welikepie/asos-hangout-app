@@ -238,6 +238,7 @@ a.prev, a.next {
 	float: right;
 	width: @aux-section-width;
 	height: floor(@main-section-width * 10 / 16) + 16px + 188px;
+	margin: 0 0 16px;
 
 	font-family: @pretty-font;
 	font-weight: normal;
@@ -366,6 +367,7 @@ a.prev, a.next {
 	width: @main-section-width;
 	height: 188px;
 	padding: 16px 36px 24px;
+	margin: 0 0 16px;
 
 	font-family: @sans-serif-font;
 	background: #fcb1ff url('../images/twitter-feed-background-desktop.png') repeat-y -656px 0;
@@ -476,6 +478,99 @@ a.prev, a.next {
 		a.prev { top: 32px; right: 100%; background-image: url('../images/twitter-feed-chevron-left.png'); }
 		a.next { top: 32px; left: 100%; background-image: url('../images/twitter-feed-chevron-right.png'); }
 	}
+}
+
+#audience-queue {
+
+	position: relative;
+	display: block;
+	padding: 16px 36px 24px;
+	overflow: hidden;
+
+	font-family: @sans-serif-font;
+	background: #5c7ee1;
+
+	h1 {
+		float: left;
+		padding: 0;
+		margin: 0 16px 16px 0;
+
+		font: normal 20px/20px @pretty-font;
+		text-transform: uppercase;
+	}
+	.join-queue {
+		display: none;
+		&.visible { display: block; }
+		float: right;
+	}
+
+	.switcher {
+		position: relative;
+		display: block;
+		clear: both;
+		width: 100%;
+		height: 100px;
+		margin: 0;
+
+		ul {
+			display: block;
+			width: 100%;
+			height: 100%;
+			padding: 0;
+			margin: 0;
+			overflow: hidden;
+
+			font-family: @sans-serif-font;
+			text-indent: 0;
+			white-space: nowrap;
+
+			list-style: none;
+			background: white;
+
+			li {
+				display: inline-block;
+				width: 100px;
+				height: 100px;
+				padding: 0;
+				margin: 0;
+
+				text-indent: 0;
+				white-space: normal;
+				vertical-align: top;
+
+				img {
+					display: block;
+					float: left;
+					width: 100px;
+					height: 100px;
+				}
+
+				a { color: inherit; text-decoration: none; }
+				h2 { display: none; }
+			}
+		}
+
+		a.prev { top: 32px; right: 100%; background-image: url('../images/twitter-feed-chevron-left.png'); }
+		a.next { top: 32px; left: 100%; background-image: url('../images/twitter-feed-chevron-right.png'); }
+	}
+
+	.invitation {
+		display: none;
+		&.open { display: block; }
+		padding: 16px 0;
+
+		font-size: 18px;
+		line-height: 26px;
+		text-align: center;
+
+		a {
+			color: #333;
+			font-weight: bold;
+			text-decoration: none;
+			&:hover, &:focus { text-decoration: underline; }
+		}
+	}
+
 }
 
 #sharing {

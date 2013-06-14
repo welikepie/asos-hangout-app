@@ -105,9 +105,10 @@
 						}));
 						response.end(
 							content.toString()
-								.replace("/* APP OPTIONS */null", appOptions.collection.toJSON())
-								.replace("/* PRODUCT FEED */null", productFeed.collection.toJSON())
-								.replace("/* TWITTER FEED */null", twitterFeed.collection.toJSON())
+								.replace("/* APP OPTIONS */null", JSON.stringify(appOptions.collection))
+								.replace("/* PRODUCT FEED */null", JSON.stringify(productFeed.collection))
+								.replace("/* TWITTER FEED */null", JSON.stringify(twitterFeed.collection))
+								.replace("/* AUDIENCE QUEUE */null", JSON.stringify(audienceQueue.collection))
 						);
 					}
 				});

@@ -21,11 +21,11 @@ require.config({
 });
 require([
 	'jquery', 'underscore', 'backbone', 'easyXDM', "moment",
-	'common/scripts/data/product', 'common/scripts/data/tweet',
+	'common/scripts/data/product', 'common/scripts/data/tweet', 'common/scripts/data/member',
 	'common/scripts/ui/collection-view', 'common/scripts/ui/slider'
 ], function (
 	$, _, Backbone, easyXDM, moment,
-	Products, Tweets,
+	Products, Tweets, Members,
 	CollectionView, Slider
 ) {
 	"use strict";
@@ -34,7 +34,9 @@ require([
 	// Establish collections for product and Twitter feeds,
 	// as well as URL base for the node SSE server.
 	var productFeed = new Products.ProductCollection({'comparator': function (a, b) { return a.get('addedAt') - b.get('addedAt'); }}),
-		twitterFeed = new Tweets.TweetCollection();
+		twitterFeed = new Tweets.TweetCollection(),
+		audienceQueue = new Members.MemberCollection();
+
 	productFeed.comparator = function (a, b) { return (b.get('addedAt') || (new Date()).getTime()) - (a.get('addedAt') || (new Date()).getTime()); };
 
 	// DOM-dependent scripts go here
@@ -47,6 +49,8 @@ require([
 		var liveMessage = $('#live-message'),
 			categoryLink = $('#product-feed a.shop'),
 			streamEmbed = $('#stream-embed iframe'),
+			invitation = $('#audience-queue .invitation'),
+			queueJoinLink = $('#audience-queue .join-queue'),
 			productFeedView = new CollectionView({
 
 				'collection': productFeed,
@@ -79,11 +83,26 @@ require([
 						.find('.tweet').html(model.get('text')).end();
 				}
 
+			}),
+			audienceQueueView = new CollectionView({
+
+				'collection': audienceQueue,
+				'el': $('#audience-queue ul').get(0),
+				'template': $('#audience-queue ul > li.template').remove().removeClass('template'),
+
+				'populate': function (model, element) {
+					$(element)
+						.find('h2').text(model.get('name')).end()
+						.find('img').attr('src', model.get('avatar')).end()
+						.find('a').attr('href', model.get('url')).end();
+				}
+
 			});
 
 		// Init rendering of the collection views
 		productFeedView.render();
 		twitterFeedView.render();
+		audienceQueueView.render();
 
 		var productSlider = new Slider(productFeedView.$el, 'li');
 		productSlider.changeTo = function () {
@@ -142,6 +161,26 @@ require([
 			};
 		}());
 
+		var queueSlider = new Slider(audienceQueueView.$el, 'li');
+		$('#audience-queue a.prev').on('click', function (ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			queueSlider.changeTo(queueSlider.currentIndex - 1);
+		});
+		$('#audience-queue a.next').on('click', function (ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			queueSlider.changeTo(queueSlider.currentIndex + 1);
+		});
+		(function () {
+			var oldRender = audienceQueueView.immediateRender;
+			audienceQueueView.immediateRender = function () {
+				var result = oldRender.apply(this, arguments);
+				_.delay(function () { queueSlider.changeTo(queueSlider.currentIndex); }, 100);
+				return result;
+			};
+		}());
+
 		// Blinking cursor on live message
 		window.setInterval(_.bind(liveMessage.toggleClass, liveMessage, 'blink'), 800);
 		$('footer .misc-mobile').one('click', function () { $(this).removeClass('closed'); });
@@ -160,6 +199,8 @@ require([
 					var data = JSON.parse(message),
 						ev = data.event.split(':', 2),
 						model;
+
+					console.log('Incoming event: ', data);
 
 					if (ev[0] === 'productFeed') {
 
@@ -183,10 +224,42 @@ require([
 							if (model) { twitterFeed.remove(model); }
 						}
 
+					} else if (ev[0] === 'audienceQueue') {
+
+						if (ev[1] === 'reset') {
+							audienceQueue.reset(data.payload, {'parse': true, 'validate': true});
+						} else if (ev[1] === 'add') {
+							if (!audienceQueue.get(data.payload.id)) { audienceQueue.add(data.payload, {'parse': true, 'validate': true}); }
+						} else if (ev[1] === 'remove') {
+							model = audienceQueue.get(data.payload.id);
+							if (model) { audienceQueue.remove(model); }
+						} else if (ev[1] === 'change') {
+							audienceQueue.set([data.payload], {'add': false, 'remove': false, 'merge': true});
+						}
+
+						// Set the appearance of invitation and join links
+						if (window.localID && (model = audienceQueue.get(window.localID))) {
+							queueJoinLink.removeClass('visible');
+							if (model.get('state') === 1) {
+								invitation.addClass('open');
+							} else {
+								invitation.removeClass('open');
+							}
+						} else {
+							queueJoinLink.addClass('visible');
+							invitation.removeClass('open');
+						}
+
 					} else if (ev[0] === 'appOptions') {
 						if (_.has(data.payload, 'liveMessage')) { liveMessage.html(data.payload.liveMessage.replace(/\n/g, " ")); }
 						if (_.has(data.payload, 'hangoutEmbed')) { streamEmbed.attr('src', data.payload.hangoutEmbed); }
 						if (_.has(data.payload, 'categoryLink')) { categoryLink.attr('href', data.payload.categoryLink); }
+						if (_.has(data.payload, 'checkHangoutLink')) {
+							invitation.find('a')
+								.attr('href', data.payload.checkHangoutLink)
+								.html(data.payload.checkHangoutLink);
+							console.log('TEST: ', invitation);
+						}
 					}
 
 				} catch (e) {}

@@ -23,7 +23,7 @@
 			productFeedGet = function (request, response) {
 
 				response.writeHead(200, _.extend(corsHeaders(request), { 'Content-Type': 'application/json' }));
-				response.end(productFeed.toJSON());
+				response.end(JSON.stringify(productFeed));
 
 			};
 

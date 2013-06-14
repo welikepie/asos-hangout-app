@@ -15,6 +15,7 @@
 	var appOptions = /* APP OPTIONS */null,
 		productFeed = /* PRODUCT FEED */null,
 		twitterFeed = /* TWITTER FEED */null,
+		audienceQueue = /* AUDIENCE QUEUE */null,
 		baseUrl = document.getElementsByTagName('base').length ? document.getElementsByTagName('base')[0].href : '',
 
 		source,
@@ -57,6 +58,7 @@
 				socket.postMessage(JSON.stringify({'event': 'appOptions:reset', 'payload': appOptions}));
 				socket.postMessage(JSON.stringify({'event': 'productFeed:reset', 'payload': productFeed}));
 				socket.postMessage(JSON.stringify({'event': 'twitterFeed:reset', 'payload': twitterFeed}));
+				socket.postMessage(JSON.stringify({'event': 'audienceQueue:reset', 'payload': audienceQueue}));
 
 				// Establish connection to SSE stream and establish message pass-through
 				createSource();

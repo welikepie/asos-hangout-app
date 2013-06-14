@@ -262,13 +262,19 @@ module.exports = function (grunt) {
 			},
 
 			'landing-page-html-dev': {
-				'src': 'src/landing-page/index.html',
-				'dest': 'build/landing-page/index.html',
+				'src': '*.php',
+				'cwd': 'src/landing-page/',
+				'dest': 'build/landing-page/',
+				'expand': true,
+				'filter': 'isFile',
 				'options': { 'processContent': grunt.template.process }
 			},
 			'landing-page-html-release': {
-				'src': 'src/landing-page/index.html',
-				'dest': 'build/landing-page/index.html',
+				'src': '*.php',
+				'cwd': 'src/landing-page/',
+				'dest': 'build/landing-page/',
+				'expand': true,
+				'filter': 'isFile',
 				'options': {
 					'processContent': function (content) {
 						return grunt.template.process(content

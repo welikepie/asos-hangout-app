@@ -15,7 +15,10 @@
 					'twitterSearch': '',
 					'hangoutEmbed': '',
 					'liveMessage': '',
-					'categoryLink': ''
+					'categoryLink': '',
+
+					'checkHangoutLink': '',
+					'mainHangoutLink': ''
 				}),
 				appOptionsGet,
 				appOptionsChange;
@@ -39,7 +42,7 @@
 			appOptionsGet = function (request, response, path, done) {
 
 				response.writeHead(200, _.extend(corsHeaders(request), {'Content-Type': 'application/json'}));
-				return response.end(appOptions.toJSON());
+				return response.end(JSON.stringify(appOptions));
 
 			};
 
