@@ -5,8 +5,11 @@
     "title": "ASOS Hangout App",
     "baseUrl": "http://ks3310759.kimsufi.com/asos-hangout-dev/",
     "baseSslUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/",
+    "hangoutAppId": "1035480721184",
     "hangoutUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/hangout-app/",
-    "stagingHangoutUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/admin/staging-app/",
+    "stagingAppId": "",
+    "stagingHangoutUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/staging-app/",
+    "stagingHangoutAdminUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/admin/staging-app/",
     "nodeUrl": "http://ks3310759.kimsufi.com:8889/"
   },
   "devDependencies": {

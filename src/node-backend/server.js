@@ -34,7 +34,7 @@
 
 		queueFactory = require('./handlers/user-queue').factory,
 		audienceQueue = queueFactory('audienceQueue', publicSSE),
-		hangoutQueue = queueFactory('hangoutQueue', publicSSE);
+		hangoutQueue = queueFactory('stagingQueue', publicSSE);
 
 	productFeed = require('./handlers/product-feed').factory(publicSSE, auth);
 	twitterFeed = require('./handlers/twitter-feed').factory(publicSSE, auth);

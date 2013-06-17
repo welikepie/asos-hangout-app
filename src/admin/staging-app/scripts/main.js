@@ -26,7 +26,10 @@ require([
 
 	var stagingQueue = new Members.MemberCollection(),
 		audienceQueue = new Members.MemberCollection();
-	audienceQueue.comparator = function (a, b) { return (a.get('addedAt') || (new Date()).getTime()) - (b.get('addedAt') || (new Date()).getTime()); };
+
+	audienceQueue.comparator = stagingQueue.comparator = function (a, b) {
+		return (a.get('addedAt') || (new Date()).getTime()) - (b.get('addedAt') || (new Date()).getTime());
+	};
 
 	var init = _.after(2, function () {
 
@@ -89,7 +92,15 @@ require([
 						});
 					},
 					'click button.accept': function (model/*, ev, element*/) { console.log('Accepted ' + model.id); },
-					'click button.reject': function (model/*, ev, element*/) { console.log('Rejected ' + model.id); }
+					'click button.reject': function (model/*, ev, element*/) {
+						$.ajax({
+							'url': nodeUrl + 'audience-queue/' + model.id,
+							'type': 'DELETE',
+							'dataType': 'text',
+							'cache': false,
+							'headers': { 'Authorization': window.authToken }
+						});
+					}
 				}
 
 			});
@@ -120,6 +131,19 @@ require([
 							if (model) { audienceQueue.remove(model); }
 						} else if (ev[1] === 'change') {
 							audienceQueue.set([data.payload], {'add': false, 'remove': false, 'merge': true});
+						}
+
+					} else if (ev[0] === 'stagingQueue') {
+
+						if (ev[1] === 'reset') {
+							stagingQueue.reset(data.payload);
+						} else if (ev[1] === 'add') {
+							if (!stagingQueue.get(data.payload.id)) { stagingQueue.add(data.payload); }
+						} else if (ev[1] === 'remove') {
+							model = stagingeQueue.get(data.payload.id);
+							if (model) { stagingQueue.remove(model); }
+						} else if (ev[1] === 'change') {
+							stagingQueue.set([data.payload], {'add': false, 'remove': false, 'merge': true});
 						}
 
 					}
