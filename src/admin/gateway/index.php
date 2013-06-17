@@ -1,6 +1,6 @@
 <?php
 
-	define('URL_PREFIX', '/asos-hangout-app/build/admin/gateway');
+	define('URL_PREFIX', '/asos-hangout-dev/admin/gateway');
 	require_once(__DIR__ . '/gateway.php');
 	require_once(__DIR__ . '/zaphpa/zaphpa.lib.php');
 	$router = new Zaphpa_Router();

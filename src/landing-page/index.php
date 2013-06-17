@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<?php session_start(); ?><!DOCTYPE html>
 <html>
 	<head>
 		<title>ASOS Shop-Along</title>
@@ -37,7 +37,6 @@
 			  })();
 
 			window.localID = <?php
-				session_start();
 				$local_id = isset($_SESSION['user_data']) ? $_SESSION['user_data']['id'] : null;
 				echo(json_encode($local_id));
 			?>;

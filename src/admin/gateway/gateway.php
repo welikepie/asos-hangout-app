@@ -7,8 +7,8 @@
 
 	class GatewayInterface {
 
-		protected static $db = null;
-		protected static function open_db () {
+		public static $db = null;
+		public static function open_db () {
 			try {
 				static::$db = new mysqli(
 					'welikepie.com',
@@ -25,7 +25,7 @@
 				throw $e;
 			}
 		}
-		protected static function close_db () {
+		public static function close_db () {
 			if (isset(self::$db)) {
 				// Kill the thread, thus closing the TCP connection
 				self::$db->kill(self::$db->thread_id);
@@ -33,7 +33,7 @@
 				self::$db = null;
 			}
 		}
-		protected static function execute_query ($query, $args, $callback = NULL) {
+		public static function execute_query ($query, $args, $callback = NULL) {
 
 			if (!self::$db) { throw new Exception('Database connection not opened.'); }
 
@@ -191,7 +191,7 @@
 						'name' => $row['name'],
 						'photo_small' => $row['image'],
 						'photo_big' => $row['image'],
-						'price' => self::$currencies[$filters['currency']] . number_format(floatval($row['price']), 2),
+						'price' => GatewayInterface::$currencies[$filters['currency']] . number_format(floatval($row['price']), 2),
 						'url' => 'http://www.asos.com/pgeproduct.aspx?iid=' . $product_id,
 						'description' => ($row['description'] && ($row['description'] !== null) ? $row['description'] : null),
 						'categories' => array()

@@ -3,10 +3,11 @@
   "version": "0.0.1",
   "app": {
     "title": "ASOS Hangout App",
-    "baseUrl": "http://ukcampaign.asos.com/",
-    "baseSslUrl": "https://ukcampaign.asos.com/",
-    "hangoutUrl": "https://ukcampaign.asos.com/hangout-app/",
-    "nodeUrl": "http://ukcampaign.asos.com:8888/"
+    "baseUrl": "http://ks3310759.kimsufi.com/asos-hangout-dev/",
+    "baseSslUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/",
+    "hangoutUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/hangout-app/",
+    "stagingHangoutUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/admin/staging-app/",
+    "nodeUrl": "http://ks3310759.kimsufi.com:8889/"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

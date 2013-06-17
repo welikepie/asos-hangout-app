@@ -91,6 +91,23 @@ module.exports = function (grunt) {
 				'src': ['src/hangout-app/scripts/*.js', 'src/hangout-app/scripts/!(vendor)/**/*.js']
 			},
 
+			'staging-app-dev': {
+				'options': {
+					'debug': true,
+					'devel': true,
+					'unused': false
+				},
+				'src': ['src/admin/staging-app/scripts/*.js', 'src/admin/staging-app/scripts/!(vendor)/**/*.js']
+			},
+			'staging-app-release': {
+				'options': {
+					'debug': false,
+					'devel': false,
+					'unused': true
+				},
+				'src': ['src/admin/staging-app/scripts/*.js', 'src/admin/staging-app/scripts/!(vendor)/**/*.js']
+			},
+
 			'node-backend-dev': {
 				'options': {
 					'debug': true,
@@ -188,6 +205,34 @@ module.exports = function (grunt) {
 				'dest': 'build/hangout-app/styles/styles.css'
 			},
 
+			'staging-app-lint': {
+				'src': 'src/admin/staging-app/styles/*.less',
+				'options': {
+					'compile': false,
+					'compress': false,
+					'noIDs': false,
+					'noOverqualifying': false,
+					'noUniversalSelectors': false,
+					'strictPropertyOrder': false
+				}
+			},
+			'staging-app-dev': {
+				'options': {
+					'compile': true,
+					'compress': false
+				},
+				'src': 'src/admin/staging-app/styles/*.less',
+				'dest': 'build/admin/staging-app/styles/styles.css'
+			},
+			'staging-app-release': {
+				'options': {
+					'compile': true,
+					'compress': true
+				},
+				'src': 'src/admin/staging-app/styles/*.less',
+				'dest': 'build/admin/staging-app/styles/styles.css'
+			},
+
 			'admin-lint': {
 				'src': 'src/admin/**/*.less',
 				'options': {
@@ -233,6 +278,9 @@ module.exports = function (grunt) {
 			'hangout-app': { 'src': ['build/hangout-app'] },
 			'hangout-app-scripts-post': { 'src': ['src/hangout-app/main.js'] },
 			'hangout-app-cleanup': { 'src': ['build/hangout-app/index.html', 'build/hangout-app/styles'] },
+			'staging-app': { 'src': ['build/admin/staging-app'] },
+			'staging-app-scripts-post': { 'src': ['src/admin/staging-app/main.js'] },
+			'staging-app-cleanup': { 'src': ['build/admin/staging-app/index.html', 'build/admin/staging-app/styles'] },
 			'admin': { 'src': ['build/admin'] },
 			'node-backend': { 'src': ['build/node-backend'] }
 		},
@@ -435,6 +483,94 @@ module.exports = function (grunt) {
 				'filter': 'isFile'
 			},
 
+			'staging-app-html-dev': {
+				'src': ['index.html', 'hangout.js'],
+				'cwd': 'src/admin/staging-app/',
+				'dest': 'build/admin/staging-app/',
+				'expand': true,
+				'filter': 'isFile'
+			},
+			'staging-app-html-release': {
+				'src': 'src/admin/staging-app/index.html',
+				'dest': 'build/admin/staging-app/index.html',
+				'options': {
+					'processContent': function (content) {
+						return grunt.template.process(content
+							.replace('<base href=""', '<base href="<%= pkg.app.stagingHangoutUrl %>"')
+							.replace( /src="..\/..\/common\/scripts\/vendor\/([a-zA-Z0-9_-]+)\.js"/gi, 'src="scripts/$1.js"' )
+							.replace(
+								/<link(?:[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*|[^>]*href="([^"]+)"[^>]*rel="stylesheet"[^>]*)>/gi,
+								function (match, file) {
+									var baseUrl = grunt.config.get('pkg.app.stagingHangoutUrl'),
+										css = grunt.file.read('build/admin/staging-app/' + file)
+											.replace(/\.\.\/images/gi, baseUrl + 'images')
+											.replace(/\.\.\/\.\.\/common\/styles\/fonts/gi, grunt.config.get('pkg.app.baseSslUrl') + 'common/styles/fonts')
+											.replace(/\s+/gi, ' ');
+									return '<style type="text/css">' + css + '</style>';
+								}
+							)
+						);
+					}
+				}
+			},
+			'staging-app-xml': {
+				'src': 'src/admin/staging-app/app.xml',
+				'dest': 'build/admin/staging-app/app.xml',
+				'options': { 'processContent': grunt.template.process }
+			},
+
+			'staging-app-scripts': {
+				'src': '**/*.js',
+				'dest': 'build/admin/staging-app/scripts/',
+				'expand': true,
+				'cwd': 'src/admin/staging-app/scripts/',
+				'filter': 'isFile'
+			},
+			'staging-app-scripts-pre': {
+				'src': 'src/admin/staging-app/scripts/main.js',
+				'dest': 'src/admin/staging-app/main.js'
+			},
+			'staging-app-amd': {
+				'src': ['require.js', 'modernizr.js', 'json3.js'],
+				'cwd': 'src/common/scripts/vendor/',
+				'dest': 'build/admin/staging-app/scripts/',
+				'expand': true,
+				'filter': 'isFile'
+			},
+			'staging-app-compile-lint': {
+				'src': 'build/admin/staging-app/scripts/main.js',
+				'dest': 'build/admin/staging-app/scripts/main.js',
+				'options': {
+					'processContent': function (content) {
+						/*jshint boss:true */
+						var config;
+						if (config = content.match(/require\.config\((\{[^\v]+?\})\);/i)) {
+							config = JSON.parse(config[1]);
+							if ('config' in config) { config = 'require.config(' + JSON.stringify({'config': config.config}) + ');'; }
+							else { config = ''; }
+						} else { config = ''; }
+						return content
+							.replace(/require\.config\(\{[^\v]+?\}\);/i, config)
+							.replace(/define\("admin\/staging-app\/scripts\/main", function\(\)\{\}\);/i, "");
+					}
+				}
+			},
+
+			'staging-app-styling': {
+				'src': '**/*.!(less)',
+				'cwd': 'src/admin/staging-app/styles/',
+				'dest': 'build/admin/staging-app/styles/',
+				'expand': true,
+				'filter': 'isFile'
+			},
+			'staging-app-images': {
+				'src': ['**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.png'],
+				'cwd': 'src/admin/staging-app/images/',
+				'dest': 'build/admin/staging-app/images/',
+				'expand': true,
+				'filter': 'isFile'
+			},
+
 			'node-backend-dev': {
 				'src': '**/*',
 				'cwd': 'src/node-backend',
@@ -510,6 +646,13 @@ module.exports = function (grunt) {
 				'dest': 'build/hangout-app/scripts/',
 				'expand': true,
 				'filter': 'isFile'
+			},
+			'staging-app': {
+				'src': ['main.js', 'modernizr.js', 'require.js'],
+				'cwd': 'build/admin/staging-app/scripts/',
+				'dest': 'build/admin/staging-app/scripts/',
+				'expand': true,
+				'filter': 'isFile'
 			}
 		},
 
@@ -532,6 +675,15 @@ module.exports = function (grunt) {
 					'optimize': 'none',
 					'include': 'hangout-app/scripts/main',
 					'out': 'build/hangout-app/scripts/main.js'
+				}
+			},
+			'staging-app': {
+				'options': {
+					'baseUrl': 'src',
+					'mainConfigFile': 'src/admin/staging-app/main.js',
+					'optimize': 'none',
+					'include': 'admin/staging-app/scripts/main',
+					'out': 'build/admin/staging-app/scripts/main.js'
 				}
 			}
 		}
@@ -636,6 +788,60 @@ module.exports = function (grunt) {
 		'copy:hangout-app-html-release',
 		'copy:hangout-app-xml',
 		'clean:hangout-app-cleanup'
+	]);
+
+	grunt.registerTask('staging-app-scripts-dev', [
+		'jshint:common-dev',
+		'copy:common-scripts',
+		'jshint:staging-app-dev',
+		'copy:staging-app-scripts'
+	]);
+	grunt.registerTask('staging-app-scripts-compiled', [
+		'jshint:common-dev',
+		'jshint:staging-app-dev',
+		'copy:staging-app-scripts-pre',
+		'requirejs:staging-app',
+		'copy:staging-app-compile-lint',
+		'clean:staging-app-scripts-post',
+		'copy:staging-app-amd'
+	]);
+	grunt.registerTask('staging-app-scripts-release', [
+		'jshint:staging-app-release',
+		'staging-app-scripts-compiled',
+		'uglify:staging-app'
+	]);
+	grunt.registerTask('staging-app-dev', [
+		'clean:staging-app',
+		'recess:staging-app-lint',
+		'recess:staging-app-dev',
+		'staging-app-scripts-dev',
+		'copy:staging-app-styling',
+		'copy:staging-app-images',
+		'copy:staging-app-html-dev'
+	]);
+	grunt.registerTask('staging-app-compiled', [
+		'clean:staging-app',
+		'recess:staging-app-lint',
+		'recess:staging-app-dev',
+		'staging-app-scripts-compiled',
+		'copy:staging-app-styling',
+		'copy:staging-app-images',
+		'copy:hangout-app-branding',
+		'copy:staging-app-html-release',
+		'copy:staging-app-xml',
+		'clean:staging-app-cleanup'
+	]);
+	grunt.registerTask('staging-app-release', [
+		'clean:staging-app',
+		'recess:staging-app-lint',
+		'recess:staging-app-release',
+		'staging-app-scripts-release',
+		'copy:staging-app-styling',
+		'copy:staging-app-images',
+		'copy:hangout-app-branding',
+		'copy:staging-app-html-release',
+		'copy:staging-app-xml',
+		'clean:staging-app-cleanup'
 	]);
 
 	grunt.registerTask('node-backend-dev', [

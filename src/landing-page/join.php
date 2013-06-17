@@ -119,7 +119,7 @@
 	curl_setopt_array($curl, array(
 		CURLOPT_RETURNTRANSFER => false,
 		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		CURLOPT_URL => 'http://localhost:8888/audience-queue',
+		CURLOPT_URL => '<%= pkg.app.nodeUrl %>audience-queue',
 		CURLOPT_POSTFIELDS => str_replace('\/', '/', json_encode($user))
 	));
 
