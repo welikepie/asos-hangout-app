@@ -251,7 +251,7 @@ module.exports = function (grunt) {
 			},
 
 			'staging-admin-app-lint': {
-				'src': 'src/staging-app/styles/*.less',
+				'src': 'src/admin/staging-app/styles/*.less',
 				'options': {
 					'compile': false,
 					'compress': false,
@@ -266,7 +266,7 @@ module.exports = function (grunt) {
 					'compile': true,
 					'compress': false
 				},
-				'src': 'src/staging-app/styles/*.less',
+				'src': 'src/admin/staging-app/styles/*.less',
 				'dest': 'build/admin/staging-app/styles/styles.css'
 			},
 			'staging-admin-app-release': {
@@ -1032,7 +1032,7 @@ module.exports = function (grunt) {
 		'staging-admin-app-scripts-compiled',
 		'copy:staging-admin-app-styling',
 		'copy:staging-admin-app-images',
-		'copy:hangout-admin-app-branding',
+		'copy:hangout-app-branding',
 		'copy:staging-admin-app-html-release',
 		'copy:staging-admin-app-xml',
 		'clean:staging-admin-app-cleanup'
@@ -1044,7 +1044,7 @@ module.exports = function (grunt) {
 		'staging-admin-app-scripts-release',
 		'copy:staging-admin-app-styling',
 		'copy:staging-admin-app-images',
-		'copy:hangout-admin-app-branding',
+		'copy:hangout-app-branding',
 		'copy:staging-admin-app-html-release',
 		'copy:staging-admin-app-xml',
 		'clean:staging-admin-app-cleanup'

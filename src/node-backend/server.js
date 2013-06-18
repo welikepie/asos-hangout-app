@@ -34,7 +34,7 @@
 
 		queueFactory = require('./handlers/user-queue').factory,
 		audienceQueue = queueFactory('audienceQueue', publicSSE),
-		hangoutQueue = queueFactory('stagingQueue', publicSSE);
+		stagingQueue = queueFactory('stagingQueue', publicSSE);
 
 	productFeed = require('./handlers/product-feed').factory(publicSSE, auth);
 	twitterFeed = require('./handlers/twitter-feed').factory(publicSSE, auth);
@@ -109,6 +109,7 @@
 								.replace("/* PRODUCT FEED */null", JSON.stringify(productFeed.collection))
 								.replace("/* TWITTER FEED */null", JSON.stringify(twitterFeed.collection))
 								.replace("/* AUDIENCE QUEUE */null", JSON.stringify(audienceQueue.collection))
+								.replace("/* STAGING QUEUE */null", JSON.stringify(stagingQueue.collection))
 						);
 					}
 				});
@@ -138,6 +139,13 @@
 	requestManager.addHandler('POST', '/audience-queue', audienceQueue.handlers.add);
 	requestManager.addHandler('PATCH', '/audience-queue', audienceQueue.handlers.change);
 	requestManager.addHandler('DELETE', /^\/audience-queue\/([0-9a-zA-Z]+)$/, audienceQueue.handlers.remove);
+
+	// Queue functionality
+	requestManager.addHandler('GET', '/staging-queue', stagingQueue.handlers.get);
+	requestManager.addHandler('GET', /^\/staging-queue\/([0-9a-zA-Z]+)$/, stagingQueue.handlers.present);
+	requestManager.addHandler('POST', '/staging-queue', stagingQueue.handlers.add);
+	requestManager.addHandler('PATCH', '/staging-queue', stagingQueue.handlers.change);
+	requestManager.addHandler('DELETE', /^\/staging-queue\/([0-9a-zA-Z]+)$/, stagingQueue.handlers.remove);
 
 	var server = http.createServer(requestManager.callback);
 	productFeed.collection.on('add', function (item) { console.log('New product added.'); });

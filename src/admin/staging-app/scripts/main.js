@@ -28,7 +28,7 @@ require([
 		audienceQueue = new Members.MemberCollection();
 
 	audienceQueue.comparator = stagingQueue.comparator = function (a, b) {
-		return (a.get('addedAt') || (new Date()).getTime()) - (b.get('addedAt') || (new Date()).getTime());
+		return (a.get('joined') || (new Date()).getTime()) - (b.get('joined') || (new Date()).getTime());
 	};
 
 	var init = _.after(2, function () {
@@ -82,6 +82,7 @@ require([
 
 				'itemEvents': {
 					'click button.invite': function (model/*, ev, element*/) {
+
 						$.ajax({
 							'url': nodeUrl + 'audience-queue',
 							'type': 'PATCH',
@@ -90,8 +91,41 @@ require([
 							'headers': { 'Authorization': window.authToken },
 							'data': JSON.stringify({'id': model.id, 'state': 1})
 						});
+
 					},
-					'click button.accept': function (model/*, ev, element*/) { console.log('Accepted ' + model.id); },
+					'click button.accept': function (model/*, ev, element*/) {
+
+						var temp = model.toJSON();
+						delete temp.addedAt;
+						delete temp.joined;
+						temp.state = 0;
+
+						$.ajax({
+							'url': nodeUrl + 'staging-queue',
+							'type': 'POST',
+							'dataType': 'text',
+							'cache': false,
+							'data': JSON.stringify(temp),
+							'header': { 'Authorization': window.authToken },
+							'success': function () {
+
+								console.log('Finished adding person to staging queue.');
+								$.ajax({
+									'url': nodeUrl + 'audience-queue/' + model.id,
+									'type': 'DELETE',
+									'dataType': 'text',
+									'cache': false,
+									'headers': { 'Authorization': window.authToken },
+									'success': function () {
+										console.log('Finished removing the person from audience queue.');
+									}
+								});
+
+							}
+						});
+
+
+					},
 					'click button.reject': function (model/*, ev, element*/) {
 						$.ajax({
 							'url': nodeUrl + 'audience-queue/' + model.id,
@@ -123,9 +157,9 @@ require([
 					if (ev[0] === 'audienceQueue') {
 
 						if (ev[1] === 'reset') {
-							audienceQueue.reset(data.payload);
+							audienceQueue.reset(data.payload, {'parse': true, 'validate': true});
 						} else if (ev[1] === 'add') {
-							if (!audienceQueue.get(data.payload.id)) { audienceQueue.add(data.payload); }
+							if (!audienceQueue.get(data.payload.id)) { audienceQueue.add(data.payload, {'parse': true, 'validate': true}); }
 						} else if (ev[1] === 'remove') {
 							model = audienceQueue.get(data.payload.id);
 							if (model) { audienceQueue.remove(model); }
@@ -136,11 +170,11 @@ require([
 					} else if (ev[0] === 'stagingQueue') {
 
 						if (ev[1] === 'reset') {
-							stagingQueue.reset(data.payload);
+							stagingQueue.reset(data.payload, {'parse': true, 'validate': true});
 						} else if (ev[1] === 'add') {
-							if (!stagingQueue.get(data.payload.id)) { stagingQueue.add(data.payload); }
+							if (!stagingQueue.get(data.payload.id)) { stagingQueue.add(data.payload, {'parse': true, 'validate': true}); }
 						} else if (ev[1] === 'remove') {
-							model = stagingeQueue.get(data.payload.id);
+							model = stagingQueue.get(data.payload.id);
 							if (model) { stagingQueue.remove(model); }
 						} else if (ev[1] === 'change') {
 							stagingQueue.set([data.payload], {'add': false, 'remove': false, 'merge': true});
@@ -153,15 +187,37 @@ require([
 
 		});
 
+		// Send Hangout of the staging URL to the server to allow for easy
+		// display of invitation links for all the invited audience members.
+		// The link is retrieved from Hangouts API then modified to include
+		// the staging application ID (for autolaunch).
+		var link_parser = document.createElement('a');
+		link_parser.href = gapi.hangout.getHangoutUrl();
+		link_parser.search = (function () {
+			var temp = link_parser.search.replace(/^\?/, '');
+			if (temp.length) {
+				temp = temp.split('&');
+				temp.push('gid=' + window.stagingAppId);
+				temp = temp.join('&');
+			} else {
+				temp = 'gid=' + window.stagingAppId;
+			}
+			return '?' + temp;
+		}());
+
 		// Send Hangout URL to server for for invitations
 		$.ajax({
 			'url': nodeUrl + 'app-options',
 			'type': 'POST',
 			'dataType': 'text',
 			'cache': false,
-			'data': {'checkHangoutLink': gapi.hangout.getHangoutUrl()},
+			'data': {'checkHangoutLink': link_parser.href},
 			'headers': { 'Authorization': window.authToken }
-		});
+		}); link_parser = null;
+
+		// On people arriving at and leaving from the staging hangout,
+		// ensure their status in the audience queue is modified accordingly
+		// (change member status index appropriately).
 		gapi.hangout.onParticipantsChanged.add(function (ev) {
 
 			var toAdd = [],

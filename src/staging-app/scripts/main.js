@@ -27,7 +27,7 @@ require([
 	var stagingQueue = new Members.MemberCollection(),
 		audienceQueue = new Members.MemberCollection();
 
-	var init = _.after(2, function () {
+	var init = _.after(2, function () { try {
 
 		var baseUrl = $('base').eq(0).attr('data-base-url'),
 			nodeUrl = $('base').eq(0).attr('data-node-url'),
@@ -97,12 +97,13 @@ require([
 			updateState = function () {
 
 				var temp, state = 'rejected';
-				if (audienceQueue.get(localID)) {
+				temp = audienceQueue.get(localID);
+				if (temp && (temp.get('state') !== 0)) {
 					state = 'check';
 				} else {
 					temp = stagingQueue.get(localID);
 					if (temp) {
-						state = temp.get('state') === 0 ?
+						state = (temp.get('state') === 0) ?
 							'accepted' :
 							'invited';
 					}
@@ -141,8 +142,15 @@ require([
 		audienceQueue.on('all', updateState);
 		stagingQueue.on('all', updateState);
 
-	});
+	} catch (e) { console.log('Error: ', e); } });
 
-	$(init); gapi.hangout.onApiReady.add(init);
+	$(function () {
+		console.log('Running from jQuery.');
+		init();
+	});
+	gapi.hangout.onApiReady.add(function () {
+		console.log('Running from GAPI.');
+		init();
+	});
 
 });

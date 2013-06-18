@@ -10,6 +10,10 @@
 
 	header('HTTP/1.1 200 OK', true, 200);
 	header('Content-Type: text/javascript');
-	echo('window.authToken = ' . json_encode($token) . ';');
+	echo(
+		'window.authToken = ' . json_encode($token) . ";\n" .
+		"window.stagingAppId = \"<%= pkg.app.stagingAppId %>\";\n" .
+		"window.hangoutAppId = \"<%= pkg.app.hangoutAppId %>\";"
+	);
 
 ?>

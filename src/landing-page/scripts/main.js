@@ -33,9 +33,11 @@ require([
 	// DATA STRUCTURES
 	// Establish collections for product and Twitter feeds,
 	// as well as URL base for the node SSE server.
-	var productFeed = new Products.ProductCollection({'comparator': function (a, b) { return a.get('addedAt') - b.get('addedAt'); }}),
+	var appOptions = {},
+		productFeed = new Products.ProductCollection({'comparator': function (a, b) { return a.get('addedAt') - b.get('addedAt'); }}),
 		twitterFeed = new Tweets.TweetCollection(),
-		audienceQueue = new Members.MemberCollection();
+		audienceQueue = new Members.MemberCollection(),
+		stagingQueue = new Members.MemberCollection();
 
 	productFeed.comparator = function (a, b) { return (b.get('addedAt') || (new Date()).getTime()) - (a.get('addedAt') || (new Date()).getTime()); };
 
@@ -198,9 +200,7 @@ require([
 
 					var data = JSON.parse(message),
 						ev = data.event.split(':', 2),
-						model;
-
-					console.log('Incoming event: ', data);
+						model, temp = 0;
 
 					if (ev[0] === 'productFeed') {
 
@@ -237,29 +237,28 @@ require([
 							audienceQueue.set([data.payload], {'add': false, 'remove': false, 'merge': true});
 						}
 
-						// Set the appearance of invitation and join links
-						if (window.localID && (model = audienceQueue.get(window.localID))) {
-							queueJoinLink.removeClass('visible');
-							if (model.get('state') === 1) {
-								invitation.addClass('open');
-							} else {
-								invitation.removeClass('open');
-							}
-						} else {
-							queueJoinLink.addClass('visible');
-							invitation.removeClass('open');
+					} else if (ev[0] === 'stagingQueue') {
+
+						if (ev[1] === 'reset') {
+							stagingQueue.reset(data.payload, {'parse': true, 'validate': true});
+						} else if (ev[1] === 'add') {
+							if (!stagingQueue.get(data.payload.id)) { stagingQueue.add(data.payload, {'parse': true, 'validate': true}); }
+						} else if (ev[1] === 'remove') {
+							model = stagingQueue.get(data.payload.id);
+							if (model) { stagingQueue.remove(model); }
+						} else if (ev[1] === 'change') {
+							stagingQueue.set([data.payload], {'add': false, 'remove': false, 'merge': true});
 						}
 
 					} else if (ev[0] === 'appOptions') {
 						if (_.has(data.payload, 'liveMessage')) { liveMessage.html(data.payload.liveMessage.replace(/\n/g, " ")); }
 						if (_.has(data.payload, 'hangoutEmbed')) { streamEmbed.attr('src', data.payload.hangoutEmbed); }
 						if (_.has(data.payload, 'categoryLink')) { categoryLink.attr('href', data.payload.categoryLink); }
-						if (_.has(data.payload, 'checkHangoutLink')) {
-							invitation.find('a')
-								.attr('href', data.payload.checkHangoutLink)
-								.html(data.payload.checkHangoutLink);
-							console.log('TEST: ', invitation);
-						}
+						if (_.has(data.payload, 'checkHangoutLink')) { appOptions.checkHangoutLink = data.payload.checkHangoutLink; }
+					}
+
+					if ((ev[0] === 'stagingQueue') || (ev[0] === 'audienceQueue')) {
+						if
 					}
 
 				} catch (e) {}
@@ -270,3 +269,20 @@ require([
 	});
 
 });
+
+// Set the appearance of invitation and join links
+						if (window.localID && (model = audienceQueue.get(window.localID))) {
+							queueJoinLink.removeClass('visible');
+							if (model.get('state') !== 0) {
+								invitation.addClass('open');
+							} else {
+								invitation.removeClass('open');
+							}
+						} else {
+							queueJoinLink.addClass('visible');
+							invitation.removeClass('open');
+						}
+
+						invitation.find('a')
+								.attr('href', data.payload.checkHangoutLink)
+								.html(data.payload.checkHangoutLink);
