@@ -125,6 +125,23 @@ module.exports = function (grunt) {
 				'src': ['src/admin/staging-app/scripts/*.js', 'src/admin/staging-app/scripts/!(vendor)/**/*.js']
 			},
 
+			'main-admin-app-dev': {
+				'options': {
+					'debug': true,
+					'devel': true,
+					'unused': false
+				},
+				'src': ['src/admin/admin-app/scripts/*.js', 'src/admin/admin-app/scripts/!(vendor)/**/*.js']
+			},
+			'main-admin-app-release': {
+				'options': {
+					'debug': false,
+					'devel': false,
+					'unused': true
+				},
+				'src': ['src/admin/admin-app/scripts/*.js', 'src/admin/admin-app/scripts/!(vendor)/**/*.js']
+			},
+
 			'node-backend-dev': {
 				'options': {
 					'debug': true,
@@ -278,6 +295,34 @@ module.exports = function (grunt) {
 				'dest': 'build/admin/staging-app/styles/styles.css'
 			},
 
+			'main-admin-app-lint': {
+				'src': 'src/admin/admin-app/styles/*.less',
+				'options': {
+					'compile': false,
+					'compress': false,
+					'noIDs': false,
+					'noOverqualifying': false,
+					'noUniversalSelectors': false,
+					'strictPropertyOrder': false
+				}
+			},
+			'main-admin-app-dev': {
+				'options': {
+					'compile': true,
+					'compress': false
+				},
+				'src': 'src/admin/admin-app/styles/*.less',
+				'dest': 'build/admin/admin-app/styles/styles.css'
+			},
+			'main-admin-app-release': {
+				'options': {
+					'compile': true,
+					'compress': true
+				},
+				'src': 'src/admin/admin-app/styles/*.less',
+				'dest': 'build/admin/admin-app/styles/styles.css'
+			},
+
 			'admin-lint': {
 				'src': 'src/admin/**/*.less',
 				'options': {
@@ -329,6 +374,9 @@ module.exports = function (grunt) {
 			'staging-admin-app': { 'src': ['build/admin/staging-app'] },
 			'staging-admin-app-scripts-post': { 'src': ['src/admin/staging-app/main.js'] },
 			'staging-admin-app-cleanup': { 'src': ['build/admin/staging-app/index.html', 'build/admin/staging-app/styles'] },
+			'main-admin-app': { 'src': ['build/admin/admin-app'] },
+			'main-admin-app-scripts-post': { 'src': ['src/admin/admin-app/main.js'] },
+			'main-admin-app-cleanup': { 'src': ['build/admin/admin-app/index.html', 'build/admin/admin-app/styles'] },
 			'admin': { 'src': ['build/admin'] },
 			'node-backend': { 'src': ['build/node-backend'] }
 		},
@@ -707,6 +755,94 @@ module.exports = function (grunt) {
 				'filter': 'isFile'
 			},
 
+			'main-admin-app-html-dev': {
+				'src': ['index.html', 'hangout.js'],
+				'cwd': 'src/admin/admin-app/',
+				'dest': 'build/admin/admin-app/',
+				'expand': true,
+				'filter': 'isFile'
+			},
+			'main-admin-app-html-release': {
+				'src': 'src/admin/admin-app/index.html',
+				'dest': 'build/admin/admin-app/index.html',
+				'options': {
+					'processContent': function (content) {
+						return grunt.template.process(content
+							.replace('<base href=""', '<base href="<%= pkg.app.hangoutAdminUrl %>"')
+							.replace( /src="..\/..\/common\/scripts\/vendor\/([a-zA-Z0-9_-]+)\.js"/gi, 'src="scripts/$1.js"' )
+							.replace(
+								/<link(?:[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*|[^>]*href="([^"]+)"[^>]*rel="stylesheet"[^>]*)>/gi,
+								function (match, file) {
+									var baseUrl = grunt.config.get('pkg.app.hangoutAdminUrl'),
+										css = grunt.file.read('build/admin/admin-app/' + file)
+											.replace(/\.\.\/images/gi, baseUrl + 'images')
+											.replace(/\.\.\/\.\.\/common\/styles\/fonts/gi, grunt.config.get('pkg.app.baseSslUrl') + 'common/styles/fonts')
+											.replace(/\s+/gi, ' ');
+									return '<style type="text/css">' + css + '</style>';
+								}
+							)
+						);
+					}
+				}
+			},
+			'main-admin-app-xml': {
+				'src': 'src/admin/admin-app/app.xml',
+				'dest': 'build/admin/admin-app/app.xml',
+				'options': { 'processContent': grunt.template.process }
+			},
+
+			'main-admin-app-scripts': {
+				'src': '**/*.js',
+				'dest': 'build/admin/admin-app/scripts/',
+				'expand': true,
+				'cwd': 'src/admin/admin-app/scripts/',
+				'filter': 'isFile'
+			},
+			'main-admin-app-scripts-pre': {
+				'src': 'src/admin/admin-app/scripts/main.js',
+				'dest': 'src/admin/admin-app/main.js'
+			},
+			'main-admin-app-amd': {
+				'src': ['require.js', 'modernizr.js', 'json3.js'],
+				'cwd': 'src/common/scripts/vendor/',
+				'dest': 'build/admin/admin-app/scripts/',
+				'expand': true,
+				'filter': 'isFile'
+			},
+			'main-admin-app-compile-lint': {
+				'src': 'build/admin/admin-app/scripts/main.js',
+				'dest': 'build/admin/admin-app/scripts/main.js',
+				'options': {
+					'processContent': function (content) {
+						/*jshint boss:true */
+						var config;
+						if (config = content.match(/require\.config\((\{[^\v]+?\})\);/i)) {
+							config = JSON.parse(config[1]);
+							if ('config' in config) { config = 'require.config(' + JSON.stringify({'config': config.config}) + ');'; }
+							else { config = ''; }
+						} else { config = ''; }
+						return content
+							.replace(/require\.config\(\{[^\v]+?\}\);/i, config)
+							.replace(/define\("admin\/staging-app\/scripts\/main", function\(\)\{\}\);/i, "");
+					}
+				}
+			},
+
+			'main-admin-app-styling': {
+				'src': '**/*.!(less)',
+				'cwd': 'src/admin/admin-app/styles/',
+				'dest': 'build/admin/admin-app/styles/',
+				'expand': true,
+				'filter': 'isFile'
+			},
+			'main-admin-app-images': {
+				'src': ['**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.png'],
+				'cwd': 'src/admin/admin-app/images/',
+				'dest': 'build/admin/admin-app/images/',
+				'expand': true,
+				'filter': 'isFile'
+			},
+
 			'node-backend-dev': {
 				'src': '**/*',
 				'cwd': 'src/node-backend',
@@ -796,6 +932,13 @@ module.exports = function (grunt) {
 				'dest': 'build/admin/staging-app/scripts/',
 				'expand': true,
 				'filter': 'isFile'
+			},
+			'main-admin-app': {
+				'src': ['main.js', 'modernizr.js', 'require.js'],
+				'cwd': 'build/admin/admin-app/scripts/',
+				'dest': 'build/admin/admin-app/scripts/',
+				'expand': true,
+				'filter': 'isFile'
 			}
 		},
 
@@ -836,6 +979,15 @@ module.exports = function (grunt) {
 					'optimize': 'none',
 					'include': 'admin/staging-app/scripts/main',
 					'out': 'build/admin/staging-app/scripts/main.js'
+				}
+			},
+			'main-admin-app': {
+				'options': {
+					'baseUrl': 'src',
+					'mainConfigFile': 'src/admin/admin-app/main.js',
+					'optimize': 'none',
+					'include': 'admin/admin-app/scripts/main',
+					'out': 'build/admin/admin-app/scripts/main.js'
 				}
 			}
 		}
@@ -1048,6 +1200,60 @@ module.exports = function (grunt) {
 		'copy:staging-admin-app-html-release',
 		'copy:staging-admin-app-xml',
 		'clean:staging-admin-app-cleanup'
+	]);
+
+	grunt.registerTask('main-admin-app-scripts-dev', [
+		'jshint:common-dev',
+		'copy:common-scripts',
+		'jshint:main-admin-app-dev',
+		'copy:main-admin-app-scripts'
+	]);
+	grunt.registerTask('main-admin-app-scripts-compiled', [
+		'jshint:common-dev',
+		'jshint:main-admin-app-dev',
+		'copy:main-admin-app-scripts-pre',
+		'requirejs:main-admin-app',
+		'copy:main-admin-app-compile-lint',
+		'clean:main-admin-app-scripts-post',
+		'copy:main-admin-app-amd'
+	]);
+	grunt.registerTask('main-admin-app-scripts-release', [
+		'jshint:main-admin-app-release',
+		'main-admin-app-scripts-compiled',
+		'uglify:main-admin-app'
+	]);
+	grunt.registerTask('main-admin-app-dev', [
+		'clean:main-admin-app',
+		'recess:main-admin-app-lint',
+		'recess:main-admin-app-dev',
+		'main-admin-app-scripts-dev',
+		'copy:main-admin-app-styling',
+		'copy:main-admin-app-images',
+		'copy:main-admin-app-html-dev'
+	]);
+	grunt.registerTask('main-admin-app-compiled', [
+		'clean:main-admin-app',
+		'recess:main-admin-app-lint',
+		'recess:main-admin-app-dev',
+		'main-admin-app-scripts-compiled',
+		'copy:main-admin-app-styling',
+		'copy:main-admin-app-images',
+		'copy:hangout-app-branding',
+		'copy:main-admin-app-html-release',
+		'copy:main-admin-app-xml',
+		'clean:main-admin-app-cleanup'
+	]);
+	grunt.registerTask('main-admin-app-release', [
+		'clean:main-admin-app',
+		'recess:main-admin-app-lint',
+		'recess:main-admin-app-release',
+		'main-admin-app-scripts-release',
+		'copy:main-admin-app-styling',
+		'copy:main-admin-app-images',
+		'copy:hangout-app-branding',
+		'copy:main-admin-app-html-release',
+		'copy:main-admin-app-xml',
+		'clean:main-admin-app-cleanup'
 	]);
 
 	grunt.registerTask('node-backend-dev', [

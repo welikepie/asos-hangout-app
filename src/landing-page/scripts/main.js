@@ -255,10 +255,43 @@ require([
 						if (_.has(data.payload, 'hangoutEmbed')) { streamEmbed.attr('src', data.payload.hangoutEmbed); }
 						if (_.has(data.payload, 'categoryLink')) { categoryLink.attr('href', data.payload.categoryLink); }
 						if (_.has(data.payload, 'checkHangoutLink')) { appOptions.checkHangoutLink = data.payload.checkHangoutLink; }
+						if (_.has(data.payload, 'mainHangoutLink')) { appOptions.mainHangoutLink = data.payload.mainHangoutLink; }
 					}
 
-					if ((ev[0] === 'stagingQueue') || (ev[0] === 'audienceQueue')) {
-						if
+					if ((ev[0] === 'checkHangoutLink') || (ev[0] === 'mainHangoutLink')) {
+
+						if (window.localID) {
+							if (audienceQueue.get(window.localID)) { temp = 1; }
+							else if (model = stagingQueue.get(window.localID)) {
+								if (model.state === 0) { temp = 1; }
+								else { temp = 2; }
+							}
+							else { temp = 0; }
+						} else { temp = 0; }
+
+						switch (temp) {
+							case 0:
+								queueJoinLink.addClass('visible');
+								invitation.removeClass('open');
+								break;
+							case 1:
+								queueJoinLink.removeClass('visible');
+								invitation
+									.removeClass('open')
+									.find('a')
+										.attr('href', appOptions.checkHangoutLink)
+										.html(appOptions.checkHangoutLink);
+								break;
+							case 2:
+								queueJoinLink.removeClass('visible');
+								invitation
+									.removeClass('open')
+									.find('a')
+										.attr('href', appOptions.mainHangoutLink)
+										.html(appOptions.mainHangoutLink);
+								break;
+						}
+
 					}
 
 				} catch (e) {}
@@ -269,20 +302,3 @@ require([
 	});
 
 });
-
-// Set the appearance of invitation and join links
-						if (window.localID && (model = audienceQueue.get(window.localID))) {
-							queueJoinLink.removeClass('visible');
-							if (model.get('state') !== 0) {
-								invitation.addClass('open');
-							} else {
-								invitation.removeClass('open');
-							}
-						} else {
-							queueJoinLink.addClass('visible');
-							invitation.removeClass('open');
-						}
-
-						invitation.find('a')
-								.attr('href', data.payload.checkHangoutLink)
-								.html(data.payload.checkHangoutLink);

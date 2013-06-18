@@ -76,6 +76,9 @@ require([
 							stagingQueue.set([data.payload], {'add': false, 'remove': false, 'merge': true});
 						}
 
+					} else if ((ev[0] === 'appOptions') && _.has(data.payload, 'mainHangoutLink')) {
+						console.log('Changing invite link to ' + data.payload.mainHangoutLink);
+						$('.invite a').attr('href', data.payload.mainHangoutLink);
 					}
 
 				} catch (e) { console.log('Error: ', e); }
