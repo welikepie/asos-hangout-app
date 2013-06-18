@@ -48,6 +48,28 @@ body {
 	background: #f9abff;
 }
 
+.modal {
+	position: absolute;
+	top: 0; right: 0; bottom: 0; left: 0;
+	z-index: 20;
+	display: none;
+	&.visible { display: block; }
+
+	background: url('../images/modal-background.png');
+
+	p {
+		display: block;
+		padding: 12px;
+		margin: 16px;
+
+		color: white;
+		font-size: 14px;
+		line-height: 18px;
+
+		background: #992a1b;
+	}
+}
+
 a.prev, a.next {
 	position: absolute;
 	top: 50%;

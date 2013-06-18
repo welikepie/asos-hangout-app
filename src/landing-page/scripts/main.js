@@ -1,4 +1,4 @@
-/*jshint devel:true, immed:false, newcap:false */
+/*jshint devel:true, immed:false, newcap:false, boss:true */
 /*global require:true */
 require.config({
 	"baseUrl": "..",
@@ -200,7 +200,7 @@ require([
 
 					var data = JSON.parse(message),
 						ev = data.event.split(':', 2),
-						model, temp = 0;
+						model;
 
 					if (ev[0] === 'productFeed') {
 
@@ -258,46 +258,52 @@ require([
 						if (_.has(data.payload, 'mainHangoutLink')) { appOptions.mainHangoutLink = data.payload.mainHangoutLink; }
 					}
 
-					if ((ev[0] === 'checkHangoutLink') || (ev[0] === 'mainHangoutLink')) {
-
-						if (window.localID) {
-							if (audienceQueue.get(window.localID)) { temp = 1; }
-							else if (model = stagingQueue.get(window.localID)) {
-								if (model.state === 0) { temp = 1; }
-								else { temp = 2; }
-							}
-							else { temp = 0; }
-						} else { temp = 0; }
-
-						switch (temp) {
-							case 0:
-								queueJoinLink.addClass('visible');
-								invitation.removeClass('open');
-								break;
-							case 1:
-								queueJoinLink.removeClass('visible');
-								invitation
-									.removeClass('open')
-									.find('a')
-										.attr('href', appOptions.checkHangoutLink)
-										.html(appOptions.checkHangoutLink);
-								break;
-							case 2:
-								queueJoinLink.removeClass('visible');
-								invitation
-									.removeClass('open')
-									.find('a')
-										.attr('href', appOptions.mainHangoutLink)
-										.html(appOptions.mainHangoutLink);
-								break;
-						}
-
-					}
-
 				} catch (e) {}
 			}
 
 		});
+
+		var statusFunc = function () {
+			var model, temp;
+			if (window.localID) {
+				if (model = audienceQueue.get(window.localID)) {
+					if (model.get('state') !== 0) { temp = 2; }
+					else { temp = 1; }
+				} else if (model = stagingQueue.get(window.localID)) {
+					if (model.get('state') === 0) { temp = 2; }
+					else { temp = 3; }
+				} else { temp = 0; }
+			} else { temp = 0; }
+
+			switch (temp) {
+				case 0:
+					queueJoinLink.addClass('visible');
+					invitation.removeClass('open');
+					break;
+				case 1:
+					queueJoinLink.removeClass('visible');
+					invitation.removeClass('open');
+					break;
+				case 2:
+					queueJoinLink.removeClass('visible');
+					invitation
+						.addClass('open')
+						.find('a')
+							.attr('href', appOptions.checkHangoutLink)
+							.html(appOptions.checkHangoutLink);
+					break;
+				case 3:
+					queueJoinLink.removeClass('visible');
+					invitation
+						.addClass('open')
+						.find('a')
+							.attr('href', appOptions.mainHangoutLink)
+							.html(appOptions.mainHangoutLink);
+					break;
+			}
+		};
+		audienceQueue.on('add remove reset change sort', statusFunc);
+		stagingQueue.on('add remove reset change sort', statusFunc);
 
 	});
 

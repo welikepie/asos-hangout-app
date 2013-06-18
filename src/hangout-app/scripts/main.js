@@ -21,11 +21,11 @@ require.config({
 });
 require([
 	'jquery', 'underscore', 'backbone', 'easyXDM', 'moment',
-	'common/scripts/data/product', 'common/scripts/data/tweet',
+	'common/scripts/data/product', 'common/scripts/data/tweet', 'common/scripts/data/member',
 	'common/scripts/ui/collection-view', 'common/scripts/ui/slider'
 ], function (
 	$, _, Backbone, easyXDM, moment,
-	Products, Tweets,
+	Products, Tweets, Members,
 	CollectionView, Slider
 ) {
 	"use strict";
@@ -34,14 +34,18 @@ require([
 	// Establish collections for product and Twitter feeds,
 	// as well as URL base for the node SSE server.
 	var productFeed = new Products.ProductCollection(),
-		twitterFeed = new Tweets.TweetCollection();
+		twitterFeed = new Tweets.TweetCollection(),
+		stagingQueue = new Members.MemberCollection();
 	productFeed.comparator = function (a, b) { return (b.get('addedAt') || (new Date()).getTime()) - (a.get('addedAt') || (new Date()).getTime()); };
+	stagingQueue.comparator = function (a, b) { return (a.get('joined') || (new Date()).getTime()) - (b.get('joined') || (new Date()).getTime()); };
+	productFeed.on('all', function (name, ev) { console.log('Event "' + name + '" ran with: ', ev); });
 
 	// DOM-dependent scripts go here
-	$(function () {
+	var init = _.after(2, function () {
 
 		var baseUrl = $('base').eq(0).attr('data-base-url'),
-			nodeUrl = $('base').eq(0).attr('data-node-url');
+			nodeUrl = $('base').eq(0).attr('data-node-url'),
+			localID = gapi.hangout.getLocalParticipant().person.id;
 
 		// Create DOM and Backbone controls for realtime data
 		var liveMessage = $('#live-message'),
@@ -140,6 +144,7 @@ require([
 		window.setInterval(_.bind(liveMessage.toggleClass, liveMessage, 'blink'), 800);
 
 		// Connect to the SSE server and set up appropriate modifications to local collections
+		console.log('Will try to connect script to: ', nodeUrl + 'stream?' + (new Date()).getTime());
 		new easyXDM.Socket({
 
 			'interval': 1000,
@@ -150,6 +155,7 @@ require([
 			'onMessage': function (message) {
 				try {
 
+					console.log('Message arrived: ', message);
 					var data = JSON.parse(message),
 						ev = data.event.split(':', 2),
 						model;
@@ -176,6 +182,19 @@ require([
 							if (model) { twitterFeed.remove(model); }
 						}
 
+					} else if (ev[0] === 'stagingQueue') {
+
+						if (ev[1] === 'reset') {
+							stagingQueue.reset(data.payload, {'parse': true, 'validate': true});
+						} else if (ev[1] === 'add') {
+							if (!stagingQueue.get(data.payload.id)) { stagingQueue.add(data.payload, {'parse': true, 'validate': true}); }
+						} else if (ev[1] === 'remove') {
+							model = stagingQueue.get(data.payload.id);
+							if (model) { stagingQueue.remove(model); }
+						} else if (ev[1] === 'change') {
+							stagingQueue.set([data.payload], {'add': false, 'remove': false, 'merge': true});
+						}
+
 					} else if (ev[0] === 'appOptions') {
 						if (_.has(data.payload, 'liveMessage')) {
 							liveMessage.html(data.payload.liveMessage.replace(/\n/g, " "));
@@ -187,8 +206,31 @@ require([
 
 		});
 
+		// Bind the change events on staging queue to know when to run kick procedures.
+		var kickTimeout = null;
+		stagingQueue.on('add remove sort change reset', function () {
+			if (stagingQueue.get(localID)) {
+				if (kickTimeout) {
+					window.clearTimeout(kickTimeout);
+					kickTimeout = null;
+					$('.modal').removeClass('visible');
+				}
+			} else {
+				if (!kickTimeout) {
+					$('.modal').addClass('visible');
+					kickTimeout = window.setTimeout(function () {
+
+						window.top.close();
+						window.top.location.href = (baseUrl + '/landing-page').replace('//', '/');
+
+					}, 5000);
+				}
+			}
+		});
+
 	});
 
-	gapi.hangout.onApiReady.add(function init () {});
+	$(init);
+	gapi.hangout.onApiReady.add(init);
 
 });
