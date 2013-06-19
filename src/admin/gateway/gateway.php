@@ -128,7 +128,7 @@
 			} else { $id = null; }
 
 			$filters = array(
-				'name' => isset($_GET['name']) ? '%' . $_GET['name'] . '%' : null,
+				'name' => isset($_GET['name']) ? $_GET['name'] : null,
 				'gender' => isset($_GET['gender']) && in_array(strtolower($_GET['gender']), array('male', 'female')) ? strtolower($_GET['gender']) : null,
 				'category' => isset($_GET['category']) ? array_map(function ($val) { return intval($val, 10); }, explode(',', $_GET['category'])) : null,
 				'currency' => isset($_GET['currency']) && array_key_exists(strtoupper($_GET['currency']), self::$currencies) ? strtoupper($_GET['currency']) : 'GBP',
@@ -159,8 +159,14 @@
 				$sql_params[] = $id;
 			} else {
 				if ($filters['name']) {
-					$sql_filters[] = 'products.name LIKE ? OR products.description LIKE ?';
-					$sql_params[] = $filters['name']; $sql_params[] = $filters['name'];
+					preg_match_all('/"[^"]+"|\S+/', $filters['name'], $name_matches);
+					foreach ($name_matches[0] as &$sentence) {
+						$sql_filters[] = '(products.name LIKE ? OR products.description LIKE ?)';
+						$temp = preg_replace('/"?([^"]+)"?/', '%$1%', $sentence);
+						$sql_params[] = $temp;
+						$sql_params[] = $temp;
+					}
+					unset($temp); unset($name_matches);
 				}
 				if ($filters['gender']) {
 					$sql_filters[] = 'products.gender = ?';
