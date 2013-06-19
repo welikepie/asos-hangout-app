@@ -1,4 +1,4 @@
-/*jshint devel:true */
+/*jshint devel:true, boss:true */
 /*global require:true, gapi:true */
 require.config({
 	"baseUrl": "../..",
@@ -100,6 +100,160 @@ require([
 				}
 
 			});
+
+		var automaticTimer = {
+
+			'enabled': false,
+			'interval': 90,
+			'kickFunc': function () {
+				var id = this.id;
+				window.clearTimeout(this.get('kickTimeout'));
+				this.unset('kickTimeout');
+
+				$.ajax({
+					'url': nodeUrl + 'staging-queue/' + id,
+					'type': 'DELETE',
+					'dataType': 'text',
+					'cache': false,
+					'headers': { 'Authorization': window.authToken }
+				});
+			},
+			'participantFunc': function (ev) {
+
+				var present = [],
+					absent = [],
+					model,
+					temp = _.chain(ev.participants)
+						.pluck('person')
+						.pluck('id')
+						.value();
+
+				stagingQueue.each(function (model) {
+
+					if (
+						automaticTimer.enabled &&
+						_.contains(temp, model.id) &&
+						!model.has('kickTimeout')
+					) {
+						console.log('Adding automatic kick to user: ', model.toJSON());
+						model.set('kickTimeout', window.setTimeout(_.bind(automaticTimer.kickFunc, model), automaticTimer.interval * 1000));
+					}
+
+					else if (
+						!_.contains(temp, model.id) &&
+						model.has('kickTimeout')
+					) {
+						console.log('Removing automatic kick from user: ', model.toJSON());
+						window.clearTimeout(model.get('kickTimeout')); model.unset('kickTimeout');
+					}
+
+				});
+
+				if (automaticTimer.enabled && !stagingQueue.some(function (model) { return _.contains(temp, model.id); })) {
+					model = stagingQueue.find(function (model) { return model.get('state') !== 2; });
+					console.log('No participants in live queue, trying to invite: ', (model ? model.toJSON() : null));
+					if (model && (model.get('state') === 0)) {
+
+						$.ajax({
+							'url': nodeUrl + 'staging-queue',
+							'type': 'PATCH',
+							'dataType': 'text',
+							'cache': false,
+							'headers': { 'Authorization': window.authToken },
+							'data': JSON.stringify({'id': model.id, 'state': 1})
+						});
+
+					}
+				}
+
+			},
+			'queueFunc': function () {
+
+				var temp = _.chain(gapi.hangout.getParticipants())
+					.pluck('person')
+					.pluck('id')
+					.value();
+
+				if (automaticTimer.enabled && !stagingQueue.some(function (model) { return _.contains(temp, model.id); })) {
+					var model = stagingQueue.find(function (model) { return model.get('state') !== 2; });
+					console.log('No participants in live queue, trying to invite: ', (model ? model.toJSON() : null));
+					if (model.get('state') === 0) {
+
+						$.ajax({
+							'url': nodeUrl + 'staging-queue',
+							'type': 'PATCH',
+							'dataType': 'text',
+							'cache': false,
+							'headers': { 'Authorization': window.authToken },
+							'data': JSON.stringify({'id': model.id, 'state': 1})
+						});
+
+					}
+				}
+
+			},
+
+			'enable': function () {
+
+				var that = this,
+					interval = parseInt($('#automatic-cycle input').val(), 10);
+
+				if (!interval) {
+					window.alert('Duration for each participant must be a positive number.');
+					return false;
+				}
+				this.enabled = true;
+				this.interval = interval;
+
+				// Attach timers to existing participants
+				stagingQueue.each(function (model) {
+					if (model.get('state') === 2) {
+						model.set('kickTimeout', window.setTimeout(_.bind(that.kickFunc, model), interval * 1000));
+					}
+				});
+
+				gapi.hangout.onParticipantsChanged.add(this.participantFunc);
+				stagingQueue.on('add remove sort reset change sync', this.queueFunc);
+				this.queueFunc();
+
+				return true;
+
+			},
+			'disable': function () {
+
+				this.enabled = false;
+				
+				gapi.hangout.onParticipantsChanged.remove(this.participantFunc);
+				stagingQueue.off('add remove sort reset change sync', this.queueFunc);
+
+				// Remove times from existing participants
+				stagingQueue.each(function (model) {
+					var timeout;
+					if (timeout = model.get('kickTimeout')) {
+						window.clearTimeout(timeout);
+						model.unset('kickTimeout');
+					}
+				});
+
+				return true;
+
+			}
+		};
+
+		$('#automatic-cycle button').on('click', function () {
+
+			if (!automaticTimer.enabled) {
+				if (automaticTimer.enable()) {
+					$('#automatic-cycle input').attr('disabled', 'disabled');
+					$(this).html('Disable');
+				}
+			} else {
+				automaticTimer.disable();
+				$('#automatic-cycle input').removeAttr('disabled');
+				$(this).html('Enable');
+			}
+
+		});
 
 		// Connect to the SSE server and set up appropriate modifications to local collections
 		new easyXDM.Socket({
