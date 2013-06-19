@@ -9,7 +9,9 @@
     "hangoutUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/hangout-app/",
     "stagingAppId": "861805338172",
     "stagingHangoutUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/staging-app/",
+    "stagingAdminAppId": "369075383649",
     "stagingHangoutAdminUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/admin/staging-app/",
+    "hangoutAdminAppId": "111804366820",
     "hangoutAdminUrl": "https://ks3310759.kimsufi.com:444/asos-hangout-dev/admin/admin-app/",
     "nodeUrl": "http://ks3310759.kimsufi.com:8889/"
   },
