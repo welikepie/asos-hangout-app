@@ -140,10 +140,12 @@ require([
 		// display of invitation links for all the invited audience members.
 		// The link is retrieved from Hangouts API then modified to include
 		// the staging application ID (for autolaunch).
-		var link_parser = document.createElement('a');
-		link_parser.href = gapi.hangout.getHangoutUrl();
-		link_parser.search = (function () {
-			var temp = link_parser.search.replace(/^\?/, '');
+		var params = {};
+		params.mainHangoutLink = (function () {
+
+			var temp, link_parser = document.createElement('a');
+			link_parser.href = gapi.hangout.getHangoutUrl();
+			temp = link_parser.search.replace(/^\?/, '');
 			if (temp.length) {
 				temp = temp.split('&');
 				temp.push('gid=' + window.hangoutAppId);
@@ -151,8 +153,25 @@ require([
 			} else {
 				temp = 'gid=' + window.hangoutAppId;
 			}
-			return '?' + temp;
+			link_parser.search = '?' + temp;
+			return link_parser.href;
+
+
 		}());
+
+		if (!(params.hangoutEmbed = gapi.hangout.onair.getYouTubeLiveId())) {
+			delete params.hangoutEmbed;
+			gapi.hangout.onair.onYouTubeLiveIdReady.add(function (youTubeLiveId) {
+				$.ajax({
+					'url': nodeUrl + 'app-options',
+					'type': 'POST',
+					'dataType': 'text',
+					'cache': false,
+					'data': {'hangoutEmbed': youTubeLiveId},
+					'headers': { 'Authorization': window.authToken }
+				});
+			});
+		}
 
 		// Send Hangout URL to server for for invitations
 		$.ajax({
@@ -160,9 +179,9 @@ require([
 			'type': 'POST',
 			'dataType': 'text',
 			'cache': false,
-			'data': {'mainHangoutLink': link_parser.href},
+			'data': params,
 			'headers': { 'Authorization': window.authToken }
-		}); link_parser = null;
+		});
 
 		// On people arriving at and leaving from the staging hangout,
 		// ensure their status in the audience queue is modified accordingly

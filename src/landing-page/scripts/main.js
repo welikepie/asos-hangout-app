@@ -252,7 +252,13 @@ require([
 
 					} else if (ev[0] === 'appOptions') {
 						if (_.has(data.payload, 'liveMessage')) { liveMessage.html(data.payload.liveMessage.replace(/\n/g, " ")); }
-						if (_.has(data.payload, 'hangoutEmbed')) { streamEmbed.attr('src', data.payload.hangoutEmbed); }
+						if (_.has(data.payload, 'hangoutEmbed')) {
+							if (data.payload.hangoutEmbed && data.payload.hangoutEmbed.length) {
+								streamEmbed.attr('src', '//www.youtube-nocookie.com/embed/' + data.payload.hangoutEmbed + '?autoplay=1');
+							} else {
+								streamEmbed.removeAttr('src');
+							}
+						}
 						if (_.has(data.payload, 'categoryLink')) { categoryLink.attr('href', data.payload.categoryLink); }
 						if (_.has(data.payload, 'checkHangoutLink')) { appOptions.checkHangoutLink = data.payload.checkHangoutLink; }
 						if (_.has(data.payload, 'mainHangoutLink')) { appOptions.mainHangoutLink = data.payload.mainHangoutLink; }

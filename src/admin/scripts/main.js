@@ -398,8 +398,8 @@ require([
 						if (_.has(data.payload, 'hangoutEmbed')) {
 							if (data.payload.hangoutEmbed && data.payload.hangoutEmbed.length) {
 								$('#general .hangouts .embed')
-									.attr('href', data.payload.hangoutEmbed)
-									.html(data.payload.hangoutEmbed);
+									.attr('href', 'http://youtu.be/' + data.payload.hangoutEmbed)
+									.html('http://youtu.be/' + data.payload.hangoutEmbed);
 							} else {
 								$('#general .hangouts .embed')
 									.removeAttr('href')
