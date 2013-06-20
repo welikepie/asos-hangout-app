@@ -287,6 +287,21 @@ require([
 
 						'success': function (data) {
 
+							// Post-process search results
+							if (parameters['name']) {
+
+								var matcher = new RegExp(_.map(
+									parameters['name'].match(/"[^"]+"|\S+/g),
+									function (match) { return '\\b' + match.replace(/^"|"$/g, '') + '\\b'; }
+								).join('|'));
+
+								data = _.filter(data, function (item) { return (
+									matcher.test(item.name) ||
+									matcher.test(item.description)
+								); });
+
+							}
+
 							// Add search signature to cache
 							var collection = _.pluck(data, 'id');
 							collection.sort();
