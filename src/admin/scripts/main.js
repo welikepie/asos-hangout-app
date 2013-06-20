@@ -346,6 +346,18 @@ require([
 			);
 		});
 
+		$('#products form input[type="radio"]').on('change', function () {
+
+			// Only fire the search on radio change if
+			// 1) there is some string to search for in name OR
+			// 2) category selection is not default "all"
+			if (
+				$('#products form input[name="name"]').val().replace(/^\s+|\sd+$/g, '').length ||
+				(allCategories.length !== allCategories.filter(':checked').length)
+			) { $('#products form').trigger('submit'); }
+
+		});
+
 		/* TWITTER FEED
 		 ********************************** */
 
