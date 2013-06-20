@@ -11,9 +11,9 @@
 		public static function open_db () {
 			try {
 				static::$db = new mysqli(
-					'welikepie.com',
+					'localhost',
 					'alex',
-					'Sannevanwel1j',
+					'myhovercraftisfullofeels',
 					'asos',
 					3306
 				);

@@ -34,6 +34,7 @@ require([
 
 		var baseUrl = $('base').eq(0).attr('data-base-url'),
 			nodeUrl = $('base').eq(0).attr('data-node-url'),
+			automaticTimer,
 
 			stagingQueueView = new CollectionView({
 
@@ -80,10 +81,18 @@ require([
 
 				'populate': function (model, element) {
 
-					$(element)
+					var el = $(element)
 						.find('a').attr('href', model.get('url')).end()
 						.find('img').attr('src', model.get('avatar')).end()
 						.find('h2').html(model.get('name')).end();
+
+					if (automaticTimer.enabled && model.get('kickedAt')) {
+						el.find('p.timer').html(
+							'Will be kicked automatically in:<br><strong>' +
+							Math.round((model.get('kickedAt') - (new Date()).getTime()) / 1000) +
+							' seconds</strong>'
+						);
+					}
 
 				},
 
@@ -101,14 +110,17 @@ require([
 
 			});
 
-		var automaticTimer = {
+		automaticTimer = {
 
 			'enabled': false,
 			'interval': 90,
+			'timerRender': null,
+
 			'kickFunc': function () {
 				var id = this.id;
 				window.clearTimeout(this.get('kickTimeout'));
 				this.unset('kickTimeout');
+				this.unset('kickedAt');
 
 				$.ajax({
 					'url': nodeUrl + 'staging-queue/' + id,
@@ -137,6 +149,7 @@ require([
 					) {
 						console.log('Adding automatic kick to user: ', model.toJSON());
 						model.set('kickTimeout', window.setTimeout(_.bind(automaticTimer.kickFunc, model), automaticTimer.interval * 1000));
+						model.set('kickedAt', (new Date()).getTime() + (automaticTimer.interval * 1000));
 					}
 
 					else if (
@@ -144,7 +157,9 @@ require([
 						model.has('kickTimeout')
 					) {
 						console.log('Removing automatic kick from user: ', model.toJSON());
-						window.clearTimeout(model.get('kickTimeout')); model.unset('kickTimeout');
+						window.clearTimeout(model.get('kickTimeout'));
+						model.unset('kickTimeout');
+						model.unset('kickedAt');
 					}
 
 				});
@@ -209,6 +224,7 @@ require([
 				stagingQueue.each(function (model) {
 					if (model.get('state') === 2) {
 						model.set('kickTimeout', window.setTimeout(_.bind(that.kickFunc, model), interval * 1000));
+						model.set('kickedAt', (new Date()).getTime() + (interval * 1000));
 					}
 				});
 
@@ -216,12 +232,18 @@ require([
 				stagingQueue.on('add remove sort reset change sync', this.queueFunc);
 				this.queueFunc();
 
+				this.timerRender = window.setInterval(_.bind(participantsView.render, participantsView), 3000);
+				participantsView.render();
+
 				return true;
 
 			},
 			'disable': function () {
 
 				this.enabled = false;
+
+				window.clearInterval(this.timerRender);
+				this.timerRender = null;
 				
 				gapi.hangout.onParticipantsChanged.remove(this.participantFunc);
 				stagingQueue.off('add remove sort reset change sync', this.queueFunc);
@@ -232,8 +254,11 @@ require([
 					if (timeout = model.get('kickTimeout')) {
 						window.clearTimeout(timeout);
 						model.unset('kickTimeout');
+						model.unset('kickedAt');
 					}
 				});
+
+				participantsView.render();
 
 				return true;
 
