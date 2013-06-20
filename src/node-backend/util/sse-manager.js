@@ -32,7 +32,7 @@
 
 			this._events = [];
 			this.event_limit = event_limit;
-			this._listeners = [],
+			this._listeners = [];
 			this.listeners_limit = listener_limit;
 			this.guaranteed_backlog = guaranteed_backlog || 0;
 

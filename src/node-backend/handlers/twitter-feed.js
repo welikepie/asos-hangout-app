@@ -16,7 +16,8 @@
 
 			var twitterFeedGet,
 				twitterFeedAdd,
-				twitterFeedRemove;
+				twitterFeedRemove,
+				twitterFeedReset;
 
 			twitterFeedGet = function (request, response) {
 
@@ -89,12 +90,26 @@
 
 			};
 
+			twitterFeedReset = function (request, response) {
+
+				return authManager.apply(request, response, function () {
+
+					twitterFeed.length = 0;
+					sseManager.emit('twitterFeed:reset', []);
+					response.writeHead(200, corsHeaders(request));
+					response.end();
+
+				});
+
+			};
+
 			return {
 				'collection': twitterFeed,
 				'handlers': {
 					'get': twitterFeedGet,
 					'add': twitterFeedAdd,
-					'remove': twitterFeedRemove
+					'remove': twitterFeedRemove,
+					'reset': twitterFeedReset
 				}
 			};
 

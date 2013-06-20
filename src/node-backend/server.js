@@ -33,8 +33,8 @@
 		}),
 
 		queueFactory = require('./handlers/user-queue').factory,
-		audienceQueue = queueFactory('audienceQueue', publicSSE),
-		stagingQueue = queueFactory('stagingQueue', publicSSE);
+		audienceQueue = queueFactory('audienceQueue', publicSSE, auth),
+		stagingQueue = queueFactory('stagingQueue', publicSSE, auth);
 
 	productFeed = require('./handlers/product-feed').factory(publicSSE, auth);
 	twitterFeed = require('./handlers/twitter-feed').factory(publicSSE, auth);
@@ -128,6 +128,7 @@
 	requestManager.addHandler('GET', '/twitter-feed', twitterFeed.handlers.get);
 	requestManager.addHandler('POST', '/twitter-feed', twitterFeed.handlers.add);
 	requestManager.addHandler('DELETE', /^\/twitter-feed\/([0-9]+)$/, twitterFeed.handlers.remove);
+	requestManager.addHandler('DELETE', '/twitter-feed', twitterFeed.handlers.reset);
 
 	// App Option Controls
 	requestManager.addHandler('GET', '/app-options', appOptions.handlers.get);
@@ -139,6 +140,7 @@
 	requestManager.addHandler('POST', '/audience-queue', audienceQueue.handlers.add);
 	requestManager.addHandler('PATCH', '/audience-queue', audienceQueue.handlers.change);
 	requestManager.addHandler('DELETE', /^\/audience-queue\/([0-9a-zA-Z]+)$/, audienceQueue.handlers.remove);
+	requestManager.addHandler('DELETE', '/audience-queue', audienceQueue.handlers.reset);
 
 	// Queue functionality
 	requestManager.addHandler('GET', '/staging-queue', stagingQueue.handlers.get);
@@ -146,6 +148,7 @@
 	requestManager.addHandler('POST', '/staging-queue', stagingQueue.handlers.add);
 	requestManager.addHandler('PATCH', '/staging-queue', stagingQueue.handlers.change);
 	requestManager.addHandler('DELETE', /^\/staging-queue\/([0-9a-zA-Z]+)$/, stagingQueue.handlers.remove);
+	requestManager.addHandler('DELETE', '/staging-queue', stagingQueue.handlers.reset);
 
 	var server = http.createServer(requestManager.callback);
 	productFeed.collection.on('add', function (item) { console.log('New product added.'); });

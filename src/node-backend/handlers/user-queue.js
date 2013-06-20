@@ -8,7 +8,7 @@
 
 	define(function () {
 
-		return {'factory': function (queueName, sseManager) {
+		return {'factory': function (queueName, sseManager, authManager) {
 
 			var userQueue = observed.observeCollection();
 			userQueue.addListener('add', sseManager.emit.bind(sseManager, queueName + ':add'));
@@ -18,6 +18,7 @@
 				userQueueAdd,
 				userQueueChange,
 				userQueueRemove,
+				userQueueReset,
 				userQueuePresent,
 				setChangeListener = function (item) {
 
@@ -160,6 +161,19 @@
 
 			};
 
+			userQueueReset = function (request, response) {
+
+				return authManager.apply(request, response, function () {
+
+					userQueue.length = 0;
+					sseManager.emit(queueName + ':reset', []);
+					response.writeHead(200, corsHeaders(request));
+					response.end();
+
+				});
+
+			};
+
 			userQueuePresent = function (request, response, path) {
 
 				var index, temp = path[1];
@@ -182,6 +196,7 @@
 					'add': userQueueAdd,
 					'change': userQueueChange,
 					'remove': userQueueRemove,
+					'reset': userQueueReset,
 					'present': userQueuePresent
 				}
 			};

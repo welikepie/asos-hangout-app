@@ -58,10 +58,92 @@ require([
 				'type': 'POST',
 				'dataType': 'text',
 				'cache': false,
-				'data': {'liveMessage': this.value},
+				'data': {'liveMessage': this.value || ''},
 				'headers': { 'Authorization': window.authToken }
 			});
 		}, 1000));
+
+		// APP RESET
+		$('.menu button.reset').on('click', function (ev) {
+
+			ev.preventDefault();
+			ev.stopPropagation();
+
+			if (window.confirm(
+				'WARNING!\n\nThis action will reset the state of the app - twitter feed and product feed will be emptied, ' +
+				'users will be removed from the queue and all hangouts disconnected.\nDo NOT reset app while the session is in progress.'
+			)) {
+
+				// Clear the embed, hangout links and
+				// live messaging, terminate the Twitter search
+				$.ajax({
+					'url': nodeUrl + 'app-options',
+					'type': 'POST',
+					'dataType': 'text',
+					'cache': false,
+					'data': {
+						'twitterSearch': '',
+						'hangoutEmbed': '',
+						'liveMessage': '',
+						'categoryLink': '',
+						'checkHangoutLink': '',
+						'mainHangoutLink': ''
+					},
+					'headers': { 'Authorization': window.authToken },
+					'success': function () {
+
+						// Clear UI text fields
+						$('#general .live-message textarea').val('');
+						$('#twitter .filter input').val('');
+
+						// Clear the product list
+						$.ajax({
+							'url': nodeUrl + 'product-feed',
+							'type': 'DELETE',
+							'dataType': 'text',
+							'cache': false,
+							'headers': { 'Authorization': window.authToken },
+							'success': function () {
+
+								// Clear the product search results
+								productSearchView.filter.collection = [];
+								productSearchView.render();
+
+							}
+						});
+
+						// Clear the twitter feed
+						$.ajax({
+							'url': nodeUrl + 'twitter-feed',
+							'type': 'DELETE',
+							'dataType': 'text',
+							'cache': false,
+							'headers': { 'Authorization': window.authToken }
+						});
+
+						// Clear the audience queue
+						$.ajax({
+							'url': nodeUrl + 'audience-queue',
+							'type': 'DELETE',
+							'dataType': 'text',
+							'cache': false,
+							'headers': { 'Authorization': window.authToken }
+						});
+
+						// Clear the staging queue
+						$.ajax({
+							'url': nodeUrl + 'staging-queue',
+							'type': 'DELETE',
+							'dataType': 'text',
+							'cache': false,
+							'headers': { 'Authorization': window.authToken }
+						});
+
+					}
+				});
+
+			}
+		})
 
 		/* PRODUCT FEED
 		 ********************************** */
@@ -345,6 +427,17 @@ require([
 				'dataType': 'text',
 				'cache': false,
 				'data': {'twitterSearch': $('#twitter .filter input').val().replace(/^\s+|\s+$/g, "")},
+				'headers': { 'Authorization': window.authToken }
+			});
+		});
+
+		// Bind clearing twitter feed
+		$('#twitter button.clear-all').on('click', function () {
+			$.ajax({
+				'url': nodeUrl + 'twitter-feed',
+				'type': 'DELETE',
+				'dataType': 'text',
+				'cache': false,
 				'headers': { 'Authorization': window.authToken }
 			});
 		});

@@ -33,6 +33,8 @@
 			<a class="general" href="#general">General Settings</a>
 			<a class="products" href="#products">Product Feed</a>
 			<a class="twitter" href="#twitter">Twitter Feed</a>
+
+			<button type="button" class="btn btn-danger reset">Reset App</button>
 		</div>
 		<div class="root">
 
@@ -157,7 +159,7 @@
 					</div>
 
 					<div class="product-list twitter-feed">
-						<h2>Twitter Feed</h2>
+						<h2>Twitter Feed <button type="button" class="btn btn-warning clear-all">Clear All</button></h2>
 						<ul>
 
 							<li class="template">
