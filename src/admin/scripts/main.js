@@ -63,6 +63,17 @@ require([
 			});
 		}, 1000));
 
+		$('.categoryLink button').on('click', function () {
+			$.ajax({
+				'url': nodeUrl + 'app-options',
+				'type': 'POST',
+				'dataType': 'text',
+				'cache': false,
+				'data': {'categoryLink': $('.categoryLink input[name="categoryLink"]').val() || ''},
+				'headers': { 'Authorization': window.authToken }
+			});
+		});
+
 		// APP RESET
 		$('.menu button.reset').on('click', function (ev) {
 
@@ -93,8 +104,9 @@ require([
 					'success': function () {
 
 						// Clear UI text fields
-						$('#general .live-message textarea').val('');
 						$('#twitter .filter input').val('');
+						$('#general .live-message textarea').val('');
+						$('.categoryLink input[name="categoryLink"]').val('');
 
 						// Clear the product list
 						$.ajax({
@@ -555,6 +567,12 @@ require([
 						el = $('#general .live-message textarea');
 						if (_.has(data.payload, 'liveMessage') && (data.payload.liveMessage !== el.val())) {
 							el.val(data.payload.liveMessage);
+						}
+
+						// Category link updates
+						el = $('.categoryLink input[name="categoryLink"]');
+						if (_.has(data.payload, 'categoryLink') && (data.payload.categoryLink !== el.val())) {
+							el.val(data.payload.categoryLink);
 						}
 
 					} else if (ev[0] === 'message') { window.alert(data.payload); }

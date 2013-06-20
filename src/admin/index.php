@@ -55,6 +55,8 @@
 					<a href="https://plus.google.com/hangouts/_?gid=<%= pkg.app.stagingAdminAppId %>" target="_blank" class="staging">NO HANGOUT - CLICK HERE TO START ONE</a>
 					<p>Hangout Live Stream:</p>
 					<a target="_blank" class="embed">NOT AVAILABLE, START ON-AIR HANGOUT FIRST</a>
+					<p>&quot;Shop Special Events&quot; Link</p>
+					<div class="categoryLink"><input type="text" name="categoryLink" value=""><button type="button" class="btn">Change</button></div>
 				</div>
 					
 				<div class="live-message">
