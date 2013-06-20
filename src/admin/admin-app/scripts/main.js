@@ -192,7 +192,7 @@ require([
 				if (automaticTimer.enabled && !stagingQueue.some(function (model) { return _.contains(temp, model.id); })) {
 					var model = stagingQueue.find(function (model) { return model.get('state') !== 2; });
 					console.log('No participants in live queue, trying to invite: ', (model ? model.toJSON() : null));
-					if (model.get('state') === 0) {
+					if (model && (model.get('state') === 0)) {
 
 						$.ajax({
 							'url': nodeUrl + 'staging-queue',
