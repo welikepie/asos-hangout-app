@@ -1,22 +1,22 @@
 <?php
 
-	require_once('gateway/gateway.php');
-	$handler = new Dummy();
+require_once ('gateway/gateway.php');
+$handler = new Dummy();
 
-	// Obtain list of all product categories
-	GatewayInterface::getCategories($handler, $handler);
-	$categories = json_decode($handler->buffer[0], true);
-	unset($handler);
+// Obtain list of all product categories
+GatewayInterface::getCategories($handler, $handler);
+$categories = json_decode($handler -> buffer[0], true);
+unset($handler);
 
-	// Insert authorisation token
-	if (function_exists("apache_request_headers")) {
-		$headers = apache_request_headers();
-		if (isset($headers['Authorization'])) { $token = $headers['Authorization']; }
-		else { $token = null; }
+// Insert authorisation token
+if (function_exists("apache_request_headers")) {
+	$headers = apache_request_headers();
+	if (isset($headers['Authorization'])) { $token = $headers['Authorization'];
+	} else { $token = null;
 	}
-	elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) { $token = $_SERVER['HTTP_AUTHORIZATION']; }
-	else { $token = null; }
-
+} elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) { $token = $_SERVER['HTTP_AUTHORIZATION'];
+} else { $token = null;
+}
 ?><!DOCTYPE html>
 <html>
 	<head>
@@ -25,6 +25,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="../common/styles/flat-ui.css">
 		<link rel="stylesheet" href="styles/styles.css">
+		<link rel="stylesheet" href="styles/spinner.css">
 		<script type="text/javascript">window.authToken = <?php echo(json_encode($token)); ?>;</script>
 		<script type="text/javascript" src="../common/scripts/vendor/require.js" data-main="scripts/main"></script>
 	</head>
@@ -76,9 +77,11 @@
 						<fieldset class="categories">
 							<legend>Categories</legend>
 							<label><input type="checkbox" class="all-categories" checked> Select/Deselect All</label>
-							<div><?php foreach ($categories as &$item) {
+							<div><?php
+							foreach ($categories as &$item) {
 								echo('<label><input type="checkbox" name="category" value="' . $item['id'] . '" checked> ' . $item['name'] . '</label>');
-							} ?></div>
+							}
+ ?></div>
 						</fieldset>
 						<fieldset class="misc">
 							<legend>&nbsp;</legend>
@@ -97,6 +100,29 @@
 
 					<div id="search-results" class="product-list">
 						<h2>Search Results</h2>
+						<div class="spinner">
+								<div class="wBall" id="wBall_1">
+									<div class="wInnerBall">
+									</div>
+								</div>
+								<div class="wBall" id="wBall_2">
+									<div class="wInnerBall">		
+									</div>
+								</div>
+								<div class="wBall" id="wBall_3">
+									<div class="wInnerBall">										
+									</div>
+								</div>
+								<div class="wBall" id="wBall_4">
+									<div class="wInnerBall">											
+									</div>
+								</div>
+								<div class="wBall" id="wBall_5">
+									<div class="wInnerBall">					
+									</div>
+								</div>
+							</div>
+
 						<ul>
 
 							<li class="template">
@@ -114,7 +140,7 @@
 
 					<div id="product-feed" class="product-list">
 						<h2>Product Feed <button type="button" class="btn btn-warning clear-all">Clear All</button></h2>
-						<ul>
+													<ul>
 
 							<li class="template">
 								<img src="" class="image">

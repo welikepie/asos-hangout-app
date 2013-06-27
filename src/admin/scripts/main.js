@@ -249,7 +249,11 @@ require([
 			var temp,
 				$this = $(this),
 				activator = $this.find('button[type="submit"]'),
-				parameters = {};
+				parameters = {},
+				spinner = document.getElementsByClassName("spinner")[0];
+				spinner.style.display = "block";
+				productSearchView.filter.collection = [];
+				productSearchView.render();
 
 			ev.preventDefault();
 			ev.stopPropagation();
@@ -272,7 +276,7 @@ require([
 				}
 
 				temp = $this.find('input[name="name"]').val().replace(/^\s+|\s+$/g, '');
-				if (temp.length) { parameters['name'] = temp; }
+				if (temp.length) { parameters['name'] = temp.toLowerCase(); }
 
 				temp = $this.find('input[name="gender"]').filter(':checked').val();
 				if (temp && temp.length) { parameters['gender'] = temp; }
@@ -282,6 +286,7 @@ require([
 				if (_.has(productSearchCache, hash)) {
 
 					productSearchView.filter.collection = productSearchCache[hash];
+					spinner.style.display = "none";
 					productSearchView.render();
 
 				} else {
@@ -305,7 +310,7 @@ require([
 								var matcher = new RegExp(_.map(
 									parameters['name'].match(/"[^"]+"|\S+/g),
 									function (match) { return '\\b' + match.replace(/^"|"$/g, '') + '\\b'; }
-								).join('|'));
+								).join('|'),"i");
 
 								data = _.filter(data, function (item) { return (
 									matcher.test(item.name) ||
@@ -321,13 +326,16 @@ require([
 							productSearchView.filter.collection = collection;
 
 							loadedProducts.set(data, {'add': true, 'remove': false, 'merge': false});
+							spinner.style.display = "none";
 							productSearchView.render();
 
 						},
 						'error': function () {
+							spinner.style.display = "none";
 							window.alert('There was an issue with retrieving the products. Please try again in a moment.');
 						},
 						'complete': function () {
+							spinner.style.display = "none";
 							activator
 								.removeAttr('disabled')
 								.addClass('btn-success');
