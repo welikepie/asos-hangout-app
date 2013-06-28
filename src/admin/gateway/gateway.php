@@ -199,7 +199,7 @@
 						'photo_big' => $row['image'],
 						'price' => GatewayInterface::$currencies[$filters['currency']] . number_format(floatval($row['price']), 2),
 						'url' => 'http://www.asos.com/pgeproduct.aspx?iid=' . $product_id,
-						'description' => ($row['description'] && ($row['description'] !== null) ? $row['description'] : null),
+						'description' => ($row['description'] && ($row['description'] !== null) ? utf8_encode($row['description']) : null),
 						'categories' => array()
 					);
 				}
