@@ -1,4 +1,13 @@
-@import '../../common/styles/settings.less';
+@baseline: 16px;
+
+@mobile-threshold: 480px;
+@small-screen-threshold: 900px;
+
+@video-width: 560px;
+
+@serif-font: Georgia, serif;
+@sans-serif-font: Tahoma, Arial, sans-serif;
+@pretty-font: "FuturaStd", Tahoma, sans-serif;
 
 @font-face {
 	font-family: 'FuturaStd';
@@ -22,7 +31,6 @@
 }
 
 html {
-	position: relative;
 	width: 300px;
 	height: 100%;
 	padding: 0;
@@ -104,6 +112,18 @@ header {
 	text-align: center;
 	text-transform: uppercase;
 
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	box-sizing: border-box;
+
+	* {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-ms-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+
 	h1 {
 		margin: 0 0 20px;
 
@@ -159,7 +179,7 @@ header {
 			li {
 				display: inline-block;
 				width: 100%;
-				a, img { display: block; width: 100%; }
+				a, img { display: block; width: 100%; border: none; }
 				.title, .price { display: none; }
 			}
 		}
@@ -191,6 +211,18 @@ header {
 	width: 100%;
 	padding: 20px 20px 12px;
 	background: #f9abff;
+
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	box-sizing: border-box;
+
+	* {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-ms-box-sizing: border-box;
+		box-sizing: border-box;
+	}
 
 	h1 {
 		padding: 0;
