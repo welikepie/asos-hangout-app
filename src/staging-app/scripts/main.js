@@ -77,11 +77,11 @@ require([
 						}
 
 					} else if ((ev[0] === 'appOptions') && _.has(data.payload, 'mainHangoutLink')) {
-						console.log('Changing invite link to ' + data.payload.mainHangoutLink);
+						//console.log('Changing invite link to ' + data.payload.mainHangoutLink);
 						$('.invite a').attr('href', data.payload.mainHangoutLink);
 					}
 
-				} catch (e) { console.log('Error: ', e); }
+				} catch (e) { /*console.log('Error: ', e);*/ }
 			}
 
 		});
@@ -112,7 +112,7 @@ require([
 					}
 				}
 
-				console.log('Current state is: ', state);
+				//console.log('Current state is: ', state);
 
 				if (kickTimeout) { window.clearTimeout(kickTimeout); }
 				switch (state) {
@@ -145,15 +145,9 @@ require([
 		audienceQueue.on('all', updateState);
 		stagingQueue.on('all', updateState);
 
-	} catch (e) { console.log('Error: ', e); } });
+	} catch (e) { /*console.log('Error: ', e);*/ } });
 
-	$(function () {
-		console.log('Running from jQuery.');
-		init();
-	});
-	gapi.hangout.onApiReady.add(function () {
-		console.log('Running from GAPI.');
-		init();
-	});
+	$(init);
+	gapi.hangout.onApiReady.add(init);
 
 });

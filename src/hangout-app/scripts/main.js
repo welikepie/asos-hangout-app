@@ -38,7 +38,7 @@ require([
 		stagingQueue = new Members.MemberCollection();
 	productFeed.comparator = function (a, b) { return (b.get('addedAt') || (new Date()).getTime()) - (a.get('addedAt') || (new Date()).getTime()); };
 	stagingQueue.comparator = function (a, b) { return (a.get('joined') || (new Date()).getTime()) - (b.get('joined') || (new Date()).getTime()); };
-	productFeed.on('all', function (name, ev) { console.log('Event "' + name + '" ran with: ', ev); });
+	//productFeed.on('all', function (name, ev) { console.log('Event "' + name + '" ran with: ', ev); });
 
 	// DOM-dependent scripts go here
 	var init = _.after(2, function () {
@@ -144,7 +144,7 @@ require([
 		window.setInterval(_.bind(liveMessage.toggleClass, liveMessage, 'blink'), 800);
 
 		// Connect to the SSE server and set up appropriate modifications to local collections
-		console.log('Will try to connect script to: ', nodeUrl + 'stream?' + (new Date()).getTime());
+		//console.log('Will try to connect script to: ', nodeUrl + 'stream?' + (new Date()).getTime());
 		new easyXDM.Socket({
 
 			'interval': 1000,
@@ -155,7 +155,7 @@ require([
 			'onMessage': function (message) {
 				try {
 
-					console.log('Message arrived: ', message);
+					//console.log('Message arrived: ', message);
 					var data = JSON.parse(message),
 						ev = data.event.split(':', 2),
 						model;
