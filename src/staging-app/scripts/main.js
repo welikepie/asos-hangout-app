@@ -134,7 +134,7 @@ require([
 						kickTimeout = window.setTimeout(function () {
 
 							window.top.close();
-							window.top.location.href = (baseUrl + '/landing-page').replace('//', '/');
+							window.top.location.href = (baseUrl + 'landing-page').replace('//', '/');
 
 						}, 5000);
 						break;
