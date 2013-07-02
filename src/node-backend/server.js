@@ -118,6 +118,38 @@
 
 	});
 
+	requestManager.addHandler('DELETE', '/reset', function (request, response) {
+		return auth.apply(request, response, function () {
+
+			try {
+
+				publicSSE.reset();
+				twitterSSE.reset();
+
+				_.extend(appOptions.collection, {
+					'twitterSearch': '',
+					'hangoutEmbed': '',
+					'liveMessage': '',
+					'categoryLink': '',
+
+					'checkHangoutLink': '',
+					'mainHangoutLink': ''
+				});
+				productFeed.collection.length = 0;
+				twitterFeed.collection.length = 0;
+				audienceQueue.collection.length = 0;
+				stagingQueue.collection.length = 0;
+
+				response.writeHead(200, corsHeaders(request));
+				response.end();
+			} catch (e) {
+				response.writeHead(500, corsHeaders(request));
+				response.end(e.message);
+			}
+
+		});
+	});
+
 	// Product Feed Controls
 	requestManager.addHandler('GET', '/product-feed', productFeed.handlers.get);
 	requestManager.addHandler('POST', '/product-feed', productFeed.handlers.add);
