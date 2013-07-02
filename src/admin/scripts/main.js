@@ -64,14 +64,22 @@ require([
 		}, 1000));
 
 		$('.categoryLink button').on('click', function () {
+
+			// Take and strip the value, append protocol if link, but without one
+			var val = $('.categoryLink input[name="categoryLink"]').val()
+				.replace(/^\s+|\s+$/g, '')
+				.replace(/\s{2,}/g, ' ');
+			if ((val.length > 0) && (!val.match(/^https?:\/\//))) { val = 'http://' + val; }
+
 			$.ajax({
 				'url': nodeUrl + 'app-options',
 				'type': 'POST',
 				'dataType': 'text',
 				'cache': false,
-				'data': {'categoryLink': $('.categoryLink input[name="categoryLink"]').val() || ''},
+				'data': {'categoryLink': val},
 				'headers': { 'Authorization': window.authToken }
 			});
+
 		});
 
 		// APP RESET
@@ -581,6 +589,12 @@ require([
 						el = $('.categoryLink input[name="categoryLink"]');
 						if (_.has(data.payload, 'categoryLink') && (data.payload.categoryLink !== el.val())) {
 							el.val(data.payload.categoryLink);
+						}
+
+						// Twitter search updates
+						el = $('#twitter .filter input');
+						if (_.has(data.payload, 'twitterSearch') && (data.payload.twitterSearch !== el.val())) {
+							el.val(data.payload.twitterSearch);
 						}
 
 					} else if (ev[0] === 'message') { window.alert(data.payload); }
