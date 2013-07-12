@@ -1,0 +1,30 @@
+{
+	"baseUrl" : ["http://www.asos.com"],
+	"method" : "asos",
+	"eatTemp" : ["tr>td>font>font>strong","http://www.eatserver.co.uk/editor/menuProvider.php"],
+	"searches" : ["(#floor_1>div>div>div>div>div>div>dl>dd>ul>li>a)+#floor_2>div>div>div>div>div>div>dl>dd>ul>li>a","#items>li>a"],
+	"finalSearch" : ["#ctl00_ContentMainPage_divmor>ul>li>a","#ctl00_ContentMainPage_ctlSeparateProduct_lblProductPrice","#ctl00_ContentMainPage_divmor>ul>li",".single-entry","#ctl00_ContentMainPage_ctlSeparateProduct_lblProductTitle","#ctl00_ContentMainPage_imgMainImage"],
+	"writeToDB" : true,
+	"updateDB" : true,
+	"clearDB" : false,
+	"writeToFile" : false,
+	"repeat" : "00,12,00,00,00",
+	"threshold" : "07,00,00,00,00",
+	"errorEmail":false,
+	"email":"",
+	"errorThreshold":10,
+	"recover" : true,
+	"db" : {
+		"host" : "",
+		"user" : "",
+		"pass" : "",
+		"dbName" : "",
+		"tName" : "",
+		"columns" : ["gender","price","category","description","title","image","url"],
+		"updateColumn" : "name",
+		"addTimestamp" : true
+	},
+	"retrieval" : {
+		"name" : "data.json"
+	}
+}
