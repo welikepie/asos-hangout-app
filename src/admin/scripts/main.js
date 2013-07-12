@@ -52,7 +52,7 @@ require([
 			incomingTweetsView,
 			approvedTweetsView;
 
-		$('#general .live-message textarea').on('keypress', _.debounce(function () {
+		$('#general .live-message textarea').on('keypress keyup keydown', _.debounce(function () {
 			$.ajax({
 				'url': nodeUrl + 'app-options',
 				'type': 'POST',
@@ -83,7 +83,7 @@ require([
 		});
 
 		// APP RESET
-		$('.menu button.reset').on('click', function (ev) {
+		$('.menu button.reset').on('click', _.debounce(function (ev) {
 
 			ev.preventDefault();
 			ev.stopPropagation();
@@ -93,77 +93,17 @@ require([
 				'users will be removed from the queue and all hangouts disconnected.\nDo NOT reset app while the session is in progress.'
 			)) {
 
-				// Clear the embed, hangout links and
-				// live messaging, terminate the Twitter search
 				$.ajax({
-					'url': nodeUrl + 'app-options',
-					'type': 'POST',
+					'url': nodeUrl + 'reset',
+					'type': 'DELETE',
 					'dataType': 'text',
 					'cache': false,
-					'data': {
-						'twitterSearch': '',
-						'hangoutEmbed': '',
-						'liveMessage': '',
-						'categoryLink': '',
-						'checkHangoutLink': '',
-						'mainHangoutLink': ''
-					},
 					'headers': { 'Authorization': window.authToken },
-					'success': function () {
-
-						// Clear UI text fields
-						$('#twitter .filter input').val('');
-						$('#general .live-message textarea').val('');
-						$('.categoryLink input[name="categoryLink"]').val('');
-
-						// Clear the product list
-						$.ajax({
-							'url': nodeUrl + 'product-feed',
-							'type': 'DELETE',
-							'dataType': 'text',
-							'cache': false,
-							'headers': { 'Authorization': window.authToken },
-							'success': function () {
-
-								// Clear the product search results
-								productSearchView.filter.collection = [];
-								productSearchView.render();
-
-							}
-						});
-
-						// Clear the twitter feed
-						$.ajax({
-							'url': nodeUrl + 'twitter-feed',
-							'type': 'DELETE',
-							'dataType': 'text',
-							'cache': false,
-							'headers': { 'Authorization': window.authToken }
-						});
-
-						// Clear the audience queue
-						$.ajax({
-							'url': nodeUrl + 'audience-queue',
-							'type': 'DELETE',
-							'dataType': 'text',
-							'cache': false,
-							'headers': { 'Authorization': window.authToken }
-						});
-
-						// Clear the staging queue
-						$.ajax({
-							'url': nodeUrl + 'staging-queue',
-							'type': 'DELETE',
-							'dataType': 'text',
-							'cache': false,
-							'headers': { 'Authorization': window.authToken }
-						});
-
-					}
+					'complete': _.bind(window.location.reload, window.location, false)
 				});
 
 			}
-		})
+		}, 5000, true));
 
 		/* PRODUCT FEED
 		 ********************************** */

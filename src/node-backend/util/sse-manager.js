@@ -28,7 +28,8 @@
 		**/
 		SSEManager = function (event_limit, listener_limit, guaranteed_backlog) {
 
-			var event_counter = 1;
+			var event_counter = 1,
+				base_reset = this.reset;
 
 			this._events = [];
 			this.event_limit = event_limit;
@@ -39,6 +40,10 @@
 			this.getID = function (peek) {
 				if (peek) { return event_counter; }
 				else { return event_counter++; }
+			};
+			this.reset = function () {
+				base_reset.apply(this);
+				event_counter = 1;
 			};
 
 		};
@@ -189,6 +194,11 @@
 				ident.res.removeAllListeners();
 				try { ident.res.end(); } catch (e) {}
 
+			},
+
+			'reset': function () {
+				_.each(this._listeners.slice(), this.removeListener, this);
+				this._events.length = 0;
 			}
 
 		});
