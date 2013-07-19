@@ -92,7 +92,6 @@
 	});
 	// Passthrough Handling
 	requestManager.addHandler('ANY', '/passthrough.html', function (request, response, path, done) {
-
 		fs.exists('./static/passthrough.html', function (exists) {
 			if (exists) {
 				fs.readFile('./static/passthrough.html', function (error, content) {
@@ -185,9 +184,14 @@
 	var server = http.createServer(requestManager.callback);
 	productFeed.collection.on('add', function (item) { console.log('New product added.'); });
 	productFeed.collection.on('remove', function (item) { console.log('Product removed.'); });
-	server.on('request', function (request) { console.log(request.method + ' to ' + request.url); });
+	server.on('request', function (request) { console.log(request.method + ' to ' + request.url);
+	if(request.method.indexOf("OPTIONS") > -1){
+		console.log(request);
+	}
 	
-	server.listen(8888);
+	 });
+	
+	server.listen(8889);
 	console.log('HTTP Server has been started.');
 
 }());

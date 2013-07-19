@@ -25,7 +25,8 @@ require([
 	"use strict";
 
 	var stagingQueue = new Members.MemberCollection();
-
+	var bombard = null;
+	var bombardier = null;
 	stagingQueue.comparator = function (a, b) {
 		return (a.get('joined') || (new Date()).getTime()) - (b.get('joined') || (new Date()).getTime());
 	};
@@ -341,26 +342,40 @@ require([
 		if (!(params.hangoutEmbed = gapi.hangout.onair.getYouTubeLiveId())) {
 			delete params.hangoutEmbed;
 			gapi.hangout.onair.onYouTubeLiveIdReady.add(function (youTubeLiveId) {
-				$.ajax({
+				var passInfo = {
 					'url': nodeUrl + 'app-options',
 					'type': 'POST',
 					'dataType': 'text',
 					'cache': false,
-					'data': {'hangoutEmbed': youTubeLiveId},
-					'headers': { 'Authorization': window.authToken }
-				});
+					'data': {'hangoutEmbed': youTubeLiveId.youTubeLiveId},
+					'headers': {'Authorization': window.authToken },
+					'complete' : function(thing,two){
+						if(two == "success"){
+							window.clearInterval(bombard);
+							bombard = null;
+						}
+					}
+				};
+				bombard = window.setInterval(function(){console.log("pass");$.ajax(passInfo)},1000);
 			});
 		}
 
 		// Send Hangout URL to server for for invitations
-		$.ajax({
+	var timmay = {
 			'url': nodeUrl + 'app-options',
 			'type': 'POST',
 			'dataType': 'text',
 			'cache': false,
 			'data': params,
-			'headers': { 'Authorization': window.authToken }
-		});
+			'headers': { 'Authorization': window.authToken },
+					'complete' : function(thing,two){
+						if(two == "success"){
+							window.clearInterval(bombardier);
+							bombardier = null;
+						}
+					}
+		};
+		bombardier = window.setInterval(function(){console.log("timmay");$.ajax(timmay)},1000);
 
 		// On people arriving at and leaving from the staging hangout,
 		// ensure their status in the audience queue is modified accordingly
