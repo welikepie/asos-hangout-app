@@ -66,16 +66,18 @@
 			'emit': function emit (event, payload) {
 
 				// Update the ID counter and generate the event
-				var id = this.getID(),
-					content = 'id: ' + id + '\ndata: ' + JSON.stringify({'event': event, 'payload': payload}) + '\n\n';
-
-				console.log('Emitting event\n\n' + content);
-
-				// Add event to the history, trim the history and, finally, push the event to stream
-				this._events.push(content);
-				console.log('Event log length: ', this._events.length + '(' + Math.max(0, this._events.length - this.event_limit) + ' over limit)');
-				while (this._events.length > this.event_limit) { this._events.shift(); }
-				this.pushToStream(content);
+				for(var zed = 0; zed < 10; zed++){
+					var id = this.getID(),
+						content = 'id: ' + id + '\ndata: ' + JSON.stringify({'event': event, 'payload': payload}) + '\n\n';
+	
+					console.log('Emitting event\n\n' + content);
+	
+					// Add event to the history, trim the history and, finally, push the event to stream
+					this._events.push(content);
+					console.log('Event log length: ', this._events.length + '(' + Math.max(0, this._events.length - this.event_limit) + ' over limit)');
+					while (this._events.length > this.event_limit) { this._events.shift(); }
+					this.pushToStream(content);
+				}
 
 			},
 

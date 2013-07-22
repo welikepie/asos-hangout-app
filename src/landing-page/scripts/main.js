@@ -126,11 +126,14 @@ require([
 		$('#product-feed a.prev').on('click', function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
+			console.log(productSlider);
 			productSlider.changeTo(productSlider.currentIndex - 1);
 		});
 		$('#product-feed a.next').on('click', function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
+						console.log(productSlider);
+
 			productSlider.changeTo(productSlider.currentIndex + 1);
 		});
 		(function () {
@@ -189,7 +192,6 @@ require([
 
 		// Connect to the SSE server and set up appropriate modifications to local collections
 		new easyXDM.Socket({
-
 			'interval': 1000,
 			'local': baseUrl + 'common/scripts/vendor/easyXDM/name.html',
 			'swf': baseUrl + 'common/scripts/vendor/easyXDM.swf',
@@ -203,14 +205,23 @@ require([
 						model;
 
 					if (ev[0] === 'productFeed') {
-
 						if (ev[1] === 'reset') {
 							productFeed.reset(data.payload);
+							 productSlider.changeTo(0);
 						} else if (ev[1] === 'add') {
 							if (!productFeed.get(data.payload.id)) { productFeed.add(data.payload); }
+							console.log(productSlider.currentIndex);
+							if(productSlider.currentIndex > 0){
+								 productSlider.changeTo(productSlider.currentIndex-1);
+							}
 						} else if (ev[1] === 'remove') {
+							console.log(data.payload);
 							model = productFeed.get(data.payload.id);
-							if (model) { productFeed.remove(model); }
+							if (model) {
+								console.log(productFeed.indexOf(model)+"<"+productSlider.currentSlide);
+								if(productFeed.indexOf(model)<productSlider.currentIndex){
+								productSlider.changeTo(productSlider.currentIndex-1);
+							} productFeed.remove(model); }
 						}
 
 					} else if (ev[0] === 'twitterFeed') {
@@ -253,7 +264,9 @@ require([
 					} else if (ev[0] === 'appOptions') {
 						if (_.has(data.payload, 'liveMessage')) { liveMessage.html(data.payload.liveMessage.replace(/\n/g, " ")); }
 						if (_.has(data.payload, 'hangoutEmbed')) {
+							console.log(data.payload);
 							if (data.payload.hangoutEmbed && data.payload.hangoutEmbed.length) {
+								console.log(data.payload.hangoutEmbed);
 								streamEmbed.attr('src', '//www.youtube-nocookie.com/embed/' + data.payload.hangoutEmbed + '?autoplay=1');
 							} else {
 								streamEmbed.removeAttr('src');
