@@ -20,7 +20,7 @@ if (function_exists("apache_request_headers")) {
 ?><!DOCTYPE html>
 <html>
 	<head>
-		<title>ASOS Shop-Along Admin</title>
+		<title>ASOS Shop-Along Items Admin</title>
 		<base href="" data-base-url="<%= pkg.app.baseUrl %>" data-node-url="<%= pkg.app.nodeUrl %>">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="../common/styles/flat-ui.css">
@@ -38,36 +38,7 @@ if (function_exists("apache_request_headers")) {
 			<button type="button" class="btn btn-danger reset">Reset App</button>
 		</div>
 		<div class="root">
-
-			<section id="introduction">
-				<header>ASOS Shop-Along Admin</header>
-				<p>This administration panel contains the interface to control the ASOS Shop-Along hangout process, as well as contents of product and Twitter feed.</p>
-			</section>
-
-			<section id="general">
-
-				<header>General Settings</header>
-
-				<div class="hangouts">
-					<h2>Hangouts</h2>
-					<p>Link to main hangout:</p>
-					<a href="https://plus.google.com/hangouts/_?hso=0&amp;gid=<%= pkg.app.hangoutAdminAppId %>" target="_blank" class="main">NO HANGOUT - CLICK HERE TO START ONE</a>
-					<p>Link to staging hangout:</p>
-					<a href="https://plus.google.com/hangouts/_?gid=<%= pkg.app.stagingAdminAppId %>" target="_blank" class="staging">NO HANGOUT - CLICK HERE TO START ONE</a>
-					<p>Hangout Live Stream:</p>
-					<a target="_blank" class="embed">NOT AVAILABLE, START ON-AIR HANGOUT FIRST</a>
-					<p>&quot;Shop Special Events&quot; Link</p>
-					<div class="categoryLink"><input type="text" name="categoryLink" value=""><button type="button" class="btn">Change</button></div>
-				</div>
-					
-				<div class="live-message">
-					<h2>Live Message</h2>
-					<textarea></textarea>
-				</div>
-
-			</section>
-
-			<section id="products">
+		<section id="products">
 
 				<div class="wrapper">
 
@@ -158,53 +129,6 @@ if (function_exists("apache_request_headers")) {
 				</div>
 
 			</section>
-
-			<section id="twitter">
-
-				<div class="wrapper">
-
-					<header>Twitter Feed</header>
-
-					<div class="filter">
-						<p>Specify the term by which tweets should appear (if empty, no tweets will be streamed).</p>
-						<input type="text" name="twitter_filter" value=""><button type="button" class="btn">Filter</button>
-					</div>
-
-					<div class="product-list incoming-tweets">
-						<h2>Incoming Tweets</h2>
-						<ul>
-
-							<li class="template">
-								<img src="" class="avatar">
-								<h3 class="name"><a href="" target="_blank"></a></h3>
-								<time></time>
-								<div class="content"></div>
-								<button type="button" class="btn btn-success">Add to feed</button>
-							</li>
-
-
-						</ul>
-					</div>
-
-					<div class="product-list twitter-feed">
-						<h2>Twitter Feed <button type="button" class="btn btn-warning clear-all">Clear All</button></h2>
-						<ul>
-
-							<li class="template">
-								<img src="" class="avatar">
-								<h3 class="name"><a href="" target="_blank"></a></h3>
-								<time></time>
-								<div class="content"></div>
-								<button type="button" class="btn btn-danger">Remove from feed</button>
-							</li>
-
-						</ul>
-					</div>
-
-				</div>
-
-			</section>
-
 		</div>
-	</body>
-</html>
+		</body>
+		</html>
