@@ -220,7 +220,12 @@ h6 {
   font-size: 13px;
   font-weight: 500;
   text-transform: uppercase; }
-
+.btn-round{
+	-webkit-border-radius: 6px;
+-moz-border-radius: 6px;
+border-radius: 6px;
+padding: 12px 18px 13px;
+}
 .btn {
   border: none;
   background: #34495e;
