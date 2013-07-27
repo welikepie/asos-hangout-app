@@ -1,0 +1,54 @@
+/* CSS crunched with Crunch - http://crunchapp.net/ */
+*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
+img{border:none;}
+a{color:inherit;text-decoration:none;}
+html,body,.root{position:relative;display:block;width:100%;height:100%;padding:0;margin:0;}
+body>.menu{position:fixed;top:0;right:0;z-index:10;display:block;padding:6px 10px 8px 12px;font-size:16px;line-height:20px;background:#34495E;-webkit-border-bottom-left-radius:8px;-moz-border-bottom-left-radius:8px;border-bottom-left-radius:8px;}body>.menu a{display:inline-block;padding:0 6px;color:white;cursor:pointer;}body>.menu a+a{border-left:1px solid white;}
+body>.menu button{height:26px;margin:-2px 0 -4px 30px;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;}
+.root>section{position:relative;display:block;padding:32px;}.root>section .wrapper{position:relative;display:block;width:100%;height:100%;padding:0;margin:0;}
+.root>section header{display:block;margin:0 0 16px 16px;font-size:28px;font-weight:bold;line-height:32px;}
+.root>section+section:before{content:'';position:absolute;top:0;right:32px;left:32px;height:1px;border-top:1px solid #666;}
+.root>section#products,.root>section#twitter{width:100%;height:100%;}
+section#introduction p{margin:0;}section#introduction p+p{margin-top:8px;}
+section#general{overflow:hidden;}section#general h2{padding:0 0 4px;margin:0 0 12px;border-bottom:1px solid #F6F6F6;}
+section#general>div.hangouts{float:left;width:50%;padding-right:16px;}section#general>div.hangouts p{display:block;margin:0 0 4px;}
+section#general>div.hangouts a{display:block;margin:0 0 12px;font-weight:bold;text-decoration:underline;}
+section#general>div.hangouts .categoryLink{overflow:hidden;}section#general>div.hangouts .categoryLink input[type="text"]{display:block;float:left;width:220px;padding:2px 6px;margin:0 12px 0 0;}
+section#general>div.hangouts .categoryLink button{float:left;}
+section#general>div.live-message{float:right;width:50%;padding-left:16px;}section#general>div.live-message textarea{width:100%;min-height:120px;}
+section#products input[type="checkbox"],section#products input[type="radio"]{width:auto;vertical-align:baseline;}
+section#products .btn{padding:4px 8px;border-radius:6px;}
+section#products form{display:block;width:100%;overflow:hidden;}section#products form h2{margin:0 0 12px 6px;}
+section#products form fieldset{border:1px solid #CCC;}
+section#products form fieldset.categories{float:left;width:240px;margin:0 12px 16px 0;}section#products form fieldset.categories>div{height:132px;overflow-x:hidden;overflow-y:scroll;border:1px solid #EEE;}
+section#products form fieldset.categories label{display:block;height:22px;line-height:22px;}section#products form fieldset.categories label:hover,section#products form fieldset.categories label:focus{color:white;background:#315e9b;cursor:pointer;}
+section#products form fieldset.categories>label{padding:1px;}
+section#products form fieldset.misc{float:left;min-width:320px;min-height:174px;margin:0 0 16px;}section#products form fieldset.misc legend{opacity:0;}
+section#products form fieldset.misc>*{display:block;margin:0 0 8px 0;overflow:hidden;}section#products form fieldset.misc>*>*{float:right;}
+section#products form fieldset.misc>* label{display:inline-block;margin-left:8px;}
+section#products form fieldset.misc>* input[type="text"]{padding:3px 0 3px 4px;}
+section#products form .buttons{clear:both;margin:0 0 16px;}
+section#products .product-list{position:absolute;bottom:0;width:49%;}section#products .product-list#search-results{top:300px;left:0;}
+section#products .product-list#product-feed{top:0;right:0;}
+section#products .product-list>h2{padding:0 0 4px;margin:0 0 6px;border-bottom:2px solid #EEE;}section#products .product-list>h2 button{float:right;}
+section#products .product-list>ul{position:absolute;top:44px;right:0;bottom:0;left:0;display:block;padding:0;margin:0;overflow-x:hidden;overflow-y:auto;list-style:none;}section#products .product-list>ul>li{display:block;padding:8px;margin:0 4px 0 0;overflow:hidden;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;background:#EEE;border-radius:8px;}section#products .product-list>ul>li+li{margin-top:6px;}
+section#products .product-list>ul>li img{display:block;max-width:80px;max-height:120px;float:left;border:1px solid #DDD;}
+section#products .product-list>ul>li>h3{height:18px;padding:0;margin:0 0 6px 96px;overflow:hidden;font-size:18px;line-height:18px;white-space:nowrap;text-overflow:ellipsis;}
+section#products .product-list>ul>li>.description{padding:0;margin:0 0 6px 96px;}section#products .product-list>ul>li>.description p{margin:0 0 6px;}
+section#products .product-list>ul>li .actions{float:right;}
+section#products .product-list>ul>li button{margin-left:12px;}
+section#twitter h2{padding:0 0 4px;margin:0 0 6px;border-bottom:2px solid #EEE;}section#twitter h2 button{float:right;}
+section#twitter .wrapper>*{position:absolute;display:block;width:50%;}
+section#twitter .filter{top:48px;left:0;height:100px;padding-right:16px;overflow:hidden;}section#twitter .filter p{margin:0 0 16px;}
+section#twitter .filter input{float:left;height:30px;padding:4px 6px;margin:0 8px 0 0;}
+section#twitter .filter .btn{float:left;height:30px;padding:4px 8px;border-radius:6px;}
+section#twitter .incoming-tweets{top:148px;bottom:0;left:0;padding-right:16px;}
+section#twitter .twitter-feed{top:0;right:0;bottom:0;padding-left:16px;}
+section#twitter .incoming-tweets>ul,section#twitter .twitter-feed>ul{position:absolute;top:44px;bottom:0;display:block;padding:0;margin:0;overflow-x:hidden;overflow-y:auto;list-style:none;}section#twitter .incoming-tweets>ul>li,section#twitter .twitter-feed>ul>li{display:block;padding:8px;margin:0 4px 0 0;overflow:hidden;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;background:#EEE;border-radius:8px;}section#twitter .incoming-tweets>ul>li+li,section#twitter .twitter-feed>ul>li+li{margin-top:6px;}
+section#twitter .incoming-tweets>ul>li img,section#twitter .twitter-feed>ul>li img{display:block;width:80px;height:80px;float:left;border:1px solid #DDD;}
+section#twitter .incoming-tweets>ul>li>h3,section#twitter .twitter-feed>ul>li>h3{height:18px;padding:0;margin:0 0 4px 96px;overflow:hidden;font-size:18px;line-height:18px;white-space:nowrap;text-overflow:ellipsis;}
+section#twitter .incoming-tweets>ul>li time,section#twitter .twitter-feed>ul>li time{display:block;padding:0;margin:0 0 12px 96px;}
+section#twitter .incoming-tweets>ul>li>.content,section#twitter .twitter-feed>ul>li>.content{padding:0;margin:0 0 10px 96px;}section#twitter .incoming-tweets>ul>li>.content p,section#twitter .twitter-feed>ul>li>.content p{margin:0 0 6px;}
+section#twitter .incoming-tweets>ul>li button,section#twitter .twitter-feed>ul>li button{float:right;}
+section#twitter .incoming-tweets>ul{left:0;right:16px;}
+section#twitter .twitter-feed>ul{left:16px;right:0;}

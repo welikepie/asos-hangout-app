@@ -24,7 +24,7 @@ if (function_exists("apache_request_headers")) {
 		<base href="" data-base-url="<%= pkg.app.baseUrl %>" data-node-url="<%= pkg.app.nodeUrl %>">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="../common/styles/flat-ui.css">
-		<link rel="stylesheet" href="styles/styles.css">
+		<link rel="stylesheet" href="styles/legacy.css">
 		<link rel="stylesheet" href="styles/spinner.css">
 		<script type="text/javascript">window.authToken = <?php echo(json_encode($token)); ?>;</script>
 		<script type="text/javascript" src="../common/scripts/vendor/require.js" data-main="scripts/main"></script>

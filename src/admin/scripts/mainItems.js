@@ -545,23 +545,6 @@ require([
 
 		});
 
-		// Incoming tweets stream
-		new easyXDM.Socket({
-
-			'interval': 1000,
-			'local': '../common/scripts/vendor/easyXDM/name.html',
-			'swf': '../common/scripts/vendor/easyXDM.swf',
-			'swfNoThrottle': true,
-			'remote': nodeUrl + 'twitter-stream?' + (new Date()).getTime(),
-			'onMessage': function (message) {
-				try {
-					var data = JSON.parse(message);
-					if (data.event === 'tweet') { incomingTweets.add(data.payload, {'parse': true, 'validate': true}); }
-				} catch (e) {}
-			}
-
-		});
-
 	});
 
 });

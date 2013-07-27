@@ -29,14 +29,14 @@ if (function_exists("apache_request_headers")) {
 			window.authToken = <?php echo(json_encode($token)); ?>
 			;
 		</script>
-		<script type="text/javascript" src="../common/scripts/vendor/require.js" data-main="scripts/main"></script>
+		<script type="text/javascript" src="../common/scripts/vendor/require.js" data-main="scripts/mainTwitter"></script>
+			<script type="text/javascript" src="scripts/tweetResize.js"></script>
 	</head>
 	<body>
 		<div class="menu">
 			<a class="general" target="_blank" href="hangout.php">General Settings</a>
 			<a class="products"target="_blank" href="items.php">Product Feed</a>
 			<a class="twitter" target="_blank"href="twitter.php">Twitter Feed</a>
-
 			<button type="button" class="btn btn-danger reset">Reset App</button>
 		</div>
 		<div class="root">
@@ -44,11 +44,11 @@ if (function_exists("apache_request_headers")) {
 
 			<div class="wrapper">
 
-				<header>
-					Twitter Feed
-				</header>
-
+				
 				<div class="filter">
+					<h2>
+					Twitter Feed
+				</h2>
 					<p>
 						Specify the term by which tweets should appear (if empty, no tweets will be streamed).
 					</p>
@@ -57,7 +57,6 @@ if (function_exists("apache_request_headers")) {
 						Filter
 					</button>
 				</div>
-
 				<div class="product-list incoming-tweets">
 					<h2>Incoming Tweets</h2>
 					<ul>
@@ -74,7 +73,6 @@ if (function_exists("apache_request_headers")) {
 
 					</ul>
 				</div>
-
 				<div class="product-list twitter-feed">
 					<h2>Twitter Feed
 					<button type="button" class="btn btn-warning clear-all">
@@ -94,7 +92,6 @@ if (function_exists("apache_request_headers")) {
 
 					</ul>
 				</div>
-
 			</div>
 
 		</section>
