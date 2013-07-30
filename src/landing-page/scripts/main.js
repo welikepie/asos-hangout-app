@@ -89,7 +89,7 @@ require(['jquery', 'underscore', 'backbone', 'easyXDM', "moment", 'common/script
 		};
 		productSlider.animate = function(oldIndex, newIndex, oldEl, newEl) {
 			var result = Slider.prototype.animate.apply(this, arguments);
-			$('#product-feed .desc').attr('href', newEl.find('a').attr('href'));
+			$('#product-feed .desc').attr('href', newEl.find('a').attr('href')+"&affid=10180");
 			$('#product-feed .desc .title').fadeOut(150).queue('fx', function(next) {
 				this.innerHTML = newEl.find('.title').html() || '';
 				next();
@@ -299,6 +299,7 @@ require(['jquery', 'underscore', 'backbone', 'easyXDM', "moment", 'common/script
 							console.log(data.payload);
 							if (data.payload.hangoutEmbed && data.payload.hangoutEmbed.length) {
 								console.log(data.payload.hangoutEmbed);
+								streamEmbed.css("display","block");
 								streamEmbed.attr('src', '//www.youtube-nocookie.com/embed/' + data.payload.hangoutEmbed + '?autoplay=1');
 							} else {
 								streamEmbed.removeAttr('src');

@@ -181,10 +181,8 @@ require([
 						'cache': false,
 						'headers': { 'Authorization': window.authToken }
 					});
-
 				}
 			}
-
 		});
 		productFeedView.listenTo(productFeed, 'add remove sort change sync reset', _.debounce(productFeedView.render, 250));
 
@@ -343,7 +341,20 @@ require([
 
 		/* TWITTER FEED
 		 ********************************** */
-
+			$.ajax({
+							'url': nodeUrl + 'twitter-feed',
+							'type': 'GET',
+							'headers': { 'Authorization': window.authToken },
+							'success': function(response){
+								console.log(response);
+								if(response.length>0){
+									for(var i = response.length-1; i >= 0; i--){
+										console.log(i);
+										approvedTweets.add(response[i]);
+									}
+								}
+							}
+						});
 		 incomingTweetsView = new CollectionView({
 
 			'collection': incomingTweets,
@@ -362,8 +373,10 @@ require([
 
 			'itemEvents': {
 				'click button': function (model) {
+					console.log("Sending off for a toy car.");
 					if (!approvedTweets.get(model.get('id'))) {
-
+						approvedTweets.add(model, {at:0});
+						//Pages.add({ foo: bar }, { at: Pages.length - 2 })
 						$.ajax({
 							'url': nodeUrl + 'twitter-feed',
 							'type': 'POST',
@@ -397,7 +410,7 @@ require([
 
 			'itemEvents': {
 				'click button': function (model) {
-
+					approvedTweets.remove(model);
 					$.ajax({
 						'url': nodeUrl + 'twitter-feed/' + model.id,
 						'type': 'DELETE',
@@ -410,6 +423,7 @@ require([
 			}
 
 		});
+		approvedTweetsView.listenTo(approvedTweets, 'add remove sort change sync reset', _.debounce(approvedTweetsView.render, 250));
 
 		incomingTweetsView.render();
 		approvedTweetsView.render();

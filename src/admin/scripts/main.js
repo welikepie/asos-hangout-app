@@ -388,6 +388,7 @@ require([
 			'advancedFilter': function (collection) { return collection.first(approvedTweetCount); },
 
 			'populate': function (model, element) {
+				
 				$(element)
 					.find('.name a').text(model.get('author').name).attr('href', model.get('author').url).end()
 					.find('img').attr('src', model.get('author').avatar).end()

@@ -70,7 +70,7 @@
 				<div class="banner">
 					<div class="shop-along-logo">ASOS Shop-Along</div>
 					<p class="left">Tweet <span class="hashtag">#askasos</span> to look&nbsp;the&nbsp;part</p>
-					<p class="right">Special event style, sorted</p>
+					<p class="right">Festival style, sorted</p>
 				</div>
 			</header>
 
@@ -102,7 +102,7 @@
 					<h3 class="price"></h3>
 				</a>
 
-				<a href="" target="_blank" class="shop">Shop Special Events&nbsp;›</a>
+				<a href="" target="_blank" class="shop">Shop Festival&nbsp;›</a>
 			</section>
 
 			<section id="twitter-feed">
