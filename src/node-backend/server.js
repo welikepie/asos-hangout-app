@@ -152,7 +152,7 @@
 	// Product Feed Controls
 	requestManager.addHandler('GET', '/product-feed', productFeed.handlers.get);
 	requestManager.addHandler('POST', '/product-feed', productFeed.handlers.add);
-	requestManager.addHandler('DELETE', /^\/product-feed\/([0-9]+)$/, productFeed.handlers.remove);
+	requestManager.addHandler('DELETE', /^\/product-feed\/([0-9and]+)$/, productFeed.handlers.remove);
 	requestManager.addHandler('DELETE', '/product-feed', productFeed.handlers.reset);
 
 	// Twitter Feed Controls
@@ -165,7 +165,7 @@
 	requestManager.addHandler('GET', '/app-options', appOptions.handlers.get);
 	requestManager.addHandler('POST', '/app-options', appOptions.handlers.change);
 
-	// Queue functionality
+/*	// Queue functionality
 	requestManager.addHandler('GET', '/audience-queue', audienceQueue.handlers.get);
 	requestManager.addHandler('GET', /^\/audience-queue\/([0-9a-zA-Z]+)$/, audienceQueue.handlers.present);
 	requestManager.addHandler('POST', '/audience-queue', audienceQueue.handlers.add);
@@ -180,18 +180,16 @@
 	requestManager.addHandler('PATCH', '/staging-queue', stagingQueue.handlers.change);
 	requestManager.addHandler('DELETE', /^\/staging-queue\/([0-9a-zA-Z]+)$/, stagingQueue.handlers.remove);
 	requestManager.addHandler('DELETE', '/staging-queue', stagingQueue.handlers.reset);
-
+*/
 	var server = http.createServer(requestManager.callback);
 	productFeed.collection.on('add', function (item) { console.log('New product added.'); });
 	productFeed.collection.on('remove', function (item) { console.log('Product removed.'); });
 	server.on('request', function (request) { console.log(request.method + ' to ' + request.url);
 	if(request.method.indexOf("OPTIONS") > -1){
-		console.log(request);
+		//console.log(request);
 	}
-	
 	 });
-	
-	server.listen(8889);
+	server.listen(8890);
 	console.log('HTTP Server has been started.');
 
 }());

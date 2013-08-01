@@ -146,14 +146,22 @@ function huntLinks(j) {
 	console.log("Hunting " + get.baseUrl[j]);
 	//xmlhttp.open("GET", get.baseUrl[j], false);
 	console.log(j);
-	request(get.baseUrl[j], function(error, response, body) {
+	var zeds = request.jar();
+			zeds.add(request.cookie("asos=topcatid=1000&PreferredSite=us.asos.com&currencyid=2"));
+	request({url:get.baseUrl[j],followAllRedirects:true,headers:{
+"User-Agent": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1573.2 Safari/537.36",
+"Accept-Encoding": "none"}
+}, function(error, response, body) {
 
 		if (!error && response.statusCode == 200) {
 			// console.log(body) // Print the web page.
+			console.log(response);
+			//return;
 			carryOn(body, get.baseUrl[j], j);
 			console.log(get.baseUrl[j]);
 		} else {
 			console.log(response);
+			console.log(response.responseText);
 			console.log("\033[31m A spider got lost! Error " + error + " with a code " + response.statusCode + '\033[0m');
 		}
 
@@ -220,7 +228,9 @@ function dataScrape(base, k, referenceArr) { {
 					if (get.method == "asos") {
 						tempResults[loop.index] = tempResults[loop.index] + "&parentID=-1&pge=0&pgeSize=9999&sort=-1";
 					}
-					request(tempResults[loop.index], function(error, response, body) {
+					request({url:tempResults[loop.index],headers:{
+"User-Agent": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1573.2 Safari/537.36",
+"Accept-Encoding": "none"}}, function(error, response, body) {
 						if (!error && response.statusCode == 200) {
 							var text = body;
 							$ = cheerio.load(text);
@@ -264,7 +274,7 @@ function dataScrape(base, k, referenceArr) { {
 
 						} else {
 							//console.log(tempResults);
-							console.log("\033[31m A spider got lost! Error : " + error + '\033[0m');
+							console.log("\033[31m A spider got lost! Error : " + error + "with status code"+response.statusCode+'\033[0m');
 							loop.next();
 						}
 						if (loop.index == tempResults.length - 1) {
@@ -333,13 +343,9 @@ function writingToEndPoint(startFrom) {
 	console.log(startFrom);
 	console.log(links.length);
 	var jsonResults = [];
-	/*	var arr = [];
-	for (var i = 0; i < links.length; i++) {
-	if (links[i].indexOf("sgid") != -1) {
-	arr.push(links[i]);
-	}
-	}
-	links = arr; */
+		var arr = [];
+	//return;
+	//links = arr; 
 	//	console.log(arr);
 	//	return 0;
 	//SELECT id FROM asos.products WHERE name = "" and description is null;
@@ -351,12 +357,17 @@ function writingToEndPoint(startFrom) {
 		var j = "";
 		if (get.method = "asos") {
 			var j = request.jar();
-			j.add(request.cookie("asos=topcatid=1000&customerguid=2a6aad1ef6d84192b3c634a4be54d846&PreferredSite=www.asos.com&currencyid=1"));
+			j.add(request.cookie("asos=topcatid=1000&PreferredSite=us.asos.com&currencyid=2"));
+			//1 = gbp, 2 = USD
+			//PreferredSite -> asos.com, us.asos.com
 		}
 		//request = request.defaults({jar:j});
 		request({
 			url : links[l + startFrom],
-			jar : j
+			jar : j,
+			headers:{
+"User-Agent": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1573.2 Safari/537.36",
+"Accept-Encoding": "none"}
 		}, function(error, response, body) {
 
 			if (!error && response.statusCode == 200) {
@@ -398,7 +409,7 @@ function writingToEndPoint(startFrom) {
 										image = popup[2];
 										iid = "iid=" + image.match(/[0-9]{4,}/);
 									}
-									localJson[y].url = "http://www.asos.com/pgeproduct.aspx?" + sgid + "&" + iid;
+									localJson[y].url = get.baseUrl+"/pgeproduct.aspx?" + sgid + "&" + iid;
 									//console.log(links[l+startFrom]+"/n");
 									if (get.finalSearch[m] == "#ctl00_ContentMainPage_divmor>ul>li>a") {
 										var temp = $(patternArr[z].replace(/>/g, " "));
@@ -414,6 +425,7 @@ function writingToEndPoint(startFrom) {
 											//console.log(temp[0].children[0]);
 											console.log(temp);
 											localJson[y].price = parseFloat(temp.match(/[0-9]*[.][0-9]*/)[0]);
+											console.log(localJson[y].price);
 										} else {
 											localJson[y].price = "null";
 										}
@@ -648,11 +660,12 @@ function writingToEndPoint(startFrom) {
 						}
 					} else {
 						console.log(resultsJson.description.length +"||"+resultsJson.title.length+"||"+resultsJson.category.length);
+						console.log(resultsJson);
 						if (resultsJson.description.length == 0 || resultsJson.title.length == 0 || resultsJson.category.length == 0 ||resultsJson.description.length == 4 || resultsJson.title.length == 4  || resultsJson.description == undefined || resultsJson.title == undefined || resultsJson.category == undefined) {
 							var errs = {};
 							errorJson.push(resultsJson);
 						}
-						console.log(resultsJson.description +"||"+resultsJson.title+"||"+resultsJson.category);
+						//console.log(resultsJson.description +"||"+resultsJson.title+"||"+resultsJson.category);
 						jsonResults.push(resultsJson);
 					}
 				}
@@ -884,8 +897,8 @@ function writingToEndPoint(startFrom) {
 									console.log(product);
 									return query('INSERT INTO products (' + 'id, timestamp, gender, ' + 'name, image, description' + ') VALUES (' + ':id, FROM_UNIXTIME(:timestamp), :gender, ' + ':name, :image, :description' + ') ON DUPLICATE KEY UPDATE id = :id, timestamp = FROM_UNIXTIME(:timestamp),gender=:gender, name = :name, description = :description, image = :image', product).then(function() {
 										// Once the main product is in, insert the price
-										// (assume GBP as currency for now)
-										return query('INSERT INTO product_prices (product_id, currency, price) ' + 'VALUES (:id, \'GBP\', :price)' + ' ON DUPLICATE KEY UPDATE product_id = :id, currency = \'GBP\', price=:price', product);
+										// (assume GBP as currency for now; changed to USD)
+										return query('INSERT INTO product_prices (product_id, currency, price) ' + 'VALUES (:id, \'USD\', :price)' + ' ON DUPLICATE KEY UPDATE product_id = :id, currency = \'USD\', price=:price', product);
 									}, function(error) {
 										console.log("INTO PRODUCTS AND PRODUCT PRICES" + error);
 										//throw error;
@@ -1010,7 +1023,7 @@ function writingToEndPoint(startFrom) {
 					loop.next();
 				}
 			} else {
-				console.log("\033[31mA spider got lost! Error " + error + "\033[0m");
+				console.log("\033[31mA spider got lost! Error " + error + "with response code "+response.statusCode+"\033[0m");
 				loop.next();
 			}
 		})

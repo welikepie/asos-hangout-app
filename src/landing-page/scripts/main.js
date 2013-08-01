@@ -174,6 +174,31 @@ require(['jquery', 'underscore', 'backbone', 'easyXDM', "moment", 'common/script
 			$(this).removeClass('closed');
 		});
 
+		var setId = 0;
+	var sortOut = function(input){
+			var toSort = input;
+			console.log("DOING SOMETHING");
+			var sorted = [];
+			console.log(input);
+			if(toSort.length!=undefined){
+			for(var i = 0; i < toSort.length; i++)
+			{	
+				console.log(i);
+				toSort[i].prodId = toSort[i].id;
+				toSort[i].id=setId;
+				setId++;
+			}
+			}
+			else{
+				toSort.prodId = toSort.id;
+				toSort.id=setId;
+				setId++;
+			}
+			console.log(toSort);
+			return toSort;
+		}
+
+
 		// Connect to the SSE server and set up appropriate modifications to local collections
 		new easyXDM.Socket({
 			'interval' : 1000,
@@ -188,32 +213,30 @@ require(['jquery', 'underscore', 'backbone', 'easyXDM', "moment", 'common/script
 
 					if (ev[0] === 'productFeed') {
 						if (ev[1] === 'reset') {
-							productFeed.reset(data.payload);
+							productFeed.reset(sortOut(data.payload));
 							//productSlider.changeTo(0);
 						} else if (ev[1] === 'add') {
-							if (!productFeed.get(data.payload.id)) {
-								if (!productFeed.contains(data.payload)) {
-									productFeed.add(data.payload);
-									console.log(productSlider.currentIndex);
+							//if (!productFeed.get(data.payload.id)) {
+								//if (!productFeed.contains(data.payload)) {
+									productFeed.add(sortOut(data.payload));
 									productSlider.changeTo(0);
 									//						if(productSlider.currentIndex > 0){
 									//							 productSlider.changeTo(productSlider.currentIndex-1);
 									//						}
-								}
+								//}
 
-							}
+							//}
 
 						} else if (ev[1] === 'remove') {
 							console.log(data.payload);
-							model = productFeed.get(data.payload.id);
-							if (model) {
+			var model = productFeed.where({"prodId":data.payload.id,"addedAt":parseInt(data.payload.addedAt,10)});
+							console.log(model);
+							if (model) { productFeed.remove(model); }
 								//								console.log(productFeed.indexOf(model)+"<"+productSlider.currentSlide);
 								//THERE IS A BUG IN THIS CODE. RENDERING BEHAVES AS NORMAL THEN GOES IFFY
 								//								if((productFeed.indexOf(model)<productSlider.currentIndex )){
 								//								productSlider.currentIndex = productSlider.currentIndex-1;
 								//								}
-								productFeed.remove(model);
-							}
 						}
 
 					} else if (ev[0] === 'twitterFeed') {

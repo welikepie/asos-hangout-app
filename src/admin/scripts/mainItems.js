@@ -25,7 +25,7 @@ require([
 ) {
 	"use strict";
 
-	var loadedProducts = new Products.ProductCollection(),
+	var loadedProducts = new Products.ProductCollection(),	
 		productFeed = new Products.ProductCollection(),
 		productSearchCache = {},
 
@@ -33,7 +33,7 @@ require([
 		approvedTweets = new Tweets.TweetCollection(),
 		incomingTweetCount = 50,
 		approvedTweetCount = 20;
-
+		
 	productFeed.comparator = function (a, b) { return (b.get('addedAt') || (new Date()).getTime()) - (a.get('addedAt') || (new Date()).getTime()); };
 
 	$(function () {
@@ -137,7 +137,7 @@ require([
 
 			'itemEvents': {
 				'click button': function (model) {
-					if (!productFeed.get(model.get('id'))) {
+					//if (!productFeed.get(model.get('id'))) {
 					console.log("dis");
 						$.ajax({
 							'url': nodeUrl + 'product-feed',
@@ -148,7 +148,7 @@ require([
 							'headers': { 'Authorization': window.authToken }
 						});
 
-					}
+					//}
 				}
 			}
 
@@ -173,9 +173,9 @@ require([
 
 			'itemEvents': {
 				'click button': function (model) {
-
+					console.log(productFeed.get(model.id).attributes.prodId+"."+productFeed.get(model.id).attributes.addedAt);
 					$.ajax({
-						'url': nodeUrl + 'product-feed/' + model.id,
+						'url': nodeUrl + 'product-feed/' + productFeed.get(model.id).attributes.prodId+"and"+productFeed.get(model.id).attributes.addedAt,
 						'type': 'DELETE',
 						'dataType': 'text',
 						'cache': false,
@@ -186,7 +186,7 @@ require([
 			}
 
 		});
-		productFeedView.listenTo(productFeed, 'add remove sort change sync reset', _.debounce(productFeedView.render, 250));
+	//	productFeedView.listenTo(productFeed, 'add remove sort change sync reset', _.debounce(productFeedView.render, 250));
 
 		productSearchView.render();
 		productFeedView.render();
@@ -397,9 +397,8 @@ require([
 
 			'itemEvents': {
 				'click button': function (model) {
-
 					$.ajax({
-						'url': nodeUrl + 'twitter-feed/' + model.id,
+						'url': nodeUrl + 'twitter-feed/' + productFeed.get(model.id).prodId,
 						'type': 'DELETE',
 						'dataType': 'text',
 						'cache': false,
@@ -439,7 +438,29 @@ require([
 
 		/* DATA STREAM HANDLING
 		 ********************************** */
-
+		var setId = 0;
+	var sortOut = function(input){
+			var toSort = input;
+			console.log("DOING SOMETHING");
+			var sorted = [];
+			console.log(input);
+			if(toSort.length!=undefined){
+			for(var i = 0; i < toSort.length; i++)
+			{	
+				console.log(i);
+				toSort[i].prodId = toSort[i].id;
+				toSort[i].id=setId;
+				setId++;
+			}
+			}
+			else{
+				toSort.prodId = toSort.id;
+				toSort.id=setId;
+				setId++;
+			}
+			console.log(toSort);
+			return toSort;
+		}
 		// General event stream
 		new easyXDM.Socket({
 
@@ -448,6 +469,8 @@ require([
 			'swf': '../common/scripts/vendor/easyXDM.swf',
 			'swfNoThrottle': true,
 			'remote': nodeUrl + 'stream?' + (new Date()).getTime(),
+			
+
 			'onMessage': function (message) {
 
 				try {
@@ -455,28 +478,22 @@ require([
 					var data = JSON.parse(message),
 						ev = data.event.split(':', 2),
 						el, temp;
-
+					//console.log(message);
 					// Product feed updater
 					if (ev[0] === 'productFeed') {
 
 						if (ev[1] === 'reset') {
-							productFeed.reset(data.payload);
+							//console.log(data.payload);
+							//break;
+							productFeed.reset(sortOut(data.payload));
+							console.log(productFeed);
 						} else if (ev[1] === 'add') {
-							if (!productFeed.get(data.payload.id)) { productFeed.add(data.payload); }
+							console.log(sortOut(data.payload));
+							productFeed.add(sortOut(data.payload));
 						} else if (ev[1] === 'remove') {
-							var model = productFeed.get(data.payload.id);
+							var model = productFeed.where({"prodId":data.payload.id,"addedAt":parseInt(data.payload.addedAt,10)});
+							console.log(model);
 							if (model) { productFeed.remove(model); }
-						}
-
-					} else if (ev[0] === 'twitterFeed') {
-
-						if (ev[1] === 'reset') {
-							approvedTweets.reset(data.payload, {'parse': true, 'validate': true});
-						} else if (ev[1] === 'add') {
-							if (!approvedTweets.get(data.payload.id)) { approvedTweets.add(data.payload, {'parse': true, 'validate': true}); }
-						} else if (ev[1] === 'remove') {
-							var model = approvedTweets.get(data.payload.id);
-							if (model) { approvedTweets.remove(model); }
 						}
 
 					// Generic app options updater
@@ -546,5 +563,4 @@ require([
 		});
 
 	});
-
 });
