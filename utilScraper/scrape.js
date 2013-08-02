@@ -117,7 +117,7 @@ function timed() {
 		absentConf = false;
 		console.log(e);
 	}
-	if(absentConf == true){
+	if (absentConf == true) {
 		try {
 			absentConf = fs.existsSync('links.json');
 		} catch(e) {
@@ -143,15 +143,19 @@ function timed() {
 }
 
 function huntLinks(j) {
-	console.log("Hunting " + get.baseUrl[j]);
+	console.log("Hunting " + get.baseUrl[j] + "huntLinks");
 	//xmlhttp.open("GET", get.baseUrl[j], false);
 	console.log(j);
 	var zeds = request.jar();
-			zeds.add(request.cookie("asos=topcatid=1000&PreferredSite=us.asos.com&currencyid=2"));
-	request({url:get.baseUrl[j],followAllRedirects:true,headers:{
-"User-Agent": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1573.2 Safari/537.36",
-"Accept-Encoding": "none"}
-}, function(error, response, body) {
+	zeds.add(request.cookie("asos=topcatid=1000&PreferredSite=us.asos.com&currencyid=2"));
+	request({
+		url : get.baseUrl[j],
+		followAllRedirects : true,
+		headers : {
+			"User-Agent" : "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1573.2 Safari/537.36",
+			"Accept-Encoding" : "none"
+		}
+	}, function(error, response, body) {
 
 		if (!error && response.statusCode == 200) {
 			// console.log(body) // Print the web page.
@@ -228,21 +232,40 @@ function dataScrape(base, k, referenceArr) { {
 					if (get.method == "asos") {
 						tempResults[loop.index] = tempResults[loop.index] + "&parentID=-1&pge=0&pgeSize=9999&sort=-1";
 					}
-					request({url:tempResults[loop.index],headers:{
-"User-Agent": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1573.2 Safari/537.36",
-"Accept-Encoding": "none"}}, function(error, response, body) {
+					request({
+						url : tempResults[loop.index],
+						headers : {
+							"User-Agent" : "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1573.2 Safari/537.36",
+							"Accept-Encoding" : "none"
+						}
+					}, function(error, response, body) {
 						if (!error && response.statusCode == 200) {
 							var text = body;
 							$ = cheerio.load(text);
 							console.log("Hunting " + tempResults[loop.index] + ".");
 							var parsed = parseElements(get.searches[k + 1]);
-							console.log(parsed);
+							//console.log(parsed);
 							var tempArr = [];
+							var category = "None";
+							if ($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs").length > 0) {
+								if ($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].hasOwnProperty("children")) {
+									var tLength = $("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children.length;
+									for (var textSeek = tLength - 1; textSeek >= 0; textSeek--) {
+										//console.log(textSeek);
+										//console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].type);
+										if ($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].type == "text") {
+											console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].data);
+											category = $("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].data;
+											break;
+										}
+									}
+								}
+							}
+							//console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children);
 							for (var z = 0; z < parsed.length; z++) {
 								var returned = $(parsed[z].replace(/>/g, " "));
-								//console.log(returned);
+								console.log(returned.length);
 								for (var b = 0; b < returned.length; b++) {
-									//console.log(returned[b]);
 									tempArr.push(returned[b]);
 								}
 							}
@@ -251,6 +274,7 @@ function dataScrape(base, k, referenceArr) { {
 							}
 							for (var m = 0; m < tempArr.length; m++) {
 								var test = tempArr[m].attribs.href;
+								//console.log(test);
 								if (test != undefined && test != "") {
 									var match = base.match(/[.a-z0-9A-Z]*/g)[4];
 									if (test.indexOf(match) == -1) {
@@ -264,17 +288,17 @@ function dataScrape(base, k, referenceArr) { {
 										}
 										match = test;
 									}
-									//console.log(match);
-									resultsArr.push(match);
+									//console.log([match,category]);
+									resultsArr.push(new Array(match, category.replace(/^\s+/,"")));
 								}
 							}
 							loop.next();
-							//console.log(resultsArr);
+							//console.log(eliminateDuplicates(resultsArr));
 							console.log('\033[35m' + Math.floor(100 * ((loop.index + 1) / tempResults.length)) + " % completed of pass " + (k + 1) + " of " + (get.searches.length - 1) + ". " + resultsArr.length + " results." + "\033[0m");
 
 						} else {
 							//console.log(tempResults);
-							console.log("\033[31m A spider got lost! Error : " + error + "with status code"+response.statusCode+'\033[0m');
+							console.log("\033[31m A spider got lost! Error : " + error + "with status code" + response.statusCode + '\033[0m');
 							loop.next();
 						}
 						if (loop.index == tempResults.length - 1) {
@@ -289,25 +313,37 @@ function dataScrape(base, k, referenceArr) { {
 				}, function() {
 				});
 			} else if (k == get.searches.length - 1) {
+				console.log(resultsArr);
+				var processArr = {};
 				console.log("finished");
-				var urlPrepend = "http://www.asos.com/pgeproduct.aspx?";
+				var urlPrepend = "http://us.asos.com/pgeproduct.aspx?";
 				for (var i in resultsArr) {
-					var thing = resultsArr[i].match(/iid=([0-9]+)/);
+					var thing = resultsArr[i][0].match(/iid=([0-9]+)/);
 					if (thing != null) {
-						//	console.log(thing[0]);
-						resultsArr[i] = urlPrepend + thing[0];
+						if (!processArr.hasOwnProperty(resultsArr[i][1])) {
+							processArr[resultsArr[i][1]] = new Array();
+						}//	console.log(thing[0]);
+						processArr[resultsArr[i][1]].push(urlPrepend + thing[0]);
 					} else {
-						thing = resultsArr[i].match(/sgid=([0-9]+)/);
+						thing = resultsArr[i][0].match(/sgid=([0-9]+)/);
 						if (thing != null) {
 							//	console.log(thing[0]);
-							resultsArr[i] = urlPrepend + thing[0];
+							if (!processArr.hasOwnProperty(resultsArr[i][1])) {
+								processArr[resultsArr[i][1]] = new Array();
+							}
+							processArr[resultsArr[i][1]].push(urlPrepend + thing[0]);
 						}
 					}
+
+					//processArr.resultsArr[i][1].push(resultsArr[i])
 					//temp.push(links[i].match(/iid=([0-9]+)/)[0]);
 					//console.log(temp[i]);
 				}
-
-				fs.writeFileSync("links.json", '{"data":' + JSON.stringify(eliminateDuplicates(resultsArr)) + '}');
+				for (var i in processArr) {
+					processArr[i] = eliminateDuplicates(processArr[i]);
+				}
+				fs.writeFileSync("links.json", '{"data":' + JSON.stringify(mergeCats(processArr)) + '}');
+				//fs.writeFileSync("links.json", '{"data":' + JSON.stringify(eliminateDuplicates(resultsArr)) + '}');
 				fs.writeFileSync("numTracker.json", '{"data":' + "0" + '}');
 				writingToEndPoint(0);
 				return;
@@ -336,16 +372,19 @@ function writingToEndPoint(startFrom) {
 	errorJson = [];
 	console.log('Spider digesting and loading progress.');
 	var links = JSON.parse(fs.readFileSync("links.json", "utf-8"));
+	
 	links = links.data;
 	console.log("file loaded");
 	//for (var l = 0; l < (links.length - startFrom); l++) {
+	//	console.log(links);
 	var start = links.length - startFrom;
 	console.log(startFrom);
 	console.log(links.length);
 	var jsonResults = [];
-		var arr = [];
+	var arr = [];
+	return;
 	//return;
-	//links = arr; 
+	//links = arr;
 	//	console.log(arr);
 	//	return 0;
 	//SELECT id FROM asos.products WHERE name = "" and description is null;
@@ -365,9 +404,10 @@ function writingToEndPoint(startFrom) {
 		request({
 			url : links[l + startFrom],
 			jar : j,
-			headers:{
-"User-Agent": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1573.2 Safari/537.36",
-"Accept-Encoding": "none"}
+			headers : {
+				"User-Agent" : "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1573.2 Safari/537.36",
+				"Accept-Encoding" : "none"
+			}
 		}, function(error, response, body) {
 
 			if (!error && response.statusCode == 200) {
@@ -409,7 +449,7 @@ function writingToEndPoint(startFrom) {
 										image = popup[2];
 										iid = "iid=" + image.match(/[0-9]{4,}/);
 									}
-									localJson[y].url = get.baseUrl+"/pgeproduct.aspx?" + sgid + "&" + iid;
+									localJson[y].url = get.baseUrl + "/pgeproduct.aspx?" + sgid + "&" + iid;
 									//console.log(links[l+startFrom]+"/n");
 									if (get.finalSearch[m] == "#ctl00_ContentMainPage_divmor>ul>li>a") {
 										var temp = $(patternArr[z].replace(/>/g, " "));
@@ -642,14 +682,14 @@ function writingToEndPoint(startFrom) {
 								counted++;
 							}
 							if (counted > 0) {
-								console.log(localJson[zed].description.length +"||"+localJson[zed].title.length+"||"+localJson[zed].category.length);
+								console.log(localJson[zed].description.length + "||" + localJson[zed].title.length + "||" + localJson[zed].category.length);
 								jsonResults.push(localJson[zed]);
 
-							if (localJson[zed].description.length == 0 || localJson[zed].title.length == 0 || localJson[zed].category.length == 0 || localJson[zed].description.length == 4 || localJson[zed].title.length == 4 || localJson[zed].description == undefined || localJson[zed].title == undefined || localJson[zed].category == undefined) {
-								var multiErrs = {};
-								errorJson.push(localJson[zed]);
-							}
-							
+								if (localJson[zed].description.length == 0 || localJson[zed].title.length == 0 || localJson[zed].category.length == 0 || localJson[zed].description.length == 4 || localJson[zed].title.length == 4 || localJson[zed].description == undefined || localJson[zed].title == undefined || localJson[zed].category == undefined) {
+									var multiErrs = {};
+									errorJson.push(localJson[zed]);
+								}
+
 								var sgid = localJson[0].url.match(/sgid=([0-9]+)/)[1];
 								query("DELETE FROM product_groups WHERE group_id = :sgid", {
 									sgid : sgid
@@ -659,9 +699,9 @@ function writingToEndPoint(startFrom) {
 							}
 						}
 					} else {
-						console.log(resultsJson.description.length +"||"+resultsJson.title.length+"||"+resultsJson.category.length);
+						console.log(resultsJson.description.length + "||" + resultsJson.title.length + "||" + resultsJson.category.length);
 						console.log(resultsJson);
-						if (resultsJson.description.length == 0 || resultsJson.title.length == 0 || resultsJson.category.length == 0 ||resultsJson.description.length == 4 || resultsJson.title.length == 4  || resultsJson.description == undefined || resultsJson.title == undefined || resultsJson.category == undefined) {
+						if (resultsJson.description.length == 0 || resultsJson.title.length == 0 || resultsJson.category.length == 0 || resultsJson.description.length == 4 || resultsJson.title.length == 4 || resultsJson.description == undefined || resultsJson.title == undefined || resultsJson.category == undefined) {
 							var errs = {};
 							errorJson.push(resultsJson);
 						}
@@ -1023,29 +1063,30 @@ function writingToEndPoint(startFrom) {
 					loop.next();
 				}
 			} else {
-				console.log("\033[31mA spider got lost! Error " + error + "with response code "+response.statusCode+"\033[0m");
+				console.log("\033[31mA spider got lost! Error " + error + "with response code " + response.statusCode + "\033[0m");
 				loop.next();
 			}
 		})
 	}, function() {
-		
-		
-		if(errorJson.length > get.errorThreshold && get.errorEmail == true){
-		var errToSend = "";
-		for(var allErrs = 0; allErrs < errorJson.length; allErrs++){
-			console.log(JSON.stringify(errorJson[allErrs]));
-			errToSend += JSON.stringify(errorJson[allErrs])+"\n,";
-		}
-server.send({
-   text:    "Scraper finished with "+errorJson.length+" issues.", 
-   from:    "you <"+get.email+">", 
-   to:      "someone <"+get.email+">",
-   subject: "Scraper finished with "+errorJson.length+" issues.",
-   attachment: 
-   [
-      {data:"<html> You got some errors, here they are serialized: "+errToSend+"</html>", alternative:true}
-   ]
-}, function(err, message) { console.log(err || message); });	
+
+		if (errorJson.length > get.errorThreshold && get.errorEmail == true) {
+			var errToSend = "";
+			for (var allErrs = 0; allErrs < errorJson.length; allErrs++) {
+				console.log(JSON.stringify(errorJson[allErrs]));
+				errToSend += JSON.stringify(errorJson[allErrs]) + "\n,";
+			}
+			server.send({
+				text : "Scraper finished with " + errorJson.length + " issues.",
+				from : "you <" + get.email + ">",
+				to : "someone <" + get.email + ">",
+				subject : "Scraper finished with " + errorJson.length + " issues.",
+				attachment : [{
+					data : "<html> You got some errors, here they are serialized: " + errToSend + "</html>",
+					alternative : true
+				}]
+			}, function(err, message) {
+				console.log(err || message);
+			});
 		}
 		cleanDB(0);
 		callFinal = !callFinal;
@@ -1054,7 +1095,7 @@ server.send({
 			fs.unlinkSync('numTracker.json');
 		}
 		if (fs.existsSync('links.json')) {
-			fs.unlinkSync('links.json');
+			//fs.unlinkSync('links.json');
 		}
 
 	});
@@ -1168,6 +1209,29 @@ function asyncLoop(iterations, func, callback) {
 	};
 	loop.next();
 	return loop;
+}
+
+function mergeCats(obj) {
+var returnArr = {};
+//console.log(obj);
+	for(var zed in obj){
+		for(var ex in obj[zed]){
+			//console.log(obj[zed]);
+			if(!returnArr.hasOwnProperty(obj[zed][ex])){
+				returnArr[obj[zed][ex]] = new Array();	
+			}
+			returnArr[obj[zed][ex]].push(zed);
+			
+		}
+		console.log(zed);
+	}
+	console.log(returnArr);
+	for(var i in returnArr){
+		if(returnArr[i].indexOf(" None") > -1 && returnArr[i].length >1){
+			returnArr[i].splice(returnArr[i].indexOf(" None"), 1);
+		}
+	}
+	return returnArr;
 }
 
 function eliminateDuplicates(arr) {
@@ -1305,7 +1369,7 @@ function cleanDB(startFrom) {
 				console.log('Retrieved raw data, deleting...');
 				var res = results[0];
 				_.each(res, function(element) {
-				query("DELETE FROM products WHERE id = :element", {
+					query("DELETE FROM products WHERE id = :element", {
 						"element" : element.id
 					}).then(function() {
 						query("DELETE FROM product_categories WHERE product_id = :element", {
