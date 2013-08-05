@@ -1,7 +1,7 @@
-var cheerio = require('cheerio'), email = require('emailjs'), get = require('./config.json'), mysql = require('mysql'), fs = require('fs'), request = require('request'), Q = require('q'), _ = require('lodash'), htmlencode = require('htmlencode');
+var cheerio = require('cheerio'), email = require('emailjs'), get = require('./configIT.json'), mysql = require('mysql'), fs = require('fs'), request = require('request'), Q = require('q'), _ = require('lodash'), htmlencode = require('htmlencode');
 
 var diff;
-var requestCookie = "asos=topcatid=1000&PreferredSite=us.asos.com&currencyid=2";
+var requestCookie = "asos=topcatid=1000&PreferredSite=www.asos.com/it/&currencyid=19";
 var timeStamp = 0;
 var thresh = 0;
 var absentConf = false;
@@ -113,14 +113,14 @@ setInterval(function() {
 
 function timed() {
 	try {
-		absentConf = fs.existsSync('numTracker.json');
+		absentConf = fs.existsSync('numTrackerIT.json');
 	} catch(e) {
 		absentConf = false;
 		console.log(e);
 	}
 	if (absentConf == true) {
 		try {
-			absentConf = fs.existsSync('links.json');
+			absentConf = fs.existsSync('linksIT.json');
 		} catch(e) {
 			absentConf = false;
 			console.log(e);
@@ -129,7 +129,7 @@ function timed() {
 	console.log("Scraping interrupted : " + absentConf);
 	if (absentConf == true && get.recover == true) {
 		console.log("Didn't finish eating last time around!");
-		var encode = JSON.parse(fs.readFileSync("numTracker.json", "utf-8"));
+		var encode = JSON.parse(fs.readFileSync("numTrackerIT.json", "utf-8"));
 		callFinal = !callFinal;
 		if (encode.data > 0) {
 			writingToEndPoint(encode.data - 1);
@@ -317,7 +317,7 @@ function dataScrape(base, k, referenceArr) { {
 				console.log(resultsArr);
 				var processArr = {};
 				console.log("finished");
-				var urlPrepend = "http://us.asos.com/pgeproduct.aspx?";
+				var urlPrepend = "http://www.asos.com/it/pgeproduct.aspx?";
 				for (var i in resultsArr) {
 					var thing = resultsArr[i][0].match(/iid=([0-9]+)/);
 					if (thing != null) {
@@ -343,9 +343,9 @@ function dataScrape(base, k, referenceArr) { {
 				for (var i in processArr) {
 					processArr[i] = eliminateDuplicates(processArr[i]);
 				}
-				fs.writeFileSync("links.json", '{"data":' + JSON.stringify(mergeCats(processArr)) + '}');
-				//fs.writeFileSync("links.json", '{"data":' + JSON.stringify(eliminateDuplicates(resultsArr)) + '}');
-				fs.writeFileSync("numTracker.json", '{"data":' + "0" + '}');
+				fs.writeFileSync("linksIT.json", '{"data":' + JSON.stringify(mergeCats(processArr)) + '}');
+				//fs.writeFileSync("linksIT.json", '{"data":' + JSON.stringify(eliminateDuplicates(resultsArr)) + '}');
+				fs.writeFileSync("numTrackerIT.json", '{"data":' + "0" + '}');
 				writingToEndPoint(0);
 				return;
 			}
@@ -372,7 +372,7 @@ function dataScrape(base, k, referenceArr) { {
 function writingToEndPoint(startFrom) {
 	errorJson = [];
 	console.log('Spider digesting and loading progress.');
-	var links = JSON.parse(fs.readFileSync("links.json", "utf-8"));
+	var links = JSON.parse(fs.readFileSync("linksIT.json", "utf-8"));
 	
 	links = links.data;
 	var linksTags = links;
@@ -985,7 +985,7 @@ function writingToEndPoint(startFrom) {
 
 						// .done() is used here instead of .then() to make sure errors are thrown if detected
 					}).done(function() {
-						fs.writeFileSync("numTracker.json", '{"data":' + (l + startFrom) + '}');
+						fs.writeFileSync("numTrackerIT.json", '{"data":' + (l + startFrom) + '}');
 						jsonResults = [];
 						loop.next();
 					});
@@ -1035,7 +1035,7 @@ function writingToEndPoint(startFrom) {
 								//return;
 							}
 							//console.log(results);
-							fs.writeFileSync("numTracker.json", '{"data":' + (l + startFrom) + '}');
+							fs.writeFileSync("numTrackerIT.json", '{"data":' + (l + startFrom) + '}');
 							console.log("Wrapping in silk at \033[1;35m" + Math.floor(100 * ((l + startFrom) / links.length)) + "%\033[0m completion. \033[1;35m" + (links.length - (l + startFrom)) + "\033[0m links remaining.");
 							loop.next();
 						});
@@ -1044,7 +1044,7 @@ function writingToEndPoint(startFrom) {
 					}
 					//writeToDB();
 				} else {
-					fs.writeFileSync("numTracker.json", '{"data":' + (l + startFrom) + '}');
+					fs.writeFileSync("numTrackerIT.json", '{"data":' + (l + startFrom) + '}');
 					console.log("Wrapping in silk at \033[1;35m" + Math.floor(100 * ((l + startFrom) / links.length)) + "%\033[0m completion. \033[1;35m" + (links.length - (l + startFrom)) + "\033[0m links remaining.");
 					//console.log("\033[1;35m" +resultString+"\033[0m");
 					loop.next();
@@ -1077,12 +1077,12 @@ function writingToEndPoint(startFrom) {
 		}
 		cleanDB(0);
 		callFinal = !callFinal;
-		console.log(fs.existsSync('numTracker.json') + "," + fs.existsSync('links.json'));
-		if (fs.existsSync('numTracker.json')) {
-			fs.unlinkSync('numTracker.json');
+		console.log(fs.existsSync('numTrackerIT.json') + "," + fs.existsSync('linksIT.json'));
+		if (fs.existsSync('numTrackerIT.json')) {
+			fs.unlinkSync('numTrackerIT.json');
 		}
-		if (fs.existsSync('links.json')) {
-			fs.unlinkSync('links.json');
+		if (fs.existsSync('linksIT.json')) {
+			fs.unlinkSync('linksIT.json');
 		}
 
 	});
@@ -1338,8 +1338,8 @@ function parseElements(input) {
 
 function cleanDB(startFrom) {
 	if (startFrom == 0 && get.updateDB == true && get.db.addTimestamp == true) {
-		if (fs.existsSync('links.json')) {
-			var links = JSON.parse(fs.readFileSync("links.json", "utf-8"));
+		if (fs.existsSync('linksIT.json')) {
+			var links = JSON.parse(fs.readFileSync("linksIT.json", "utf-8"));
 			links = links.data;
 		} else {
 			links = "";
@@ -1449,4 +1449,4 @@ var pushSpacing = function(results) {
 	console.log(results);
 	return results;
 }
-//			fs.writeFileSync("numTracker.json", '{"data":' + inputCount + '}');
+//			fs.writeFileSync("numTrackerIT.json", '{"data":' + inputCount + '}');
