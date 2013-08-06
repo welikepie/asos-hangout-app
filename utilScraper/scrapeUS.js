@@ -253,15 +253,23 @@ function dataScrape(base, k, referenceArr) { {
 									var tLength = $("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children.length;
 									for (var textSeek = tLength - 1; textSeek >= 0; textSeek--) {
 										//console.log(textSeek);
-										//console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].type);
+										console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].type);
 										if ($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].type == "text") {
-											console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].data);
-											category = $("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].data;
+											console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek]);
+											if($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].data.replace(/^\s+/, '').replace(/\s+$/, '') != ""){
+												console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek]);
+												category = $("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].data;
+											}
+											else{
+												console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].next.children[0].data);
+												category = $("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].next.children[0].data;
+											}
 											break;
 										}
 									}
 								}
 							}
+							console.log(category);
 							//console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children);
 							for (var z = 0; z < parsed.length; z++) {
 								var returned = $(parsed[z].replace(/>/g, " "));
@@ -612,11 +620,18 @@ function writingToEndPoint(startFrom) {
 								//resultJson.category, plus / between categories. l+startFrom is index in array.
 								var catArr = linksTags[links[l+startFrom]];
 								var catString = "";
-								for(var cats in catArr){
-									if(catString.length > 1){
-										catString += "/";
+								if(catArr.length > 1){
+									for(var cats in catArr){
+										if(catArr[cats]!="None" && catArr[cats]!=""){
+										if(catString.length > 1){
+											catString += "/";
+										}
+										catString += catArr[cats];
+										}
 									}
-									catString += catArr[cats];
+								}
+								else{
+									catString = catArr[0];
 								}
 								console.log(catString);
 								resultsJson.category = catString;
@@ -761,7 +776,7 @@ function writingToEndPoint(startFrom) {
 												return '';
 											}
 										}());
-									obj.name = row.title;
+									obj.name = row.title.replace(/‘|’|’|’/g, '&quot;').replace(/“|”/g, "'").replace(/–/g, "-");
 									obj.image = row.image;
 									obj.price = parseFloat(row.price);
 

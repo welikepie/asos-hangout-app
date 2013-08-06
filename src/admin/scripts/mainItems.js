@@ -24,7 +24,30 @@ require([
 	CollectionView, Products, Tweets
 ) {
 	"use strict";
+var glueJSON = {
+	"ENG" : "UK", 
+	"RUS" : "RU", 
+	"FRA" :"FR",
+	"DEU":"DE",
+	"ITA":"IT",
+	"USD":"US",
+	"AUD":"AU",
+	"SPA":"ES"
+};
+for(var z = 0; z < filterArr.length; z++){
+	filterArr[z] = filterArr[z].toLowerCase();
+}
 
+var searchLanguage = startLanguage;
+var oldLan = "";
+var currencyJSON = {	"AUD":"Australia",
+						"DEU":"Deutschland",
+						"SPA":"España",
+						"FRA":"France",
+						"ITA":"Italia",
+						"ENG":"United Kingdom",
+						"USD":"United States",
+						"RUS":"Россия"}		
 	var loadedProducts = new Products.ProductCollection(),	
 		productFeed = new Products.ProductCollection(),
 		productSearchCache = {},
@@ -51,6 +74,70 @@ require([
 			// Backbone Views for controlling Twitter feed
 			incomingTweetsView,
 			approvedTweetsView;
+window.setInterval(function(){
+	$.ajax({
+				'url': nodeUrl + 'app-options',
+				'type': 'GET',
+				'dataType': 'text',
+				'headers': { 'Authorization': window.authToken },
+				'success' : function(response){
+					console.log(glueJSON[JSON.parse(response).currency]+","+searchLanguage);
+					if(glueJSON[JSON.parse(response).currency] != searchLanguage){
+						oldLan = searchLanguage;
+								searchLanguage = glueJSON[JSON.parse(response).currency];
+								//console.log(glueJSON[data.payload.currency]);
+								productSearchView.filter.collection = [];
+								productSearchCache = {};
+								productSearchView.render();
+								//productSearchView.reset();
+								//productSearchView.render();
+								////console.log($(".categories div")[0]);
+								//'<label><input type="checkbox" name="category" value="' . $item['id'] . '" checked> ' . $item['name'] . '</label>'
+								$.ajax({
+									'url': baseUrl + 'admin/gateway'+searchLanguage+'/category',
+									'type': 'GET',
+									'dataType': 'text',
+									'cache': false,
+									'headers': { 'Authorization': window.authToken },
+									'success' : function(response){
+										////console.log(response);
+										$(".categories div")[0].innerHTML = "";
+										//searchLanguage = glueJSON[data.payload.currency];
+										//console.log(response);
+										var resp = JSON.parse(response);
+										for(var i in resp){
+											////console.log(resp[i]);
+											//id = resp[i].id
+											//name = resp[i].name
+											var thing = document.createElement("label");
+											var childThing = document.createElement("input");
+											
+											if(resp[i].name != null){
+											if(filterArr.indexOf(resp[i].name.toLowerCase()) != -1){
+												thing.setAttribute("style","display:none;");
+											}
+											}
+											else{
+												thing.setAttribute("style","display:none;");
+											}
+											childThing.setAttribute("type","checkbox");
+											childThing.setAttribute("name","category");
+											childThing.setAttribute("value",resp[i].id);
+											if($(".categories label input")[0].checked){
+											childThing.setAttribute("checked","checked");
+											}
+											thing.appendChild(childThing);
+											thing.innerHTML += resp[i].name;
+											$(".categories div")[0].appendChild(thing);
+
+											allCategories = $('#products form input[name="category"]');
+										}
+									}
+								});				
+					}
+				}
+			});
+},10000);
 
 		$('#general .live-message textarea').on('keypress keyup keydown', _.debounce(function () {
 			$.ajax({
@@ -138,7 +225,7 @@ require([
 			'itemEvents': {
 				'click button': function (model) {
 					//if (!productFeed.get(model.get('id'))) {
-					console.log("dis");
+					//console.log("dis");
 						$.ajax({
 							'url': nodeUrl + 'product-feed',
 							'type': 'POST',
@@ -172,8 +259,8 @@ require([
 			},
 
 			'itemEvents': {
-				'click button': function (model) {
-					console.log(productFeed.get(model.id).attributes.prodId+"."+productFeed.get(model.id).attributes.addedAt);
+				'click button': function (model) {//HEREBITCHES
+					//console.log(productFeed.get(model.id).attributes.prodId+"."+productFeed.get(model.id).attributes.addedAt);
 					$.ajax({
 						'url': nodeUrl + 'product-feed/' + productFeed.get(model.id).attributes.prodId+"and"+productFeed.get(model.id).attributes.addedAt,
 						'type': 'DELETE',
@@ -201,6 +288,7 @@ require([
 				spinner = document.getElementsByClassName("spinner")[0];
 				spinner.style.display = "block";
 				productSearchView.filter.collection = [];
+				productSearchCache = {};
 				productSearchView.render();
 
 			ev.preventDefault();
@@ -231,7 +319,7 @@ require([
 
 				// Check if search results are already in hash
 				var hash = JSON.stringify(parameters);
-				if (_.has(productSearchCache, hash)) {
+				if (_.has(productSearchCache, hash) && oldLan == searchLanguage) {
 
 					productSearchView.filter.collection = productSearchCache[hash];
 					spinner.style.display = "none";
@@ -242,16 +330,18 @@ require([
 					activator
 						.attr('disabled', 'disabled')
 						.removeClass('btn-success');
-
+					console.log("searching with:"+searchLanguage);
 					$.ajax({
-
-						'url': 'gateway/products',
+						'url': 'gateway'+searchLanguage+'/products',
 						'type': 'GET',
 						'dataType': 'json',
 						'data': parameters,
 
 						'success': function (data) {
-
+							console.log(data);
+							console.log(searchLanguage);
+							//productSearchCache[hash] = {};
+							//searchLanguage = startLanguage;
 							// Post-process search results
 							if (parameters['name']) {
 
@@ -266,17 +356,20 @@ require([
 								); });
 
 							}
-
+							//console.log(hash);
+							//console.log(productSearchCache);
+							//console.log(productSearchCache[hash]);
+							//console.log(loadedProducts);
+							loadedProducts.reset();
 							// Add search signature to cache
+							//loadedProducts = [];
 							var collection = _.pluck(data, 'id');
 							collection.sort();
 							productSearchCache[hash] = collection;
 							productSearchView.filter.collection = collection;
-
 							loadedProducts.set(data, {'add': true, 'remove': false, 'merge': false});
 							spinner.style.display = "none";
 							productSearchView.render();
-
 						},
 						'error': function () {
 							spinner.style.display = "none";
@@ -438,16 +531,16 @@ require([
 
 		/* DATA STREAM HANDLING
 		 ********************************** */
-		var setId = 0;
+	var setId = 0;
 	var sortOut = function(input){
 			var toSort = input;
-			console.log("DOING SOMETHING");
+			//console.log("DOING SOMETHING");
 			var sorted = [];
-			console.log(input);
+			//console.log(input);
 			if(toSort.length!=undefined){
 			for(var i = 0; i < toSort.length; i++)
 			{	
-				console.log(i);
+				//console.log(i);
 				toSort[i].prodId = toSort[i].id;
 				toSort[i].id=setId;
 				setId++;
@@ -458,7 +551,7 @@ require([
 				toSort.id=setId;
 				setId++;
 			}
-			console.log(toSort);
+			//console.log(toSort);
 			return toSort;
 		}
 		// General event stream
@@ -478,28 +571,85 @@ require([
 					var data = JSON.parse(message),
 						ev = data.event.split(':', 2),
 						el, temp;
-					//console.log(message);
+					////console.log(message);
 					// Product feed updater
 					if (ev[0] === 'productFeed') {
 
 						if (ev[1] === 'reset') {
-							//console.log(data.payload);
+							////console.log(data.payload);
 							//break;
 							productFeed.reset(sortOut(data.payload));
-							console.log(productFeed);
+							//console.log(productFeed);
 						} else if (ev[1] === 'add') {
-							console.log(sortOut(data.payload));
+							//console.log((data.payload));
 							productFeed.add(sortOut(data.payload));
 						} else if (ev[1] === 'remove') {
 							var model = productFeed.where({"prodId":data.payload.id,"addedAt":parseInt(data.payload.addedAt,10)});
-							console.log(model);
+							//console.log(model);
 							if (model) { productFeed.remove(model); }
 						}
 
 					// Generic app options updater
 					} else if (ev[0] === 'appOptions') {
 
-						// Hangout links and stream URLS
+						// Language Settings
+						if (_.has(data.payload, 'currency') && (oldLan != glueJSON[data.payload.currency])) {
+								//console.log(glueJSON);
+								//console.log(data.payload.currency);
+								oldLan = searchLanguage;
+								searchLanguage = glueJSON[data.payload.currency];
+								//console.log(glueJSON[data.payload.currency]);
+								productSearchView.filter.collection = [];
+								productSearchCache = {};
+								productSearchView.render();
+								//productSearchView.reset();
+								//productSearchView.render();
+								////console.log($(".categories div")[0]);
+								//'<label><input type="checkbox" name="category" value="' . $item['id'] . '" checked> ' . $item['name'] . '</label>'
+								$.ajax({
+									'url': baseUrl + 'admin/gateway'+searchLanguage+'/category',
+									'type': 'GET',
+									'dataType': 'text',
+									'cache': false,
+									'headers': { 'Authorization': window.authToken },
+									'success' : function(response){
+										console.log(response);
+										$(".categories div")[0].innerHTML = "";
+										//searchLanguage = glueJSON[response.payload.currency];
+										//console.log(response);
+										var resp = JSON.parse(response);
+										for(var i in resp){
+											////console.log(resp[i]);
+											//id = resp[i].id
+											//name = resp[i].name
+											var thing = document.createElement("label");
+											var childThing = document.createElement("input");
+											
+											if(resp[i].name != null){
+											if(filterArr.indexOf(resp[i].name.toLowerCase()) != -1){
+												thing.setAttribute("style","display:none;");
+											}
+											}
+											else{
+												thing.setAttribute("style","display:none;");
+											}
+											childThing.setAttribute("type","checkbox");
+											childThing.setAttribute("name","category");
+											childThing.setAttribute("value",resp[i].id);
+											if($(".categories label input")[0].checked){
+											childThing.setAttribute("checked","checked");
+											}
+											thing.appendChild(childThing);
+											thing.innerHTML += resp[i].name;
+											$(".categories div")[0].appendChild(thing);
+
+											allCategories = $('#products form input[name="category"]');
+										}
+									}
+								});				
+								//http://localhost:65/asos-hangout-app/build/admin/gatewayDE/category
+						}
+						// Hangout links and stream URLS						
 						if (_.has(data.payload, 'hangoutEmbed')) {
 							if (data.payload.hangoutEmbed && data.payload.hangoutEmbed.length) {
 								$('#general .hangouts .embed')

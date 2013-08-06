@@ -35,7 +35,15 @@ require([
 		approvedTweetCount = 20;
 
 	productFeed.comparator = function (a, b) { return (b.get('addedAt') || (new Date()).getTime()) - (a.get('addedAt') || (new Date()).getTime()); };
-
+var currencyJSON = {	"AUD":"Australia",
+						"DEU":"Deutschland",
+						"SPA":"España",
+						"FRA":"France",
+						"ITA":"Italia",
+						"ENG":"United Kingdom",
+						"USD":"United States",
+						"RUS":"Россия"}
+						
 	$(function () {
 
 		var baseUrl = $('base').eq(0).attr('data-base-url'),
@@ -51,7 +59,29 @@ require([
 			// Backbone Views for controlling Twitter feed
 			incomingTweetsView,
 			approvedTweetsView;
-
+		$('#currencySelector').on('change',
+		function(){
+			console.log($('#currencySelector')[0].value);
+			console.log({'currency': $('#currencySelector')[0].value});
+			$.ajax({
+				'url': nodeUrl + 'app-options',
+				'type': 'POST',
+				'dataType': 'text',
+				'cache': false,
+				'data': {'currency': $('#currencySelector')[0].value},
+				'headers': { 'Authorization': window.authToken }
+			});
+		}
+		);
+		$.ajax({
+				'url': nodeUrl + 'app-options',
+				'type': 'POST',
+				'dataType': 'text',
+				'cache': false,
+				'data': {'liveMessage': this.value || ''},
+				'headers': { 'Authorization': window.authToken }
+			});
+			
 		$('#general .live-message textarea').on('keypress keyup keydown', _.debounce(function () {
 			$.ajax({
 				'url': nodeUrl + 'app-options',
@@ -536,6 +566,19 @@ require([
 						el = $('#twitter .filter input');
 						if (_.has(data.payload, 'twitterSearch') && (data.payload.twitterSearch !== el.val())) {
 							el.val(data.payload.twitterSearch);
+						}
+						// Currency selection
+						el = $('#currency #selected');
+						console.log(el);
+						console.log(data);
+						console.log(currencyJSON[data.payload.currency]);
+						if (_.has(data.payload, 'currency') && (el.html != currencyJSON[data.payload.currency])) {
+							console.log(currencyJSON[data.payload.currency]);
+							el.html(currencyJSON[data.payload.currency]);
+							el.val(data.payload.currency);
+							if(data.payload.currency !== $("#currencySelector").val){
+								$("#currencySelector").val(data.payload.currency);
+							}
 						}
 
 					} else if (ev[0] === 'message') { window.alert(data.payload); }

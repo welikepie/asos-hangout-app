@@ -233,6 +233,8 @@ function dataScrape(base, k, referenceArr) { {
 					if (get.method == "asos") {
 						tempResults[loop.index] = tempResults[loop.index] + "&parentID=-1&pge=0&pgeSize=9999&sort=-1";
 					}
+					var zeds = request.jar();
+					zeds.add(request.cookie(requestCookie));
 					request({
 						url : tempResults[loop.index],
 						headers : {
@@ -248,20 +250,28 @@ function dataScrape(base, k, referenceArr) { {
 							//console.log(parsed);
 							var tempArr = [];
 							var category = "None";
-							if ($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs").length > 0) {
+														if ($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs").length > 0) {
 								if ($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].hasOwnProperty("children")) {
 									var tLength = $("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children.length;
 									for (var textSeek = tLength - 1; textSeek >= 0; textSeek--) {
 										//console.log(textSeek);
-										//console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].type);
+										console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].type);
 										if ($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].type == "text") {
-											console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].data);
-											category = $("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].data;
+											console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek]);
+											if($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].data.replace(/^\s+/, '').replace(/\s+$/, '') != ""){
+												console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek]);
+												category = $("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].data;
+											}
+											else{
+												console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].next.children[0].data);
+												category = $("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children[textSeek].next.children[0].data;
+											}
 											break;
 										}
 									}
 								}
 							}
+							console.log(category);
 							//console.log($("#ctl00_ContentMainPage_ctlBreadCrumbs_lblBreadCrumbs")[0].children);
 							for (var z = 0; z < parsed.length; z++) {
 								var returned = $(parsed[z].replace(/>/g, " "));
@@ -407,7 +417,7 @@ function writingToEndPoint(startFrom) {
 		if (get.method = "asos") {
 			var j = request.jar();
 			j.add(request.cookie(requestCookie));
-			//1 = gbp, 2 = USD
+			//1 = gbp, 2 = RUB
 			//PreferredSite -> asos.com, us.asos.com
 		}
 		//request = request.defaults({jar:j});
@@ -614,11 +624,18 @@ function writingToEndPoint(startFrom) {
 								//resultJson.category, plus / between categories. l+startFrom is index in array.
 								var catArr = linksTags[links[l+startFrom]];
 								var catString = "";
-								for(var cats in catArr){
-									if(catString.length > 1){
-										catString += "/";
+								if(catArr.length > 1){
+									for(var cats in catArr){
+										if(catArr[cats]!="None" && catArr[cats]!=""){
+										if(catString.length > 1){
+											catString += "/";
+										}
+										catString += catArr[cats];
+										}
 									}
-									catString += catArr[cats];
+								}
+								else{
+									catString = catArr[0];
 								}
 								console.log(catString);
 								resultsJson.category = catString;
@@ -755,15 +772,15 @@ function writingToEndPoint(startFrom) {
 
 									obj.timestamp = parseInt(row.timestamp, 10);
 									obj.gender = ( function() {
-											if (row.gender === 'Women') {
+											if (row.gender == 'Женское') {
 												return 'female';
-											} else if (row.gender === 'Men') {
+											} else if (row.gender == 'Мужcкое') {
 												return 'male';
 											} else {
 												return '';
 											}
 										}());
-									obj.name = row.title;
+									obj.name = row.title.replace(/‘|’|’|’/g, '&quot;').replace(/“|”/g, "'").replace(/–/g, "-");
 									obj.image = row.image;
 									obj.price = parseFloat(row.price);
 
@@ -926,8 +943,8 @@ function writingToEndPoint(startFrom) {
 									console.log(product);
 									return query('INSERT INTO products (' + 'id, timestamp, gender, ' + 'name, image, description' + ') VALUES (' + ':id, FROM_UNIXTIME(:timestamp), :gender, ' + ':name, :image, :description' + ') ON DUPLICATE KEY UPDATE id = :id, timestamp = FROM_UNIXTIME(:timestamp),gender=:gender, name = :name, description = :description, image = :image', product).then(function() {
 										// Once the main product is in, insert the price
-										// (assume GBP as currency for now; changed to USD)
-										return query('INSERT INTO product_prices (product_id, currency, price) ' + 'VALUES (:id, \'USD\', :price)' + ' ON DUPLICATE KEY UPDATE product_id = :id, currency = \'USD\', price=:price', product);
+										// (assume GBP as currency for now; changed to RUB)
+										return query('INSERT INTO product_prices (product_id, currency, price) ' + 'VALUES (:id, \'RUB\', :price)' + ' ON DUPLICATE KEY UPDATE product_id = :id, currency = \'RUB\', price=:price', product);
 									}, function(error) {
 										console.log("INTO PRODUCTS AND PRODUCT PRICES" + error);
 										//throw error;

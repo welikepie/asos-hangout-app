@@ -106,6 +106,7 @@
 		_.extend(Manager.prototype, {
 
 			'addHandler': function (method, path, callback) {
+				console.log(path);
 
 				// Parse the request method requirement
 				if (typeof method !== 'string') { method = 'ANY'; } else { method = method.toUpperCase(); }

@@ -1,13 +1,4 @@
 <?php
-
-require_once ('gateway/gateway.php');
-$handler = new Dummy();
-
-// Obtain list of all product categories
-GatewayInterface::getCategories($handler, $handler);
-$categories = json_decode($handler -> buffer[0], true);
-unset($handler);
-
 // Insert authorisation token
 if (function_exists("apache_request_headers")) {
 	$headers = apache_request_headers();
@@ -59,6 +50,23 @@ if (function_exists("apache_request_headers")) {
 					<textarea></textarea>
 				</div>
 
+				<div id="currency">
+					<h2>Region Selector (Defaults to United Kingdom)</h2>
+					<div>Select Region : </div>
+					<select id="currencySelector">
+						<option value="AUD">Australia</option>
+						<option value="DEU">Deutschland</option>
+						<option value="SPA">España</option>
+						<option value="FRA">France</option>
+						<option value="ITA">Italia</option>
+						<option value="ENG" selected="selected">United Kingdom</option>
+						<option value="USD">United States</option>
+						<option value="RUS">Россия</option>
+					</select>
+					<div id="selectedWrapper">
+						<div>Selected Region : </div><div id="selected" value="ENG">United Kingdom</div>
+					</div>
+				</div>
 			</section>
 		</body>
 	</div>

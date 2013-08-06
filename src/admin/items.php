@@ -1,6 +1,8 @@
 <?php
-
-require_once ('gateway/gateway.php');
+$glueArr = array("ENG" => "UK", "RUS" => "RU", "FRA" =>"FR","DEU"=>"DE","ITA"=>"IT","USD"=>"US","AUD"=>"AU","SPA"=>"ES");
+$jsonEnc = json_decode(file_get_contents("<%= pkg.app.nodeUrl %>/app-options"),true);
+$jsonFilter = json_decode(file_get_contents("scripts/filter.json"),true);
+require_once ('gateway'.$glueArr[$jsonEnc["currency"]].'/gateway.php');
 $handler = new Dummy();
 
 // Obtain list of all product categories
@@ -17,11 +19,18 @@ if (function_exists("apache_request_headers")) {
 } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) { $token = $_SERVER['HTTP_AUTHORIZATION'];
 } else { $token = null;
 }
+function in_array_ci($needle, $haystack) 
+{
+ return in_array( strtolower($needle), array_map('strtolower', $haystack) );
+}
+
 ?>
 <!DOCTYPE html>
 <html>
 	<head>
+
 		<title>ASOS Shop-Along Items Admin</title>
+		<script type="text/javascript">var startLanguage = "<?php echo($glueArr[$jsonEnc["currency"]]);?>"; var filterArr = <?php echo json_encode($jsonFilter); ?>;</script>
 		<base href="" data-base-url="<%= pkg.app.baseUrl %>" data-node-url="<%= pkg.app.nodeUrl %>">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="../common/styles/flat-ui.css">
@@ -65,7 +74,12 @@ if (function_exists("apache_request_headers")) {
 							<div><?php
 					
 							foreach ($categories as &$item) {
-								echo('<label><input type="checkbox" name="category" value="' . $item['id'] . '" checked> ' . $item['name'] . '</label>');
+								if(!in_array_ci("num",$jsonFilter) ){
+									echo('<label><input type="checkbox" name="category" value="' . $item['id'] . '" checked> ' . $item['name'] . '</label>');
+								}
+								else{
+									echo('<label style="display:none;"><input type="checkbox" name="category" value="' . $item['id'] . '" checked> ' . $item['name'] . '</label>');
+								}
 							}
 							
  							?>

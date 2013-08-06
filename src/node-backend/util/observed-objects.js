@@ -71,6 +71,7 @@ that emit change events on property changes (for models) or addition/removal of 
 					// Overriding property setter to emit "change" event on new values
 					// (no events emitted if assigned value is the same as before).
 					'set': function (target, name, value) {
+						
 						if (target[name] !== value) {
 							target[name] = value;
 							this.emit('change', name, value, proxyObject);

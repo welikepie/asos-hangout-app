@@ -46,7 +46,7 @@ CREATE TABLE `product_categories` (
 CREATE TABLE `product_prices` (
   `product_id` bigint(20) unsigned NOT NULL,
   `currency` char(3) NOT NULL,
-  `price` decimal(8,4) NOT NULL DEFAULT '0.0000',
+  `price` decimal(8,2) NOT NULL DEFAULT '000.00',
   PRIMARY KEY (`product_id`,`currency`),
   KEY `product_price_fk_idx` (`product_id`),
   CONSTRAINT `product_price_fk` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
