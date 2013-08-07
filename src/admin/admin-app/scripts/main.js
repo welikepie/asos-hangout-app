@@ -315,7 +315,7 @@ require([
 			}
 
 		});
-
+//*/
 		// Send Hangout of the staging URL to the server to allow for easy
 		// display of invitation links for all the invited audience members.
 		// The link is retrieved from Hangouts API then modified to include
@@ -356,10 +356,18 @@ require([
 						}
 					}
 				};
-				bombard = window.setInterval(function(){console.log("pass");$.ajax(passInfo)},1000);
+				bombard = window.setInterval(function(){$.ajax(passInfo)},1000);
 			});
 		}
-
+	var bombardCheck = window.setInterval(function(){
+		if(bombard == null && bombardier == null){
+			document.getElementById("deny").className ="hidden";
+			document.getElementById("confirm").className = "";
+			document.getElementById("concern").className = "";
+			window.clearInterval(bombardCheck);
+			bombardCheck = null;
+		}
+	},1500);
 		// Send Hangout URL to server for for invitations
 	var timmay = {
 			'url': nodeUrl + 'app-options',
@@ -375,7 +383,7 @@ require([
 						}
 					}
 		};
-		bombardier = window.setInterval(function(){console.log("timmay");$.ajax(timmay)},1000);
+		bombardier = window.setInterval(function(){$.ajax(timmay)},1000);
 
 		// On people arriving at and leaving from the staging hangout,
 		// ensure their status in the audience queue is modified accordingly

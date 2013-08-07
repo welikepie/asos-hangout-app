@@ -130,7 +130,7 @@
 					'hangoutEmbed': '',
 					'liveMessage': '',
 					'categoryLink': '',
-
+					'currency' : 'ENG',
 					'checkHangoutLink': '',
 					'mainHangoutLink': ''
 				});

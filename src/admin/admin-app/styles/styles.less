@@ -29,6 +29,11 @@ html {
 	margin: 0;
 	background: white;
 }
+.hidden{
+    width:0px;
+    height:0px;
+    display:none !important;
+    }
 body {
 	width: 100%;
 	height: 100%;
@@ -51,7 +56,38 @@ header {
 	font: bold 20px/24px @sans-serif-font;
 	text-align: center;
 }
+#connectionStatus{
+    display: block;
+	padding: 12px;
+	margin: 8px;
 
+	background: #F5F5F5;
+
+	h1 {
+		padding: 0;
+		margin: 0 0 16px;
+		font-size: 16px;
+		line-height: 20px;
+	}
+    #confirm,#deny{
+        font-size:42px;
+        font-weight:bold;
+        width:250px;
+        margin:20px auto;
+        height:50px;
+        border-radius:5px;
+        text-align:center;
+        line-height:50px;
+        //padding:5px 115px;
+        //color: #F5F5F5;
+        }
+        #confirm{
+            background-color:#58d68d;
+            }
+        #deny{
+            background-color:#e74c3c;
+            }
+}
 #automatic-cycle {
 	display: block;
 	padding: 12px;

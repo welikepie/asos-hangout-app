@@ -14,8 +14,13 @@
 		<div class="root">
 
 			<header>ASOS Shop-Along Admin</header>
-
-			<section id="automatic-cycle">
+			<section id="connectionStatus">
+				<h1>Does the server know this hangout exists?</h1>
+				<div id="confirm" class="hidden">Yes</div>
+				<div id="concern" class="hidden">If the link hasn't appeared yet, sit tight; it will be there soon!</div> 
+				<div id="deny">No</div>
+			</section>
+			<section id="automatic-cycle" class="hidden">
 
 				<h1>Automatic Participant Cycling</h1>
 				<div>
@@ -25,7 +30,7 @@
 
 			</section>
 
-			<section id="participant-list" class="queue">
+			<section id="participant-list" class="queue hidden">
 				<h1>Current Participants</h1>
 				<ul>
 					<li class="template">
@@ -40,7 +45,7 @@
 				</ul>
 			</section>
 
-			<section id="staging-queue" class="queue">
+			<section id="staging-queue" class="queue hidden">
 				<h1>Staging Queue</h1>
 				<ul>
 					<li class="template">
@@ -53,7 +58,6 @@
 					</li>
 				</ul>
 			</section>
-
 		</div>
 	</body>
 </html>
